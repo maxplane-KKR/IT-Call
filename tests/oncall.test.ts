@@ -14,12 +14,37 @@ const rows: IncidentRecord[] = [
   { worker: "B", workDate: "2026-07-02", time: "08:00", category: "ทั่วไป", department: "OPD", detail: "Printer" },
 ];
 
+const workerAShiftRows = rows.slice(0, 2);
+
+const cappedShiftRows: IncidentRecord[] = [
+  ...Array.from({ length: 3 }, (_, index) => ({
+    worker: "A",
+    workDate: "2026-07-01",
+    time: `20:0${index}`,
+    category: "X-ray - Tele",
+    department: "ER",
+    detail: `Tele ${index + 1}`,
+  })),
+  { worker: "A", workDate: "2026-07-01", time: "21:00", category: "ทั่วไป", department: "ER", detail: "General" },
+];
+
 describe("on-call compensation", () => {
   it("groups per worker and date and applies exact rates", () => {
-    const shifts = aggregateShifts(rows);
-    expect(shifts).toHaveLength(2);
-    expect(shifts[0]).toMatchObject({ worker: "A", teleCount: 1, generalCount: 1, uncapped: 700, capped: 700 });
-    expect(buildDashboardSeries(rows, shifts)).toEqual({
+    const shifts = aggregateShifts(workerAShiftRows);
+    expect(shifts).toEqual([
+      {
+        key: "A|2026-07-01",
+        worker: "A",
+        workDate: "2026-07-01",
+        teleCount: 1,
+        generalCount: 1,
+        incidentCount: 2,
+        uncapped: 700,
+        capped: 700,
+        capAdjustment: 0,
+      },
+    ]);
+    expect(buildDashboardSeries(rows, aggregateShifts(rows))).toEqual({
       compensationByWorker: [
         { worker: "A", amount: 700 },
         { worker: "B", amount: 300 },
@@ -32,20 +57,41 @@ describe("on-call compensation", () => {
   });
 
   it("caps each shift at 800 THB", () => {
-    const shifts = aggregateShifts([...rows, ...rows.slice(0, 1), ...rows.slice(0, 1)]);
-    expect(shifts.find((shift) => shift.worker === "A")).toMatchObject({ uncapped: 1500, capped: 800, capAdjustment: 700 });
+    expect(aggregateShifts(cappedShiftRows)).toEqual([
+      {
+        key: "A|2026-07-01",
+        worker: "A",
+        workDate: "2026-07-01",
+        teleCount: 3,
+        generalCount: 1,
+        incidentCount: 4,
+        uncapped: 1500,
+        capped: 800,
+        capAdjustment: 700,
+      },
+    ]);
   });
 
   it("summarizes payable totals", () => {
-    expect(summarizeShifts(aggregateShifts(rows))).toMatchObject({ shiftCount: 2, teleIncidents: 1, generalIncidents: 2, eligibleCompensation: 1000 });
+    expect(summarizeShifts(aggregateShifts(rows))).toEqual({
+      shiftCount: 2,
+      teleIncidents: 1,
+      generalIncidents: 2,
+      totalIncidents: 3,
+      uncappedCompensation: 1000,
+      eligibleCompensation: 1000,
+      capAdjustment: 0,
+    });
   });
 
   it("normalizes valid rows and rejects malformed dates", () => {
-    expect(normalizeRows([{ "ผู้ปฏิบัติงาน": "A", "วันที่": "1/7/2026", "ประเภท": "ทั่วไป" }])).toHaveLength(1);
-    expect(normalizeRows([{ "ผู้ปฏิบัติงาน": "A", "วันที่": "45/7/2026", "ประเภท": "ทั่วไป" }])).toHaveLength(0);
+    expect(normalizeRows([{ "ผู้ปฏิบัติงาน": "A", "วันที่": "1/7/2026", "ประเภท": "ทั่วไป" }])).toEqual([
+      { worker: "A", workDate: "2026-07-01", time: "", category: "ทั่วไป", department: "", detail: "" },
+    ]);
+    expect(normalizeRows([{ "ผู้ปฏิบัติงาน": "A", "วันที่": "45/7/2026", "ประเภท": "ทั่วไป" }])).toEqual([]);
   });
 
   it("applies every active filter together", () => {
-    expect(filterRecords(rows, { month: "2026-07", worker: "A", category: "ทั่วไป", department: "ER" })).toHaveLength(1);
+    expect(filterRecords(rows, { month: "2026-07", worker: "A", category: "ทั่วไป", department: "ER" })).toEqual([rows[1]]);
   });
 });

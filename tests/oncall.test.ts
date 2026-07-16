@@ -29,6 +29,25 @@ const cappedShiftRows: IncidentRecord[] = [
 ];
 
 describe("on-call compensation", () => {
+  it("normalizes the field names returned by the Apps Script", () => {
+    expect(normalizeRows([{
+      timestamp: "31/1/2020, 14:48:04",
+      operator: "อัศวิน",
+      date: "2/1/2020",
+      time: "15:00:00",
+      detail: "add vpn user 906134",
+      type: "ทั่วไป",
+      dept: "Xray",
+    }])).toEqual([{
+      worker: "อัศวิน",
+      workDate: "2020-01-02",
+      time: "15:00:00",
+      detail: "add vpn user 906134",
+      category: "ทั่วไป",
+      department: "Xray",
+    }]);
+  });
+
   it("groups per worker and date and applies exact rates", () => {
     const shifts = aggregateShifts(workerAShiftRows);
     expect(shifts).toEqual([

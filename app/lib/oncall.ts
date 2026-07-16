@@ -92,9 +92,9 @@ export function normalizeRows(input: unknown): IncidentRecord[] {
   for (const item of input) {
     if (!item || typeof item !== "object" || Array.isArray(item)) continue;
     const row = item as UnknownRow;
-    const worker = stringValue(row, "worker", "ผู้ปฏิบัติงาน");
-    const workDate = normalizeDate(stringValue(row, "workDate", "วันที่"));
-    const category = stringValue(row, "category", "ประเภท");
+    const worker = stringValue(row, "worker", "operator", "ผู้ปฏิบัติงาน");
+    const workDate = normalizeDate(stringValue(row, "workDate", "date", "วันที่"));
+    const category = stringValue(row, "category", "type", "ประเภท");
     if (!worker || !workDate || !category) continue;
 
     records.push({
@@ -102,7 +102,7 @@ export function normalizeRows(input: unknown): IncidentRecord[] {
       workDate,
       time: stringValue(row, "time", "เวลา"),
       category,
-      department: stringValue(row, "department", "แผนก"),
+      department: stringValue(row, "department", "dept", "แผนก"),
       detail: stringValue(row, "detail", "รายละเอียด"),
     });
   }

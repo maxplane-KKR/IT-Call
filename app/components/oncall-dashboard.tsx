@@ -1,19 +1,20 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { filterRecords, normalizeRows, type Filters, type IncidentRecord } from "../lib/oncall";
+import { aggregateShifts, buildDashboardSeries, filterRecords, normalizeRows, summarizeShifts, type Filters, type IncidentRecord } from "../lib/oncall";
+import { createDailySummaryCsv, downloadCsv } from "../lib/csv";
+import { AnalysisGrid, DashboardFilters, IncidentLedger, KpiGrid, LiveMasthead } from "./dashboard-sections";
 
 export const ENDPOINT = "https://script.google.com/macros/s/AKfycbzet3nNEL9X8pEqB0YiqseO8GylRGTQZbtcCw4EVBfro19JkmPUouoCmVq6OjO2mMM2zA/exec";
 export const STATUS_TEXT = {
-  loading: "เธเธณเธฅเธฑเธเนเธซเธฅเธ”เธเนเธญเธกเธนเธฅ",
-  success: "เธเนเธญเธกเธนเธฅเธชเธ”",
-  initialError: "เนเธกเนเธชเธฒเธกเธฒเธฃเธ–เนเธซเธฅเธ”เธเนเธญเธกเธนเธฅเนเธ”เน",
-  refreshError: "เธเธณเน€เธ•เธทเธญเธเธเธฒเธฃเธฃเธตเน€เธเธฃเธ",
-  update: "เธญเธฑเธเน€เธ”เธ•เธเนเธญเธกเธนเธฅ",
-  worker: "เธเธนเนเธเธเธดเธเธฑเธ•เธดเธเธฒเธ",
+  loading: "กำลังโหลดข้อมูล",
+  success: "ข้อมูลพร้อมใช้งาน",
+  initialError: "ไม่สามารถโหลดข้อมูลได้",
+  refreshError: "ข้อมูลเดิมยังอยู่ แต่การอัปเดตล่าสุดไม่สำเร็จ",
+  update: "อัปเดตข้อมูล",
+  worker: "ผู้ปฏิบัติงาน",
 } as const;
 const REFRESH_MS = 300000;
-
 type Status = "loading" | "success" | "initial-error" | "refresh-error";
 
 export default function OncallDashboard() {
@@ -29,16 +30,15 @@ export default function OncallDashboard() {
 
   const refresh = useCallback(async () => {
     setRefreshing(true);
-    const nextDeadline = Date.now() + REFRESH_MS;
-    setNextRefreshAt(nextDeadline);
+    const deadline = Date.now() + REFRESH_MS;
+    setNextRefreshAt(deadline);
     setSecondsRemaining(300);
     try {
       const response = await fetch(ENDPOINT);
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
       const payload: unknown = await response.json();
       if (!Array.isArray(payload)) throw new Error("Malformed response");
-      const nextRecords = normalizeRows(payload);
-      setRecords(nextRecords);
+      setRecords(normalizeRows(payload));
       setLastRefresh(new Date());
       setStatus("success");
       setErrorMessage("");
@@ -46,55 +46,47 @@ export default function OncallDashboard() {
     } catch (error) {
       setErrorMessage(error instanceof Error ? error.message : String(error));
       setStatus(hasSucceeded.current ? "refresh-error" : "initial-error");
-    } finally {
-      setRefreshing(false);
-    }
+    } finally { setRefreshing(false); }
   }, []);
 
   useEffect(() => {
-    // Fetching on mount is the external synchronization performed by this effect.
+    // The initial fetch is the external synchronization performed by this effect.
     // eslint-disable-next-line react-hooks/set-state-in-effect
     void refresh();
   }, [refresh]);
-
   useEffect(() => {
-    const refreshTimer = window.setTimeout(() => { void refresh(); }, Math.max(0, nextRefreshAt - Date.now()));
-    return () => { window.clearTimeout(refreshTimer); };
+    const timer = window.setTimeout(() => { void refresh(); }, Math.max(0, nextRefreshAt - Date.now()));
+    return () => window.clearTimeout(timer);
   }, [nextRefreshAt, refresh]);
-
   useEffect(() => {
-    const countdownTimer = window.setInterval(() => {
-      setSecondsRemaining(Math.max(0, Math.ceil((nextRefreshAt - Date.now()) / 1000)));
-    }, 1000);
-    return () => {
-      window.clearInterval(countdownTimer);
-    };
+    const timer = window.setInterval(() => setSecondsRemaining(Math.max(0, Math.ceil((nextRefreshAt - Date.now()) / 1000))), 1000);
+    return () => window.clearInterval(timer);
   }, [nextRefreshAt]);
 
-  const workers = useMemo(() => Array.from(new Set(records.map((record) => record.worker))), [records]);
+  const values = useMemo(() => ({
+    months: Array.from(new Set(records.map((record) => record.workDate.slice(0, 7))).values()).sort().reverse(),
+    workers: Array.from(new Set(records.map((record) => record.worker))).sort(),
+    categories: Array.from(new Set(records.map((record) => record.category))).sort(),
+    departments: Array.from(new Set(records.map((record) => record.department).filter(Boolean))).sort(),
+  }), [records]);
   const visibleRecords = useMemo(() => filterRecords(records, filters), [records, filters]);
+  const shifts = useMemo(() => aggregateShifts(visibleRecords), [visibleRecords]);
+  const summary = useMemo(() => summarizeShifts(shifts), [shifts]);
+  const series = useMemo(() => buildDashboardSeries(visibleRecords, shifts), [visibleRecords, shifts]);
+  const statusText = status === "loading" ? STATUS_TEXT.loading : status === "success" ? STATUS_TEXT.success : status === "initial-error" ? STATUS_TEXT.initialError : STATUS_TEXT.refreshError;
+
+  const exportCsv = () => {
+    const report = createDailySummaryCsv(visibleRecords, shifts, filters.month ?? "");
+    downloadCsv(report.filename, report.content);
+  };
 
   return <main>
-    <p aria-live="polite">
-      {status === "loading" && STATUS_TEXT.loading}
-      {status === "success" && STATUS_TEXT.success}
-      {status === "initial-error" && STATUS_TEXT.initialError}
-      {status === "refresh-error" && STATUS_TEXT.refreshError}
-    </p>
-    {errorMessage && <p role="alert">{errorMessage}</p>}
-    <p data-testid="countdown" data-next-refresh={nextRefreshAt}>{secondsRemaining}</p>
-    {lastRefresh && <time dateTime={lastRefresh.toISOString()}>{lastRefresh.toLocaleString()}</time>}
-    <button type="button" disabled={refreshing} onClick={() => { void refresh(); }}>{STATUS_TEXT.update}</button>
-    <label>
-      {STATUS_TEXT.worker}
-      <select value={filters.worker ?? ""} onChange={(event) => setFilters((current) => ({ ...current, worker: event.target.value || undefined }))}>
-        <option value="">เธ—เธฑเนเธเธซเธกเธ”</option>
-        {workers.map((worker) => <option key={worker} value={worker}>{worker}</option>)}
-      </select>
-    </label>
-    {records.length > 0 && <table>
-      <thead><tr><th>เธเธนเนเธเธเธดเธเธฑเธ•เธดเธเธฒเธ</th><th>เธงเธฑเธเธ—เธตเน</th><th>เธฃเธฒเธขเธฅเธฐเน€เธญเธตเธขเธ”</th></tr></thead>
-      <tbody>{visibleRecords.map((record, index) => <tr key={`${record.worker}-${record.workDate}-${record.time}-${index}`}><td>{record.worker}</td><td>{record.workDate}</td><td>{record.detail}</td></tr>)}</tbody>
-    </table>}
+    <LiveMasthead statusText={statusText} errorMessage={errorMessage} lastRefresh={lastRefresh} nextRefreshAt={nextRefreshAt} secondsRemaining={secondsRemaining} refreshing={refreshing} onRefresh={() => { void refresh(); }} />
+    <div className="dashboard-shell">
+      <DashboardFilters filters={filters} {...values} onChange={(key, value) => setFilters((current) => ({ ...current, [key]: value || undefined }))} />
+      <KpiGrid summary={summary} />
+      <AnalysisGrid records={visibleRecords} series={series} />
+      {status !== "initial-error" && <IncidentLedger records={visibleRecords} onExport={exportCsv} />}
+    </div>
   </main>;
 }

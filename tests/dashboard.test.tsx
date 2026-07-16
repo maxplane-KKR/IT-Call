@@ -7,6 +7,29 @@ const row = (worker: string) => ({ worker, workDate: "2026-07-01", time: "20:00"
 afterEach(() => { cleanup(); vi.useRealTimers(); vi.restoreAllMocks(); });
 
 describe("OncallDashboard", () => {
+  it("renders the complete accessible dashboard structure and actions", async () => {
+    vi.spyOn(globalThis, "fetch").mockResolvedValue(new Response(JSON.stringify([row("Alice")]), { status: 200 }));
+    render(<OncallDashboard />);
+
+    expect(screen.getByRole("main")).toBeInTheDocument();
+    for (const label of ["เดือน", "ผู้ปฏิบัติงาน", "ประเภทเหตุการณ์", "แผนก"]) {
+      expect(screen.getByLabelText(label)).toBeInTheDocument();
+    }
+    for (const heading of [
+      "ยอดค่าตอบแทนที่จ่ายจริง", "จำนวนเวร On call", "เหตุการณ์ Tele", "เหตุการณ์ทั่วไป", "ยอดที่ถูกจำกัดเพดาน",
+      "ค่าตอบแทนรายบุคคล", "สัดส่วนประเภทเหตุการณ์", "ช่วงเวลาที่แจ้งงานสูงสุด", "สัดส่วนเคสรายบุคคล",
+    ]) expect(screen.getByRole("heading", { name: heading })).toBeInTheDocument();
+
+    await screen.findByRole("table");
+    for (const header of ["วันที่", "เวลา", "ผู้ปฏิบัติงาน", "ประเภท", "แผนก", "รายละเอียด / HN"]) {
+      expect(screen.getByRole("columnheader", { name: header })).toBeInTheDocument();
+    }
+    expect(screen.getByText(/รายละเอียดและ HN.*ผู้มีสิทธิ์/)).toBeInTheDocument();
+    expect(screen.getByRole("status")).toHaveAttribute("aria-live", "polite");
+    expect(screen.getByRole("button", { name: "อัปเดตข้อมูล" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "ดาวน์โหลด CSV รายวันและสรุปยอด" })).toBeInTheDocument();
+  });
+
   it("loads immediately and filters ledger rows by worker", async () => {
     const fetchMock = vi.spyOn(globalThis, "fetch").mockResolvedValue(new Response(JSON.stringify([row("Alice"), row("Bob")]), { status: 200 }));
     render(<OncallDashboard />);

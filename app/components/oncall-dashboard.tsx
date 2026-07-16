@@ -5,7 +5,7 @@ import { aggregateShifts, buildDashboardSeries, filterRecords, normalizeRows, su
 import { createDailySummaryCsv, downloadCsv } from "../lib/csv";
 import { AnalysisGrid, DashboardFilters, IncidentLedger, KpiGrid, LiveMasthead } from "./dashboard-sections";
 
-export const ENDPOINT = "https://script.google.com/macros/s/AKfycbzet3nNEL9X8pEqB0YiqseO8GylRGTQZbtcCw4EVBfro19JkmPUouoCmVq6OjO2mMM2zA/exec";
+export const ENDPOINT = "/api/incidents";
 export const STATUS_TEXT = {
   loading: "กำลังโหลดข้อมูล",
   success: "ข้อมูลพร้อมใช้งาน",

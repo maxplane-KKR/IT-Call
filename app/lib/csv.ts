@@ -16,18 +16,18 @@ export function createDailySummaryCsv(
   month: string,
 ): { filename: string; content: string } {
   const rows: string[] = [
-    csvRow(["เน€เธเธทเนเธญเธเนเธเธเธฒเธฃเธเนเธฒเธข"]),
-    csvRow(["เธเนเธฒเน€เธงเธฃเธเธทเนเธเธเธฒเธ", 100]),
+    csvRow(["เงื่อนไขการจ่าย"]),
+    csvRow(["ค่าเวรพื้นฐาน", 100]),
     csvRow(["X-ray - Tele", 400]),
-    csvRow(["เธเธฒเธเธ—เธฑเนเธงเนเธ", 200]),
-    csvRow(["เน€เธเธ”เธฒเธเธ•เนเธญเน€เธงเธฃ", 800]),
+    csvRow(["งานทั่วไป", 200]),
+    csvRow(["เพดานต่อเวร", 800]),
     csvRow([""]),
-    csvRow(["เธฃเธฒเธขเธฅเธฐเน€เธญเธตเธขเธ”เธฃเธฒเธขเธงเธฑเธ"]),
-    csvRow(["เธงเธฑเธเธ—เธตเน", "เน€เธงเธฅเธฒ", "เธเธนเนเธเธเธดเธเธฑเธ•เธดเธเธฒเธ", "เธเธฃเธฐเน€เธ เธ—", "เนเธเธเธ", "เธฃเธฒเธขเธฅเธฐเน€เธญเธตเธขเธ”"]),
+    csvRow(["รายละเอียดรายวัน"]),
+    csvRow(["วันที่", "เวลา", "ผู้ปฏิบัติงาน", "ประเภท", "แผนก", "รายละเอียด"]),
     ...records.map((record) => csvRow([record.workDate, record.time, record.worker, record.category, record.department, record.detail])),
     csvRow([""]),
-    csvRow(["เธชเธฃเธธเธเธฃเธฒเธขเธเธธเธเธเธฅ"]),
-    csvRow(["เธเธนเนเธเธเธดเธเธฑเธ•เธดเธเธฒเธ", "เธเธณเธเธงเธเน€เธงเธฃ", "เธเธณเธเธงเธเน€เธซเธ•เธธ", "เธเนเธฒเธ•เธญเธเนเธ—เธ"]),
+    csvRow(["สรุปรายบุคคล"]),
+    csvRow(["ผู้ปฏิบัติงาน", "จำนวนเวร", "จำนวนเหตุ", "ค่าตอบแทน"]),
   ];
 
   const workers = new Map<string, { shifts: number; incidents: number; compensation: number }>();
@@ -43,7 +43,7 @@ export function createDailySummaryCsv(
   }
 
   return {
-    filename: `IT_OnCall_เธฃเธฒเธขเธงเธฑเธเนเธฅเธฐเธชเธฃเธธเธเธขเธญเธ”_${month || "เธ—เธธเธเน€เธ”เธทเธญเธ"}.csv`,
+    filename: `IT_OnCall_รายวันและสรุปยอด_${month || "ทุกเดือน"}.csv`,
     content: `\uFEFF${rows.join("\r\n")}`,
   };
 }

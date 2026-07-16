@@ -7,6 +7,15 @@ const row = (worker: string) => ({ worker, workDate: "2026-07-01", time: "20:00"
 afterEach(() => { cleanup(); vi.useRealTimers(); vi.restoreAllMocks(); });
 
 describe("OncallDashboard", () => {
+  it("loads records through the same-origin incidents endpoint", async () => {
+    const fetchMock = vi.spyOn(globalThis, "fetch").mockResolvedValue(new Response(JSON.stringify([row("Alice")]), { status: 200 }));
+    render(<OncallDashboard />);
+
+    await screen.findByText(STATUS_TEXT.success);
+    expect(ENDPOINT).toBe("/api/incidents");
+    expect(fetchMock).toHaveBeenCalledWith("/api/incidents");
+  });
+
   it("renders the complete accessible dashboard structure and actions", async () => {
     vi.spyOn(globalThis, "fetch").mockResolvedValue(new Response(JSON.stringify([row("Alice")]), { status: 200 }));
     render(<OncallDashboard />);

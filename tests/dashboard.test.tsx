@@ -40,20 +40,27 @@ describe("OncallDashboard", () => {
     expect(fetchMock).toHaveBeenCalledTimes(2);
   });
 
-  it("auto-refreshes at 300000 ms, updates countdown, resets manually, and clears timers", async () => {
+  it("schedules one auto-refresh exactly 300000 ms after a manual refresh and clears timers", async () => {
     vi.useFakeTimers();
     const clearIntervalSpy = vi.spyOn(globalThis, "clearInterval");
+    const clearTimeoutSpy = vi.spyOn(globalThis, "clearTimeout");
     const fetchMock = vi.spyOn(globalThis, "fetch").mockResolvedValue(new Response(JSON.stringify([row("Alice")]), { status: 200 }));
     const view = render(<OncallDashboard />);
-    await act(async () => { vi.advanceTimersByTime(0); await Promise.resolve(); await Promise.resolve(); });
+    await act(async () => { await Promise.resolve(); await Promise.resolve(); });
+    expect(fetchMock).toHaveBeenCalledTimes(1);
     expect(screen.getByTestId("countdown")).toHaveTextContent("300");
-    act(() => { vi.advanceTimersByTime(1000); });
-    expect(screen.getByTestId("countdown")).toHaveTextContent("299");
+    act(() => { vi.advanceTimersByTime(60000); });
+    expect(screen.getByTestId("countdown")).toHaveTextContent("240");
     fireEvent.click(screen.getByRole("button", { name: STATUS_TEXT.update }));
+    await act(async () => { await Promise.resolve(); });
+    expect(fetchMock).toHaveBeenCalledTimes(2);
     expect(screen.getByTestId("countdown")).toHaveTextContent("300");
-    await act(async () => { vi.advanceTimersByTime(300000); await Promise.resolve(); });
-    expect(fetchMock.mock.calls.length).toBeGreaterThanOrEqual(3);
+    await act(async () => { vi.advanceTimersByTime(299999); await Promise.resolve(); });
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+    await act(async () => { vi.advanceTimersByTime(1); await Promise.resolve(); });
+    expect(fetchMock).toHaveBeenCalledTimes(3);
     view.unmount();
-    expect(clearIntervalSpy.mock.calls.length).toBeGreaterThanOrEqual(2);
+    expect(clearIntervalSpy.mock.calls.length).toBeGreaterThanOrEqual(1);
+    expect(clearTimeoutSpy.mock.calls.length).toBeGreaterThanOrEqual(1);
   });
 });

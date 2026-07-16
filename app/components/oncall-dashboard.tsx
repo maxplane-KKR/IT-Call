@@ -23,16 +23,14 @@ export default function OncallDashboard() {
   const [status, setStatus] = useState<Status>("loading");
   const [errorMessage, setErrorMessage] = useState("");
   const [refreshing, setRefreshing] = useState(false);
-  const [nextRefreshTime, setNextRefreshTime] = useState(() => Date.now() + REFRESH_MS);
+  const [nextRefreshAt, setNextRefreshAt] = useState(() => Date.now() + REFRESH_MS);
   const [secondsRemaining, setSecondsRemaining] = useState(300);
   const hasSucceeded = useRef(false);
-  const deadline = useRef(nextRefreshTime);
 
   const refresh = useCallback(async () => {
     setRefreshing(true);
     const nextDeadline = Date.now() + REFRESH_MS;
-    deadline.current = nextDeadline;
-    setNextRefreshTime(nextDeadline);
+    setNextRefreshAt(nextDeadline);
     setSecondsRemaining(300);
     try {
       const response = await fetch(ENDPOINT);
@@ -54,17 +52,24 @@ export default function OncallDashboard() {
   }, []);
 
   useEffect(() => {
-    const initialTimer = window.setTimeout(() => { void refresh(); }, 0);
-    const refreshTimer = window.setInterval(() => { void refresh(); }, REFRESH_MS);
+    // Fetching on mount is the external synchronization performed by this effect.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    void refresh();
+  }, [refresh]);
+
+  useEffect(() => {
+    const refreshTimer = window.setTimeout(() => { void refresh(); }, Math.max(0, nextRefreshAt - Date.now()));
+    return () => { window.clearTimeout(refreshTimer); };
+  }, [nextRefreshAt, refresh]);
+
+  useEffect(() => {
     const countdownTimer = window.setInterval(() => {
-      setSecondsRemaining(Math.max(0, Math.ceil((deadline.current - Date.now()) / 1000)));
+      setSecondsRemaining(Math.max(0, Math.ceil((nextRefreshAt - Date.now()) / 1000)));
     }, 1000);
     return () => {
-      window.clearTimeout(initialTimer);
-      window.clearInterval(refreshTimer);
       window.clearInterval(countdownTimer);
     };
-  }, [refresh]);
+  }, [nextRefreshAt]);
 
   const workers = useMemo(() => Array.from(new Set(records.map((record) => record.worker))), [records]);
   const visibleRecords = useMemo(() => filterRecords(records, filters), [records, filters]);
@@ -77,7 +82,7 @@ export default function OncallDashboard() {
       {status === "refresh-error" && STATUS_TEXT.refreshError}
     </p>
     {errorMessage && <p role="alert">{errorMessage}</p>}
-    <p data-testid="countdown" data-next-refresh={nextRefreshTime}>{secondsRemaining}</p>
+    <p data-testid="countdown" data-next-refresh={nextRefreshAt}>{secondsRemaining}</p>
     {lastRefresh && <time dateTime={lastRefresh.toISOString()}>{lastRefresh.toLocaleString()}</time>}
     <button type="button" disabled={refreshing} onClick={() => { void refresh(); }}>{STATUS_TEXT.update}</button>
     <label>

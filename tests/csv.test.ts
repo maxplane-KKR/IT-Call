@@ -25,11 +25,11 @@ describe("createDailySummaryCsv", () => {
   });
 
   it("quotes every cell, doubles quotes, and uses the all-month filename fallback", () => {
-    const records: IncidentRecord[] = [{ worker: " A\"B", workDate: "2026-07-01", time: "", category: "ทั่วไป", department: "", detail: "- formula" }];
+    const records: IncidentRecord[] = [{ worker: " A\"B", workDate: "2026-07-01", time: "", category: "ทั่วไป", department: "ER,North", detail: "- formula" }];
     const result = createDailySummaryCsv(records, aggregateShifts(records), "");
     expect(result.filename).toBe("IT_OnCall_เธฃเธฒเธขเธงเธฑเธเนเธฅเธฐเธชเธฃเธธเธเธขเธญเธ”_เธ—เธธเธเน€เธ”เธทเธญเธ.csv");
     expect(result.content).toContain('" A""B"');
     expect(result.content).toContain('"\'- formula"');
-    expect(result.content.slice(1).split("\n").filter(Boolean).every((line) => line.split(",").every((cell) => cell.startsWith('"')))).toBe(true);
+    expect(result.content).toContain('\r\n"2026-07-01",""," A""B","ทั่วไป","ER,North","\'- formula"\r\n');
   });
 });

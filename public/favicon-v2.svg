@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" role="img" aria-label="IT On-call">
+  <circle cx="256" cy="256" r="256" fill="#0759C7"/>
+  <circle cx="256" cy="256" r="222" fill="none" stroke="#FFFFFF" stroke-opacity="0.52" stroke-width="3"/>
+  <g data-icon="editorial-stack">
+    <text x="256" y="270" text-anchor="middle" fill="#FFFFFF" font-family="Arial,sans-serif" font-size="150" font-weight="900" letter-spacing="-12">IT</text>
+    <text x="256" y="326" text-anchor="middle" fill="#FFD43B" font-family="Arial,sans-serif" font-size="48" font-weight="900">/</text>
+    <text x="256" y="384" text-anchor="middle" fill="#FFFFFF" font-family="Arial Narrow,Arial,sans-serif" font-size="38" font-weight="800" letter-spacing="4">ON-CALL</text>
+    <text x="256" y="422" text-anchor="middle" fill="#FFFFFF" font-family="Courier New,monospace" font-size="15" font-weight="700" letter-spacing="3">24 · 7</text>
+  </g>
+</svg>

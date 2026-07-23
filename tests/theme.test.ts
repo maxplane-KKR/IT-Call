@@ -3,28 +3,30 @@ import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 
 describe("dashboard theme", () => {
-  it("uses the approved Clinical Payroll Sheet visual system", () => {
+  it("uses the MiniDash visual system", () => {
     const css = readFileSync(resolve(process.cwd(), "app/globals.css"), "utf8");
 
     for (const declaration of [
-      "--paper:#f8fbfd",
-      "--field:#eef3f7",
-      "--ink:#102438",
-      "--blue:#0759c7",
-      "--blue-soft:#dfefff",
-      "--rule:#8aa4ba",
-      "--yellow:#ffd43b",
-      "--red:#ea3150",
-      "--white:#ffffff",
-      "--muted:#5d7286",
+      "--primary:#1D4ED8",
+      "--secondary:#06B6D4",
+      "--tertiary:#F59E0B",
+      "--background:#EEF6FF",
+      "--surface:#FFFFFF",
+      "--success:#10B981",
+      "--warning:#F59E0B",
+      "--error:#EF4444",
+      "--info:#1D4ED8",
+      "--border:#D6E4F5",
     ]) {
       expect(css).toContain(declaration);
     }
+    expect(css).toContain("family=Inter");
+    expect(css).toContain("family=DM+Sans");
     expect(css).toContain("family=IBM+Plex+Mono");
-    expect(css).toContain("family=IBM+Plex+Sans+Thai");
-    expect(css).toContain("family=Noto+Serif+Thai");
-    expect(css).toContain(".kpi--1 { grid-column:span 2; color:var(--white); background:var(--blue)");
-    expect(css).toContain(".kpi--5 { grid-column:span 2; background:var(--yellow)");
+    expect(css).toContain("border-radius:8px");
+    expect(css).toContain("--shadow-subtle:0 1px 2px rgba(16,42,67,.04)");
+    expect(css).toContain(".kpi--1 { grid-column:span 2; color:var(--surface); background:var(--primary)");
+    expect(css).toContain(".kpi--5 { grid-column:span 2; background:var(--tertiary)");
     expect(css).toContain(".ledger::before");
   });
 });

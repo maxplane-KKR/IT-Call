@@ -2,12 +2,16 @@ import { readFileSync } from "node:fs";
 import { test } from "node:test";
 import assert from "node:assert/strict";
 
-test("favicon uses the selected headset concept and exact IT On-call label", () => {
+test("favicon uses the selected circular Editorial stack concept", () => {
   const svg = readFileSync(new URL("../public/favicon.svg", import.meta.url), "utf8");
 
   assert.match(svg, /aria-label="IT On-call"/);
-  assert.match(svg, /<text[^>]*>IT On-call<\/text>/);
-  assert.match(svg, /data-icon="headset"/);
+  assert.match(svg, /data-icon="editorial-stack"/);
+  assert.match(svg, /<circle[^>]*cx="256"[^>]*cy="256"[^>]*r="256"/);
+  assert.match(svg, /<text[^>]*>IT<\/text>/);
+  assert.match(svg, /<text[^>]*>\/<\/text>/);
+  assert.match(svg, /<text[^>]*>ON-CALL<\/text>/);
+  assert.doesNotMatch(svg, /data-icon="headset"/);
   assert.match(svg, /viewBox="0 0 512 512"/);
 });
 

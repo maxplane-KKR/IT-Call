@@ -20,8 +20,8 @@ test("cross-platform metadata provides versioned icons for Windows, iPad, and mo
   const manifest = JSON.parse(readFileSync(new URL("../public/manifest-v2.webmanifest", import.meta.url), "utf8"));
   const touchIcon = readFileSync(new URL("../public/apple-touch-icon-v2.png", import.meta.url));
 
-  assert.match(layout, /icon:\s*"\/favicon-v2\.svg"/);
-  assert.match(layout, /shortcut:\s*"\/favicon-v2\.svg"/);
+  assert.match(layout, /icon:\s*"\/favicon-v3\.ico"/);
+  assert.match(layout, /shortcut:\s*"\/favicon-v3\.ico"/);
   assert.match(layout, /apple:\s*"\/apple-touch-icon-v2\.png"/);
   assert.match(layout, /manifest:\s*"\/manifest-v2\.webmanifest"/);
   assert.equal(touchIcon.readUInt32BE(16), 180);
@@ -40,4 +40,21 @@ test("cross-platform metadata provides versioned icons for Windows, iPad, and mo
   assert.equal(mobileIcon512.readUInt32BE(20), 512);
   assert.equal(androidIcon.readUInt32BE(16), 1024);
   assert.equal(androidIcon.readUInt32BE(20), 1024);
+});
+
+test("Windows desktop icon is a versioned multi-size ICO", () => {
+  const ico = readFileSync(new URL("../public/favicon-v3.ico", import.meta.url));
+
+  assert.equal(ico.readUInt16LE(0), 0);
+  assert.equal(ico.readUInt16LE(2), 1);
+  assert.equal(ico.readUInt16LE(4), 4);
+  assert.deepEqual(
+    Array.from({ length: 4 }, (_, index) => ico[index * 16 + 6] || 256),
+    [16, 32, 48, 256],
+  );
+  for (let index = 0; index < 4; index += 1) {
+    const entry = 6 + index * 16;
+    const offset = ico.readUInt32LE(entry + 12);
+    assert.equal(ico.subarray(offset, offset + 8).toString("hex"), "89504e470d0a1a0a");
+  }
 });

@@ -15,11 +15,11 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title,
     description,
-    manifest: "/manifest.webmanifest",
+    manifest: "/manifest-v2.webmanifest",
     icons: {
-      icon: "/favicon.svg",
-      shortcut: "/favicon.svg",
-      apple: "/apple-touch-icon.png",
+      icon: "/favicon-v3.ico",
+      shortcut: "/favicon-v3.ico",
+      apple: "/apple-touch-icon-v2.png",
     },
     openGraph: { title, description, images: [{ url: image, width: 1200, height: 630 }] },
     twitter: { card: "summary_large_image", title, description, images: [image] },

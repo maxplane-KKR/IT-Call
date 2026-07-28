@@ -120,3 +120,10 @@ test("limits Apps Script records to the latest rolling three years", () => {
     ["cutoff", "recent"],
   );
 });
+
+test("rejects an Apps Script error payload instead of caching an empty result", () => {
+  assert.throws(
+    () => recentIncidentRows({ error: "Spreadsheet unavailable" }),
+    /Invalid incidents response/,
+  );
+});

@@ -23,19 +23,40 @@ async function render() {
   );
 }
 
-test("server-renders the IT on-call dashboard surface", async () => {
+test("redirects the root route to the supplied Skeuomorph dashboard", async () => {
   const response = await render();
-  assert.equal(response.status, 200);
-  assert.match(response.headers.get("content-type") ?? "", /^text\/html\b/i);
+  assert.ok([307, 308].includes(response.status));
+  assert.equal(
+    new URL(response.headers.get("location"), "http://localhost").pathname,
+    "/IT-Call-Skeuomorph.html",
+  );
+});
 
-  const html = await response.text();
-  assert.doesNotMatch(html, /codex-preview|Your site is taking shape|react-loading-skeleton/i);
-  assert.match(html, /IT On-call/i);
-  assert.match(html, /ยอดค่าตอบแทนที่จ่ายจริง/);
-  assert.match(html, /ตัวกรองแดชบอร์ด/);
-  assert.match(html, /รายการเหตุการณ์/);
-  assert.doesNotMatch(html, /theme-toggle|aria-pressed|โหมดสว่าง|โหมดมืด/);
-  assert.match(html, /<main\b/i);
+test("keeps the supplied dashboard content and routes data through the edge API", async () => {
+  const dashboard = await readFile(
+    new URL("../public/IT-Call-Skeuomorph.html", import.meta.url),
+    "utf8",
+  );
+
+  assert.match(dashboard, /IT Call Center Analytics/);
+  assert.match(dashboard, /สรุปยอดภาระงานรายบุคคล/);
+  assert.match(dashboard, /รายละเอียดปัญหา/);
+  assert.match(dashboard, /รายการแจ้งปัญหา \(Log\)/);
+  assert.match(dashboard, /const webAppUrl = '\/api\/incidents'/);
+  assert.match(dashboard, /const API_TIMEOUT_MS = 45000/);
+  assert.match(dashboard, /Chart\.js|chart\.umd\.min\.js/);
+  assert.match(dashboard, /width=device-width, initial-scale=1\.0/);
+  assert.doesNotMatch(dashboard, /theme-toggle|โหมดสว่าง|โหมดมืด/i);
+});
+
+test("keeps CSV export UTF-8 and incident details", async () => {
+  const dashboard = await readFile(
+    new URL("../public/IT-Call-Skeuomorph.html", import.meta.url),
+    "utf8",
+  );
+
+  assert.match(dashboard, /let csvContent = "\\uFEFF"/);
+  assert.match(dashboard, /row\.detail/);
 });
 
 test("removes the temporary starter preview infrastructure", async () => {
@@ -45,7 +66,7 @@ test("removes the temporary starter preview infrastructure", async () => {
     readFile(new URL("../package.json", import.meta.url), "utf8"),
   ]);
 
-  assert.match(page, /IT\s*<span>On-call<\/span>/);
+  assert.match(page, /redirect\("\/IT-Call-Skeuomorph\.html"\)/);
   assert.doesNotMatch(page, /SkeletonPreview|codex-preview|_sites-preview/);
   assert.match(layout, /IT On-call Compensation Desk/);
   assert.doesNotMatch(layout, /Starter Project|codex-preview|_sites-preview/);
@@ -57,51 +78,4 @@ test("removes the temporary starter preview infrastructure", async () => {
     throw error;
   });
   assert.deepEqual(previewDirectory, []);
-});
-
-test("removes the access notice card from the operation log", async () => {
-  const page = await readFile(new URL("../app/page.tsx", import.meta.url), "utf8");
-
-  assert.doesNotMatch(page, /access-notice|ข้อมูลจำกัดสิทธิ์|notice-mark/);
-});
-
-test("uses neutral copy for the live data status", async () => {
-  const page = await readFile(new URL("../app/page.tsx", import.meta.url), "utf8");
-
-  assert.doesNotMatch(page, /เวอร์ชันก่อน/);
-  assert.match(page, /ข้อมูลปฏิบัติการล่าสุด/);
-});
-
-test("removes compensation from operation log entries", async () => {
-  const page = await readFile(new URL("../app/page.tsx", import.meta.url), "utf8");
-
-  assert.doesNotMatch(page, /<th scope="col">ค่าตอบแทน<\/th>|record\.compensation/);
-});
-
-test("adds a UTF-8 BOM when downloading CSV", async () => {
-  const page = await readFile(new URL("../app/page.tsx", import.meta.url), "utf8");
-
-  assert.match(page, /new Blob\(\["\\uFEFF", toCsv\(visibleRecords\)\]/);
-});
-
-test("removes the source disclosure footer label", async () => {
-  const page = await readFile(new URL("../app/page.tsx", import.meta.url), "utf8");
-
-  assert.doesNotMatch(page, /LIVE SOURCE \/ PREVIOUS VERSION DATA/);
-});
-
-test("keeps filter controls responsive between automatic refreshes", async () => {
-  const page = await readFile(new URL("../app/page.tsx", import.meta.url), "utf8");
-
-  assert.match(page, /useDeferredValue\(filters\)/);
-  assert.match(page, /AUTO REFRESH/);
-  assert.match(page, /5 MIN/);
-  assert.match(page, /300_000/);
-  assert.doesNotMatch(page, /refreshSeconds|setRefreshSeconds|,\s*1000\)/);
-});
-
-test("labels the rolling three-year data scope", async () => {
-  const page = await readFile(new URL("../app/page.tsx", import.meta.url), "utf8");
-
-  assert.match(page, /ข้อมูลย้อนหลัง 3 ปี/);
 });

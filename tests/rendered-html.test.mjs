@@ -34,8 +34,7 @@ test("server-renders the IT on-call dashboard surface", async () => {
   assert.match(html, /ยอดค่าตอบแทนที่จ่ายจริง/);
   assert.match(html, /ตัวกรองแดชบอร์ด/);
   assert.match(html, /รายการเหตุการณ์/);
-  assert.match(html, /theme-toggle/);
-  assert.match(html, /aria-pressed/);
+  assert.doesNotMatch(html, /theme-toggle|aria-pressed|โหมดสว่าง|โหมดมืด/);
   assert.match(html, /<main\b/i);
 });
 

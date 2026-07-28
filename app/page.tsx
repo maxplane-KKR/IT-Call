@@ -10,16 +10,9 @@ import {
   summarizeRecords,
   toCsv,
 } from "../lib/dashboard-data.mjs";
-import {
-  THEME_STORAGE_KEY,
-  isTheme,
-  nextTheme,
-  themeToggleLabel,
-} from "../lib/theme.mjs";
 
 type FilterKey = "month" | "operator" | "eventType" | "department";
 type FilterState = Record<FilterKey, string>;
-type Theme = "dark" | "light";
 type DataStatus = "loading" | "success" | "error" | "refresh-error";
 type DashboardRecord = {
   id: string;
@@ -63,7 +56,6 @@ function formatDate(date: string) {
 export default function Home() {
   const [records, setRecords] = useState<DashboardRecord[]>([]);
   const [filters, setFilters] = useState<FilterState>(initialFilters);
-  const [theme, setTheme] = useState<Theme>("dark");
   const [refreshSeconds, setRefreshSeconds] = useState(300);
   const [refreshing, setRefreshing] = useState(false);
   const [lastUpdated, setLastUpdated] = useState("ยังไม่มีการอัปเดต");
@@ -130,15 +122,6 @@ export default function Home() {
         : "โหลดข้อมูลไม่สำเร็จ";
 
   useEffect(() => {
-    const storedTheme = window.localStorage.getItem(THEME_STORAGE_KEY);
-    const initialTheme: Theme = isTheme(storedTheme) ? (storedTheme as Theme) : "dark";
-    document.documentElement.dataset.theme = initialTheme;
-
-    const frame = window.requestAnimationFrame(() => setTheme(initialTheme));
-    return () => window.cancelAnimationFrame(frame);
-  }, []);
-
-  useEffect(() => {
     // Initial fetch is the external synchronization performed by this effect.
     // eslint-disable-next-line react-hooks/set-state-in-effect
     void refresh();
@@ -160,13 +143,6 @@ export default function Home() {
   function resetFilters() {
     setFilters(initialFilters);
     setExportMessage("");
-  }
-
-  function handleThemeToggle() {
-    const updatedTheme = nextTheme(theme) as Theme;
-    setTheme(updatedTheme);
-    document.documentElement.dataset.theme = updatedTheme;
-    window.localStorage.setItem(THEME_STORAGE_KEY, updatedTheme);
   }
 
   function handleRefresh() {
@@ -211,17 +187,6 @@ export default function Home() {
               <span className="status-dot" aria-hidden="true" />
               LIVE DATA
             </span>
-            <button
-              className="theme-toggle"
-              type="button"
-              onClick={handleThemeToggle}
-              aria-label={themeToggleLabel(theme)}
-              aria-pressed={theme === "light"}
-              title={themeToggleLabel(theme)}
-            >
-              <span className={`theme-icon theme-icon-${theme}`} aria-hidden="true" />
-              <span>{themeToggleLabel(theme)}</span>
-            </button>
             <button
               className="button button-primary"
               type="button"

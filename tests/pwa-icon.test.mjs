@@ -26,19 +26,36 @@ test("PWA assets use the supplied Edge Soft image without recreating the mark", 
   assert.deepEqual(pngSize("icon-512.png"), { width: 512, height: 512 });
   assert.deepEqual(pngSize("icon-192.png"), { width: 192, height: 192 });
   assert.deepEqual(pngSize("icon-180.png"), { width: 180, height: 180 });
+  assert.deepEqual(pngSize("apple-touch-icon-152.png"), { width: 152, height: 152 });
+  assert.deepEqual(pngSize("apple-touch-icon-167.png"), { width: 167, height: 167 });
+  assert.deepEqual(pngSize("maskable-192.png"), { width: 192, height: 192 });
+  assert.deepEqual(pngSize("maskable-512.png"), { width: 512, height: 512 });
+  assert.deepEqual(pngSize("mstile-150.png"), { width: 150, height: 150 });
 });
 
 test("manifest exposes PNG install icons for Windows, Android, and iOS", () => {
   assert.match(manifest, /display:\s*\"standalone\"/);
   assert.match(manifest, /src:\s*\"\/icon-192\.png\"/);
   assert.match(manifest, /src:\s*\"\/icon-512\.png\"/);
-  assert.match(manifest, /purpose:\s*\"any maskable\"/);
+  assert.match(manifest, /src:\s*\"\/maskable-192\.png\"/);
+  assert.match(manifest, /src:\s*\"\/maskable-512\.png\"/);
+  assert.match(manifest, /purpose:\s*\"maskable\"/);
 });
 
 test("layout points browsers and install prompts at the supplied image assets", () => {
   assert.match(layout, /icon:\s*\"\/icon-192\.png\"/);
   assert.match(layout, /apple:\s*\"\/icon-180\.png\"/);
   assert.match(layout, /manifest:\s*\"\/manifest\.webmanifest\"/);
+  assert.match(layout, /favicon\.ico/);
+  assert.match(layout, /browserconfig\.xml/);
+});
+
+test("favicon and Windows browser configuration are installable", () => {
+  const faviconIco = fs.readFileSync(path.join(root, "public", "favicon.ico"));
+  const browserConfig = fs.readFileSync(path.join(root, "public", "browserconfig.xml"), "utf8");
+
+  assert.deepEqual([...faviconIco.subarray(0, 4)], [0, 0, 1, 0]);
+  assert.match(browserConfig, /mstile-150\.png/);
 });
 
 test("mobile layout accounts for safe areas and narrow screens", () => {

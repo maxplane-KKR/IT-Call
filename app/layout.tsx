@@ -6,12 +6,13 @@ export const metadata: Metadata = {
   description: "Local preview of the IT on-call compensation dashboard.",
   icons: {
     icon: "/icon-192.png",
-    shortcut: "/icon-192.png",
+    shortcut: "/favicon.ico",
     apple: "/icon-180.png",
   },
   manifest: "/manifest.webmanifest",
   other: {
     "msapplication-TileColor": "#0a2238",
+    "msapplication-config": "/browserconfig.xml",
   },
 };
 

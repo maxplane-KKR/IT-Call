@@ -458,13 +458,23 @@ select:focus-visible {
 .events-heading .section-note { margin-top: 7px; }
 
 .table-wrap { overflow-x: auto; }
-table { border-collapse: collapse; min-width: 800px; width: 100%; }
+table { border-collapse: collapse; min-width: 1040px; width: 100%; }
 th { color: var(--faint); font-family: "Fira Code", monospace; font-size: 10px; font-weight: 500; letter-spacing: 0.06em; padding: 0 12px 11px; text-align: left; text-transform: uppercase; }
 td { border-top: 1px solid rgba(192, 216, 245, 0.09); color: var(--muted); font-size: 13px; padding: 14px 12px; vertical-align: middle; }
 td:first-child { color: var(--text); }
 td:first-child strong { display: block; font-family: "Fira Code", monospace; font-size: 12px; }
 td:first-child span { color: var(--faint); font-family: "Fira Code", monospace; font-size: 10px; }
 td:last-child strong { color: var(--blue-bright); display: block; font-family: "Fira Code", monospace; font-size: 12px; }
+.detail-column { width: 38%; }
+.record-detail-cell { max-width: 520px; }
+.record-detail-text {
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  display: -webkit-box;
+  line-height: 1.55;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+}
 tbody tr { transition: background 180ms var(--ease); }
 tbody tr:hover { background: rgba(255, 255, 255, 0.04); }
 .event-tag,
@@ -562,6 +572,23 @@ tbody tr:hover { background: rgba(255, 255, 255, 0.04); }
   .record-card-main { gap: 8px; justify-content: space-between; margin: 15px 0; }
   .record-card-main strong { font-size: 15px; }
   .record-card-main span { color: var(--muted); font-size: 12px; }
+  .record-card-detail { margin: 0 0 12px; }
+  .record-card-detail > span {
+    color: var(--faint);
+    display: block;
+    font-family: "Fira Code", monospace;
+    font-size: 10px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+  .record-card-detail p {
+    color: var(--text);
+    font-size: 13px;
+    line-height: 1.55;
+    margin: 5px 0 0;
+    overflow-wrap: anywhere;
+    white-space: pre-wrap;
+  }
   .record-card-bottom { border-top: 1px solid var(--line); gap: 9px; padding-top: 12px; }
   .record-card-bottom span:nth-child(2) { color: var(--muted); font-size: 12px; }
   .record-card-bottom strong { color: var(--blue-bright); font-family: "Fira Code", monospace; font-size: 12px; margin-left: auto; }

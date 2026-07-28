@@ -8,6 +8,7 @@ import {
   useRef,
   useState,
 } from "react";
+import { OperationLogRecords } from "../components/operation-log-records.mjs";
 import {
   filterRecords,
   INCIDENTS_ENDPOINT,
@@ -431,38 +432,10 @@ export default function Home() {
           <p className="sr-only" aria-live="polite">{exportMessage}</p>
           {visibleRecords.length ? (
             <>
-              <div className="table-wrap desktop-table">
-                <table>
-                  <caption className="sr-only">รายการเหตุการณ์ตามตัวกรองปัจจุบัน</caption>
-                  <thead>
-                    <tr>
-                      <th scope="col">วันเวลา</th>
-                      <th scope="col">ผู้ปฏิบัติงาน</th>
-                      <th scope="col">แผนก</th>
-                      <th scope="col">เหตุการณ์</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {displayedRecords.map((record) => (
-                      <tr key={record.id}>
-                        <td><strong>{formatDate(record.date)}</strong><span>{record.time}</span></td>
-                        <td>{record.operator}</td>
-                        <td>{record.department}</td>
-                        <td><span className={`event-tag ${record.eventType === "Tele" ? "event-tag-blue" : "event-tag-green"}`}>{record.eventType}</span></td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-              <div className="mobile-records">
-                {displayedRecords.map((record) => (
-                  <article className="record-card" key={record.id}>
-                    <div className="record-card-top"><span className="record-date">{formatDate(record.date)} · {record.time}</span></div>
-                    <div className="record-card-main"><strong>{record.operator}</strong><span>{record.department}</span></div>
-                    <div className="record-card-bottom"><span className={`event-tag ${record.eventType === "Tele" ? "event-tag-blue" : "event-tag-green"}`}>{record.eventType}</span></div>
-                  </article>
-                ))}
-              </div>
+              <OperationLogRecords
+                records={displayedRecords}
+                formatDate={formatDate}
+              />
               {displayedRecords.length < visibleRecords.length ? (
                 <div className="event-pagination">
                   <span>แสดง {displayedRecords.length} จาก {visibleRecords.length} รายการ</span>

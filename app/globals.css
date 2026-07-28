@@ -485,6 +485,17 @@ tbody tr:hover { background: rgba(255, 255, 255, 0.04); }
 
 .dashboard-footer { color: var(--faint); display: flex; font-family: "Fira Code", monospace; font-size: 10px; justify-content: space-between; letter-spacing: 0.08em; padding: 20px 3px 0; }
 
+.event-pagination {
+  align-items: center;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  display: flex;
+  font-size: 12px;
+  justify-content: space-between;
+  margin-top: 16px;
+  padding-top: 16px;
+}
+
 @media (max-width: 1180px) {
   .hero-grid { grid-template-columns: minmax(0, 1fr) minmax(360px, 0.82fr); }
   .metric-grid { grid-template-columns: repeat(4, 1fr); }
@@ -555,6 +566,7 @@ tbody tr:hover { background: rgba(255, 255, 255, 0.04); }
   .record-card-bottom span:nth-child(2) { color: var(--muted); font-size: 12px; }
   .record-card-bottom strong { color: var(--blue-bright); font-family: "Fira Code", monospace; font-size: 12px; margin-left: auto; }
   .dashboard-footer { align-items: flex-start; flex-direction: column; gap: 6px; font-size: 9px; padding-top: 15px; }
+  .event-pagination { align-items: stretch; flex-direction: column; gap: 12px; }
 }
 
 html {

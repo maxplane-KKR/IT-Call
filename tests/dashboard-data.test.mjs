@@ -7,6 +7,7 @@ import {
   sortMonthsDescending,
   summarizeRecords,
   toCsv,
+  visibleRecordWindow,
 } from "../lib/dashboard-data.mjs";
 
 test("filters records by operator and event type", () => {
@@ -118,4 +119,14 @@ test("sorts month filter options from the latest data to the oldest", () => {
   ]);
 
   assert.deepEqual(months, ["กรกฎาคม 2569", "มิถุนายน 2569", "มกราคม 2563"]);
+});
+
+test("limits the operation log render window without dropping filtered totals", () => {
+  const records = Array.from({ length: 225 }, (_, index) => ({ id: index }));
+
+  assert.deepEqual(
+    visibleRecordWindow(records, 100).map((record) => record.id),
+    Array.from({ length: 100 }, (_, index) => index),
+  );
+  assert.equal(records.length, 225);
 });

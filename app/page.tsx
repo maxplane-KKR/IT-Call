@@ -9,6 +9,7 @@ import {
   sortMonthsDescending,
   summarizeRecords,
   toCsv,
+  visibleRecordWindow,
 } from "../lib/dashboard-data.mjs";
 
 type FilterKey = "month" | "operator" | "eventType" | "department";
@@ -28,6 +29,7 @@ type DashboardRecord = {
 };
 
 const ALL = "ทั้งหมด";
+const RECORD_BATCH_SIZE = 100;
 const filterLabels: Record<FilterKey, string> = {
   month: "เดือน",
   operator: "ผู้ปฏิบัติงาน",
@@ -62,6 +64,7 @@ export default function Home() {
   const [exportMessage, setExportMessage] = useState("");
   const [dataStatus, setDataStatus] = useState<DataStatus>("loading");
   const [dataError, setDataError] = useState("");
+  const [visibleRecordCount, setVisibleRecordCount] = useState(RECORD_BATCH_SIZE);
   const hasLoadedRecords = useRef(false);
 
   const refresh = useCallback(async () => {
@@ -106,6 +109,10 @@ export default function Home() {
     () => summarizeRecords(visibleRecords),
     [visibleRecords],
   );
+  const displayedRecords = useMemo(
+    () => visibleRecordWindow(visibleRecords, visibleRecordCount),
+    [visibleRecords, visibleRecordCount],
+  );
   const activeFilters = Object.values(filters).some((value) => value !== ALL);
   const maxOperatorValue = Math.max(
     1,
@@ -137,11 +144,13 @@ export default function Home() {
 
   function updateFilter(key: FilterKey, value: string) {
     setFilters((current) => ({ ...current, [key]: value }));
+    setVisibleRecordCount(RECORD_BATCH_SIZE);
     setExportMessage("");
   }
 
   function resetFilters() {
     setFilters(initialFilters);
+    setVisibleRecordCount(RECORD_BATCH_SIZE);
     setExportMessage("");
   }
 
@@ -428,7 +437,7 @@ export default function Home() {
                     </tr>
                   </thead>
                   <tbody>
-                    {visibleRecords.map((record) => (
+                    {displayedRecords.map((record) => (
                       <tr key={record.id}>
                         <td><strong>{formatDate(record.date)}</strong><span>{record.time}</span></td>
                         <td>{record.operator}</td>
@@ -440,7 +449,7 @@ export default function Home() {
                 </table>
               </div>
               <div className="mobile-records">
-                {visibleRecords.map((record) => (
+                {displayedRecords.map((record) => (
                   <article className="record-card" key={record.id}>
                     <div className="record-card-top"><span className="record-date">{formatDate(record.date)} · {record.time}</span></div>
                     <div className="record-card-main"><strong>{record.operator}</strong><span>{record.department}</span></div>
@@ -448,6 +457,18 @@ export default function Home() {
                   </article>
                 ))}
               </div>
+              {displayedRecords.length < visibleRecords.length ? (
+                <div className="event-pagination">
+                  <span>แสดง {displayedRecords.length} จาก {visibleRecords.length} รายการ</span>
+                  <button
+                    className="button button-quiet"
+                    type="button"
+                    onClick={() => setVisibleRecordCount((current) => current + RECORD_BATCH_SIZE)}
+                  >
+                    แสดงเพิ่มอีก {Math.min(RECORD_BATCH_SIZE, visibleRecords.length - displayedRecords.length)} รายการ
+                  </button>
+                </div>
+              ) : null}
             </>
           ) : (
             <div className="empty-state">

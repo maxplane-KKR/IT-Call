@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
 import test from "node:test";
 import {
   createIncidentSource,
@@ -126,4 +127,13 @@ test("rejects an Apps Script error payload instead of caching an empty result", 
     () => recentIncidentRows({ error: "Spreadsheet unavailable" }),
     /Invalid incidents response/,
   );
+});
+
+test("allows a cold Apps Script response enough time to seed the edge cache", async () => {
+  const route = await readFile(
+    new URL("../app/api/incidents/route.ts", import.meta.url),
+    "utf8",
+  );
+
+  assert.match(route, /AbortSignal\.timeout\(30_000\)/);
 });

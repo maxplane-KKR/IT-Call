@@ -89,7 +89,7 @@ select:focus-visible {
   isolation: isolate;
   min-height: 100dvh;
   overflow: hidden;
-  padding: 28px 20px 56px;
+  padding: max(28px, calc(28px + env(safe-area-inset-top))) max(20px, calc(20px + env(safe-area-inset-right))) max(56px, calc(56px + env(safe-area-inset-bottom))) max(20px, calc(20px + env(safe-area-inset-left)));
   position: relative;
   background:
     radial-gradient(circle at 18% 0%, rgba(69, 132, 225, 0.16), transparent 34rem),
@@ -494,7 +494,9 @@ tbody tr:hover { background: rgba(255, 255, 255, 0.04); }
 }
 
 @media (max-width: 820px) {
-  .dashboard-shell { padding: 18px 14px 40px; }
+  .dashboard-shell {
+    padding: max(18px, calc(18px + env(safe-area-inset-top))) max(14px, calc(14px + env(safe-area-inset-right))) max(40px, calc(40px + env(safe-area-inset-bottom))) max(14px, calc(14px + env(safe-area-inset-left)));
+  }
   .topbar { align-items: flex-start; }
   .hero-grid { grid-template-columns: 1fr; }
   .hero-copy { min-height: auto; padding: 25px 8px 12px; }
@@ -508,7 +510,9 @@ tbody tr:hover { background: rgba(255, 255, 255, 0.04); }
 }
 
 @media (max-width: 600px) {
-  .dashboard-shell { padding: 14px 10px 30px; }
+  .dashboard-shell {
+    padding: max(14px, calc(14px + env(safe-area-inset-top))) max(10px, calc(10px + env(safe-area-inset-right))) max(30px, calc(30px + env(safe-area-inset-bottom))) max(10px, calc(10px + env(safe-area-inset-left)));
+  }
   .topbar { flex-direction: column; gap: 16px; margin-bottom: 18px; }
   .topbar-actions { justify-content: space-between; width: 100%; }
   .topbar-actions .button { flex: 1; }

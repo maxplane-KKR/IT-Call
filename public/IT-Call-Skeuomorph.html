@@ -119,6 +119,74 @@
             letter-spacing: 0.05em;
             border-bottom: 1px solid #c8b8a0;
         }
+
+        .mobile-metric-strip {
+            display: none;
+        }
+
+        @media (max-width: 600px) {
+            .desktop-metric-grid {
+                display: none !important;
+            }
+
+            .mobile-metric-strip {
+                display: grid;
+                grid-template-columns: repeat(4, minmax(0, 1fr));
+                gap: 6px;
+                width: 100%;
+                margin-bottom: 1.5rem;
+            }
+
+            .mobile-metric-card {
+                min-width: 0;
+                min-height: 92px;
+                padding: 9px 5px 8px;
+                border: 1px solid #d4c5a9;
+                border-bottom-width: 3px;
+                border-radius: 12px;
+                background: linear-gradient(180deg, #fefcf8 0%, #f6f0e4 100%);
+                box-shadow: 0 2px 7px rgba(90,70,50,0.12);
+                display: grid;
+                grid-template-rows: 27px auto auto;
+                align-items: center;
+                justify-items: center;
+                overflow: hidden;
+            }
+
+            .mobile-metric-card > i {
+                font-size: 22px;
+                line-height: 1;
+            }
+
+            .mobile-metric-card > span {
+                max-width: 100%;
+                color: #64748b;
+                font-size: 9px;
+                font-weight: 600;
+                line-height: 1.1;
+                white-space: nowrap;
+            }
+
+            .mobile-metric-value {
+                display: block;
+                max-width: 100%;
+                color: #1e293b;
+                font-family: 'Kanit', sans-serif;
+                font-size: clamp(12px, 3.5vw, 15px);
+                font-weight: 800;
+                line-height: 1.2;
+                overflow: hidden;
+                text-align: center;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+
+            .mobile-metric-card-blue { color: #2563eb; border-bottom-color: #3b82f6; }
+            .mobile-metric-card-purple { color: #9333ea; border-bottom-color: #a855f7; }
+            .mobile-metric-card-orange { color: #ea580c; border-bottom-color: #f97316; }
+            .mobile-metric-card-green { color: #059669; border-bottom-color: #10b981; }
+            .mobile-metric-card-green .mobile-metric-value { color: #059669; }
+        }
     </style>
 </head>
 <body class="text-slate-800 h-screen flex flex-col overflow-hidden">
@@ -181,7 +249,7 @@
         </div>
 
         <!-- Key Metrics Cards -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div class="desktop-metric-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
             <div class="glass-panel p-6 rounded-2xl shadow-sm border border-slate-200 flex items-center gap-5 border-b-4 border-b-blue-500 animate-fade-in-up delay-100 hover:-translate-y-1 transition-transform duration-300">
                 <div class="p-4 bg-gradient-to-br from-blue-100 to-blue-50 rounded-2xl text-blue-600 shadow-inner">
                     <i class="ph ph-ticket text-3xl"></i>
@@ -221,6 +289,29 @@
                     <h2 class="text-xl font-bold text-emerald-600" id="apiStatus">รอสักครู่</h2>
                 </div>
             </div>
+        </div>
+
+        <div class="mobile-metric-strip" role="group" aria-label="ตัวชี้วัดสำคัญบนมือถือ">
+            <article class="mobile-metric-card mobile-metric-card-blue" data-metric-label="Ticket" aria-label="Ticket: 0">
+                <i class="ph ph-ticket" aria-hidden="true"></i>
+                <span>Ticket</span>
+                <strong class="mobile-metric-value" id="mobileTotalTickets" title="0">0</strong>
+            </article>
+            <article class="mobile-metric-card mobile-metric-card-purple" data-metric-label="แผนก" aria-label="แผนก: -">
+                <i class="ph ph-buildings" aria-hidden="true"></i>
+                <span>แผนก</span>
+                <strong class="mobile-metric-value" id="mobileTopDept" title="-">-</strong>
+            </article>
+            <article class="mobile-metric-card mobile-metric-card-orange" data-metric-label="ผู้รับ" aria-label="ผู้รับ: -">
+                <i class="ph ph-user-gear" aria-hidden="true"></i>
+                <span>ผู้รับ</span>
+                <strong class="mobile-metric-value" id="mobileTopStaff" title="-">-</strong>
+            </article>
+            <article class="mobile-metric-card mobile-metric-card-green" data-metric-label="สถานะ" aria-label="สถานะ: รอสักครู่">
+                <i class="ph ph-check-circle" aria-hidden="true"></i>
+                <span>สถานะ</span>
+                <strong class="mobile-metric-value" id="mobileApiStatus" title="รอสักครู่">รอ</strong>
+            </article>
         </div>
 
         <!-- รายงานสรุปสำหรับ HR -->
@@ -369,7 +460,9 @@
         <span class="font-medium">คัดลอกเรียบร้อยแล้ว</span>
     </div>
 
-    <script>
+    <script type="module">
+        import { setMetricPair } from "/mobile-metrics.mjs";
+
         let rawData = [];
         let filteredData = [];
         let activeMonthKey = 'all';
@@ -611,13 +704,13 @@
             const totalEl = document.getElementById('totalTickets');
             totalEl.style.opacity = '0.5';
             setTimeout(() => {
-                totalEl.textContent = data.length;
+                setMetricPair(document, 'totalTickets', 'mobileTotalTickets', data.length);
                 totalEl.style.opacity = '1';
             }, 150);
 
             if(data.length === 0) {
-                document.getElementById('topDept').textContent = "-";
-                document.getElementById('topStaff').textContent = "-";
+                setMetricPair(document, 'topDept', 'mobileTopDept', "-");
+                setMetricPair(document, 'topStaff', 'mobileTopStaff', "-");
                 return;
             }
 
@@ -626,14 +719,14 @@
                 return acc;
             }, {});
             const topDept = Object.keys(deptCounts).length > 0 ? Object.keys(deptCounts).reduce((a, b) => deptCounts[a] > deptCounts[b] ? a : b, "-") : "-";
-            document.getElementById('topDept').textContent = topDept;
+            setMetricPair(document, 'topDept', 'mobileTopDept', topDept);
 
             const staffCounts = data.reduce((acc, curr) => {
                 if(curr.operator) acc[curr.operator] = (acc[curr.operator] || 0) + 1;
                 return acc;
             }, {});
             const topStaff = Object.keys(staffCounts).length > 0 ? Object.keys(staffCounts).reduce((a, b) => staffCounts[a] > staffCounts[b] ? a : b, "-") : "-";
-            document.getElementById('topStaff').textContent = topStaff;
+            setMetricPair(document, 'topStaff', 'mobileTopStaff', topStaff);
         }
 
         function appendTextCell(row, className, value, tagName = 'td') {
@@ -1170,10 +1263,10 @@
         const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
         document.getElementById('currentDate').textContent = new Date().toLocaleDateString('th-TH', dateOptions);
 
-        function setApiStatus(message, colorClass) {
+        function setApiStatus(message, colorClass, mobileMessage = message) {
             const status = document.getElementById('apiStatus');
-            status.textContent = message;
             status.className = `text-xl font-bold ${colorClass}`;
+            setMetricPair(document, 'apiStatus', 'mobileApiStatus', message, mobileMessage);
         }
 
         function setLastUpdated() {
@@ -1188,7 +1281,7 @@
             const timeoutId = window.setTimeout(() => controller.abort(), API_TIMEOUT_MS);
             isFetching = true;
             refreshButton.disabled = true;
-            setApiStatus('กำลังโหลด...', 'text-blue-600');
+            setApiStatus('กำลังโหลด...', 'text-blue-600', 'โหลด');
 
             try {
                 const response = await fetch(webAppUrl, { signal: controller.signal, headers: { Accept: 'application/json' } });
@@ -1200,12 +1293,20 @@
                 initMonthSelector();
                 initDeptFilter();
                 applyFilters(true);
-                setApiStatus(rawJson.length === 0 ? 'ไม่มีข้อมูล' : 'เชื่อมต่อสำเร็จ', rawJson.length === 0 ? 'text-slate-400' : 'text-emerald-600');
+                setApiStatus(
+                    rawJson.length === 0 ? 'ไม่มีข้อมูล' : 'เชื่อมต่อสำเร็จ',
+                    rawJson.length === 0 ? 'text-slate-400' : 'text-emerald-600',
+                    rawJson.length === 0 ? 'ว่าง' : 'สำเร็จ'
+                );
                 setLastUpdated();
 
             } catch (error) {
                 console.error("API Error:", error);
-                setApiStatus(error.name === 'AbortError' ? 'หมดเวลารอข้อมูล' : 'เกิดข้อผิดพลาด', 'text-red-500');
+                setApiStatus(
+                    error.name === 'AbortError' ? 'หมดเวลารอข้อมูล' : 'เกิดข้อผิดพลาด',
+                    'text-red-500',
+                    error.name === 'AbortError' ? 'หมดเวลา' : 'ผิดพลาด'
+                );
                 showToast('ดึงข้อมูลไม่สำเร็จ โปรดลองใหม่อีกครั้ง');
             } finally {
                 window.clearTimeout(timeoutId);
@@ -1245,4 +1346,3 @@
     </script>
 </body>
 </html>
-

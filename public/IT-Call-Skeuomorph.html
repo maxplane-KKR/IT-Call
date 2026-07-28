@@ -151,7 +151,7 @@
     </header>
 
     <main class="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8 custom-scroll">
-        
+
         <!-- Interactive Month Selector (Visual Timeline) -->
         <div class="mb-8 animate-fade-in-up">
             <div class="flex items-center justify-between mb-3">
@@ -160,10 +160,10 @@
                 </h2>
                 <span class="text-xs font-medium text-slate-400 bg-slate-200 px-2 py-1 rounded-md" id="recordCount">รอข้อมูล...</span>
             </div>
-            
+
             <div class="relative flex items-center group/timeline">
                 <div class="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-[#e8e0d0] to-transparent z-10 pointer-events-none rounded-l-lg"></div>
-                
+
                 <button type="button" id="scrollLeftBtn" aria-label="เลื่อนรายการเดือนไปทางซ้าย" class="absolute left-0 z-20 w-10 h-10 flex items-center justify-center bg-white/90 backdrop-blur border border-slate-200 rounded-full shadow-lg text-slate-600 hover:text-blue-600 hover:bg-white hover:scale-110 transition-all duration-300 opacity-0 group-hover/timeline:opacity-100 hidden focus:outline-none -ml-3">
                     <i class="ph ph-caret-left font-bold text-xl"></i>
                 </button>
@@ -175,7 +175,7 @@
                 <button type="button" id="scrollRightBtn" aria-label="เลื่อนรายการเดือนไปทางขวา" class="absolute right-0 z-20 w-10 h-10 flex items-center justify-center bg-white/90 backdrop-blur border border-slate-200 rounded-full shadow-lg text-slate-600 hover:text-blue-600 hover:bg-white hover:scale-110 transition-all duration-300 opacity-0 group-hover/timeline:opacity-100 hidden focus:outline-none -mr-3">
                     <i class="ph ph-caret-right font-bold text-xl"></i>
                 </button>
-                
+
                 <div class="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-[#e8e0d0] to-transparent z-10 pointer-events-none rounded-r-lg"></div>
             </div>
         </div>
@@ -191,7 +191,7 @@
                     <h2 class="text-4xl font-black text-slate-800 tracking-tight" id="totalTickets">0</h2>
                 </div>
             </div>
-            
+
             <div class="glass-panel p-6 rounded-2xl shadow-sm border border-slate-200 flex items-center gap-5 border-b-4 border-b-purple-500 animate-fade-in-up delay-200 hover:-translate-y-1 transition-transform duration-300">
                 <div class="p-4 bg-gradient-to-br from-purple-100 to-purple-50 rounded-2xl text-purple-600 shadow-inner">
                     <i class="ph ph-buildings text-3xl"></i>
@@ -243,7 +243,7 @@
                     </button>
                 </div>
             </div>
-            
+
             <div class="overflow-x-auto custom-scroll">
                 <table class="w-full text-left text-sm text-slate-700" id="hrTable">
                     <thead class="bg-rose-50/50 text-rose-900 font-bold border-b-2 border-rose-100">
@@ -279,7 +279,7 @@
                         <canvas id="dailyChart"></canvas>
                     </div>
                 </div>
-                
+
                 <div class="w-full md:w-1/2 border-t md:border-t-0 md:border-l border-slate-100 pt-6 md:pt-0 md:pl-8">
                     <h3 class="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2 font-kanit">
                         <i class="ph ph-clock text-rose-500 text-xl"></i> วิเคราะห์ช่วงเวลาพีก (Peak Hours)
@@ -300,7 +300,7 @@
                     <canvas id="deptChart"></canvas>
                 </div>
             </div>
-            
+
             <div class="glass-panel p-6 rounded-3xl shadow-sm border border-slate-200 animate-pop delay-400">
                 <h3 class="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2 font-kanit">
                     <i class="ph ph-chart-pie-slice text-purple-500 text-xl"></i> สัดส่วนผู้ปฏิบัติงาน
@@ -326,7 +326,7 @@
                     </div>
                     <div class="relative w-full sm:w-auto">
                         <i class="ph ph-magnifying-glass absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400"></i>
-                        <input type="text" id="searchInput" aria-label="ค้นหาปัญหาหรือชื่อผู้รับเรื่อง" placeholder="ค้นหาปัญหา, ชื่อผู้รับเรื่อง..." 
+                        <input type="text" id="searchInput" aria-label="ค้นหาปัญหาหรือชื่อผู้รับเรื่อง" placeholder="ค้นหาปัญหา, ชื่อผู้รับเรื่อง..."
                                class="pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white w-full sm:w-64 transition-all shadow-sm">
                     </div>
                     <button type="button" id="exportRawBtn" class="bg-emerald-500 hover:bg-emerald-600 text-white p-2.5 rounded-xl transition-colors shadow-sm shadow-emerald-500/30 flex items-center gap-2 whitespace-nowrap" title="โหลดข้อมูลดิบเป็น Excel">
@@ -370,15 +370,15 @@
     </div>
 
     <script>
-        let rawData = []; 
-        let filteredData = []; 
-        let activeMonthKey = 'all'; 
+        let rawData = [];
+        let filteredData = [];
+        let activeMonthKey = 'all';
         let activeMonthDisplay = 'ภาพรวมทั้งหมด (All Time)';
-        
+
         let deptChartInstance = null;
         let staffChartInstance = null;
         let dailyChartInstance = null;
-        let timeChartInstance = null; 
+        let timeChartInstance = null;
         let tablePage = 1;
         let isFetching = false;
         let searchDebounceTimer = null;
@@ -440,20 +440,20 @@
                 let monthKey = "unknown";
                 let monthDisplay = "ไม่ระบุเดือน";
                 let dayNum = "0";
-                let hourKey = "ไม่ระบุ"; 
+                let hourKey = "ไม่ระบุ";
 
                 if (row.date) {
-                    const parts = String(row.date).split('/'); 
+                    const parts = String(row.date).split('/');
                     parsedDate = parseDate(row.date);
                     if (parsedDate && parts.length === 3) {
                         const y = parsedDate.getFullYear();
                         const m = String(parsedDate.getMonth() + 1).padStart(2, '0');
-                        monthKey = `${y}-${m}`; 
-                        monthDisplay = `${thaiMonths[parsedDate.getMonth()]} ${y}`; 
-                        dayNum = parts[0]; 
+                        monthKey = `${y}-${m}`;
+                        monthDisplay = `${thaiMonths[parsedDate.getMonth()]} ${y}`;
+                        dayNum = parts[0];
                     }
                 }
-                
+
                 if (row.time) {
                     const timeParts = String(row.time).trim().split(':');
                     const hour = Number(timeParts[0]);
@@ -466,7 +466,7 @@
             }).sort((a, b) => {
                 if(!a._parsedDate) return 1;
                 if(!b._parsedDate) return -1;
-                return b._parsedDate - a._parsedDate; 
+                return b._parsedDate - a._parsedDate;
             });
         }
 
@@ -481,7 +481,7 @@
             const container = document.getElementById('monthSelector');
             const leftBtn = document.getElementById('scrollLeftBtn');
             const rightBtn = document.getElementById('scrollRightBtn');
-            
+
             if (!container || !leftBtn || !rightBtn) return;
 
             if (container.scrollLeft <= 0) {
@@ -504,9 +504,9 @@
         function initMonthSelector() {
             const container = document.getElementById('monthSelector');
             if(!container) return;
-            
+
             container.innerHTML = '';
-            
+
             const uniqueMonths = new Map();
             rawData.forEach(row => {
                 if(row._monthKey !== 'unknown') {
@@ -519,7 +519,7 @@
                 activeMonthKey = 'all';
                 activeMonthDisplay = 'ภาพรวมทั้งหมด (All Time)';
             }
-            
+
             container.appendChild(createMonthButton('all', 'ภาพรวมทั้งหมด (All Time)'));
             sortedMonthKeys.forEach(key => {
                 container.appendChild(createMonthButton(key, uniqueMonths.get(key)));
@@ -527,7 +527,7 @@
 
             updateActiveMonthButton();
             setTimeout(updateScrollButtons, 100);
-            
+
             container.onscroll = updateScrollButtons;
         }
 
@@ -536,7 +536,7 @@
             btn.dataset.month = key;
             btn.textContent = text;
             btn.className = `month-btn px-5 py-2.5 rounded-xl text-sm font-bold whitespace-nowrap transition-all duration-300 border `;
-            
+
             btn.addEventListener('click', () => {
                 activeMonthKey = key;
                 activeMonthDisplay = text;
@@ -560,10 +560,10 @@
         function initDeptFilter() {
             const select = document.getElementById('deptFilter');
             if(!select) return;
-            
+
             const uniqueDepts = [...new Set(rawData.map(r => r.dept).filter(d => d && d.trim() !== ''))].sort();
             const currentValue = select.value;
-            
+
             select.innerHTML = '<option value="all">ทุกแผนก</option>';
             uniqueDepts.forEach(dept => {
                 const option = document.createElement('option');
@@ -571,11 +571,11 @@
                 option.textContent = dept;
                 select.appendChild(option);
             });
-            
+
             if(uniqueDepts.includes(currentValue)) {
                 select.value = currentValue;
             }
-            
+
             select.onchange = () => applyFilters(true);
         }
 
@@ -589,11 +589,11 @@
             filteredData = rawData.filter(row => {
                 const matchMonth = activeMonthKey === 'all' || row._monthKey === activeMonthKey;
                 const matchDept = selectedDept === 'all' || row.dept === selectedDept;
-                
-                const matchSearch = (row.detail && row.detail.toLowerCase().includes(searchTerm)) || 
+
+                const matchSearch = (row.detail && row.detail.toLowerCase().includes(searchTerm)) ||
                                   (row.operator && row.operator.toLowerCase().includes(searchTerm)) ||
                                   (row.dept && row.dept.toLowerCase().includes(searchTerm));
-                                  
+
                 return matchMonth && matchDept && matchSearch;
             });
 
@@ -745,7 +745,7 @@
                 const operator = getOperatorName(row);
                 const date = String(row.date ?? '').trim() || "ไม่ระบุวัน";
                 const shiftKey = getShiftKey(row);
-                
+
                 // ตรวจสอบว่าเป็น Tele หรือไม่ จากช่อง Type (ต้องเป็น "X-ray - Tele" เท่านั้น ตามที่คุณระบุ)
                 const isTele = isTeleCase(row);
 
@@ -762,7 +762,7 @@
             });
 
             // ใส่ BOM ให้ Excel แสดงภาษาไทยได้ถูกต้อง
-            let csvContent = "\uFEFF"; 
+            let csvContent = "\uFEFF";
             csvContent += `รายงานคำนวณค่าตอบแทน On-call: ${activeMonthDisplay}\n`;
             csvContent += "กฎการคำนวณ:,1. On-call พื้นฐาน 100/เวร,2. ตามระบบ Tele 400/ครั้ง,3. ทั่วไป 200/ครั้ง,(ลิมิตรวมไม่เกิน 800/เวร)\n\n";
             csvContent += "ผู้ปฏิบัติงาน,วันที่เข้าเวร,จำนวนเคส Tele (400),จำนวนเคสทั่วไป (200),ค่าเวรพื้นฐาน,รายได้รวม,ยอดเงินสุทธิ (หักลิมิตแล้ว)\n";
@@ -786,18 +786,18 @@
                     const basePay = PAYMENT_RULES.basePay;
                     const telePay = work.tele * PAYMENT_RULES.telePay;
                     const generalPay = work.general * PAYMENT_RULES.generalPay;
-                    
+
                     const dayTotalRaw = basePay + telePay + generalPay;
                     const dayTotalCapped = Math.min(dayTotalRaw, PAYMENT_RULES.dailyCap);
-                    
+
                     csvContent += toCsvRow([operator, work.date, work.tele, work.general, basePay, dayTotalRaw, dayTotalCapped]) + '\n';
-                    
+
                     operatorTotal += dayTotalCapped;
                     opTele += work.tele;
                     opGeneral += work.general;
                     opShifts += 1;
                 });
-                
+
                 // บรรทัดสรุปยอดรวมของแต่ละคน
                 csvContent += toCsvRow([`สรุปยอดคุณ ${operator}`, `รวม ${opShifts} เวร`, opTele, opGeneral, '-', '', operatorTotal]) + '\n';
                 csvContent += '\n';
@@ -809,7 +809,7 @@
             // บังคับดาวน์โหลด
             const safeFileNameMonth = activeMonthKey === 'all' ? 'All_Time' : activeMonthKey;
             downloadCsv(csvContent, `HR_Payment_Report_${safeFileNameMonth}.csv`);
-            
+
             // Show Toast Success
             showToast("โหลดรายงานคำนวณเงินสำเร็จ");
         }
@@ -851,7 +851,7 @@
         function renderTable(data) {
             const tbody = document.getElementById('tableBody');
             tbody.replaceChildren();
-            
+
             if (data.length === 0) {
                 const row = document.createElement('tr');
                 appendTextCell(row, 'text-center py-8 text-slate-400', 'ไม่พบข้อมูลในเดือนหรือคำค้นหานี้');
@@ -953,7 +953,7 @@
                 const [year, month] = activeMonthKey.split('-');
                 const daysInMonth = new Date(year, month, 0).getDate();
                 labels = Array.from({length: daysInMonth}, (_, i) => `${i + 1}`);
-                
+
                 const dailyCounts = new Array(daysInMonth).fill(0);
                 data.forEach(row => {
                     if(row._dayNum) {
@@ -970,7 +970,7 @@
                 sortedForLine.forEach(row => {
                     if(row.date) dailyCounts[row.date] = (dailyCounts[row.date] || 0) + 1;
                 });
-                labels = Object.keys(dailyCounts).slice(-30); 
+                labels = Object.keys(dailyCounts).slice(-30);
                 dataPoints = Object.values(dailyCounts).slice(-30);
             }
 
@@ -986,7 +986,7 @@
                         datasets: [{
                             label: 'จำนวนปัญหา',
                             data: dataPoints,
-                            borderColor: '#6366f1', 
+                            borderColor: '#6366f1',
                             backgroundColor: 'rgba(99, 102, 241, 0.1)',
                             borderWidth: 3,
                             pointBackgroundColor: '#ffffff',
@@ -996,7 +996,7 @@
                             pointHoverRadius: 6,
                             fill: true,
 
-                            tension: 0.4 
+                            tension: 0.4
                         }]
                     },
                     options: {
@@ -1015,7 +1015,7 @@
 
         function renderTimeChart(data) {
             const ctxTime = document.getElementById('timeChart').getContext('2d');
-            
+
             const timeCounts = data.reduce((acc, curr) => {
                 if(curr._hourKey !== "ไม่ระบุ") {
                     acc[curr._hourKey] = (acc[curr._hourKey] || 0) + 1;
@@ -1063,8 +1063,8 @@
                 if(curr.dept) acc[curr.dept] = (acc[curr.dept] || 0) + 1;
                 return acc;
             }, {});
-            
-            const sortedDepts = Object.entries(deptCounts).sort((a, b) => b[1] - a[1]).slice(0, 10); 
+
+            const sortedDepts = Object.entries(deptCounts).sort((a, b) => b[1] - a[1]).slice(0, 10);
             const deptLabels = sortedDepts.map(item => item[0]);
             const deptData = sortedDepts.map(item => item[1]);
 
@@ -1076,13 +1076,13 @@
             const staffData = Object.values(staffCounts);
 
             const defaultColors = ['#ec4899', '#eab308', '#f43f5e', '#84cc16', '#14b8a6', '#64748b'];
-            
+
             const staffColors = staffLabels.map((name, i) => {
                 const n = name.toLowerCase();
-                if (n.includes('กรพี')) return '#f97316'; 
-                if (n.includes('อธิบดี')) return '#8b5cf6'; 
-                if (n.includes('อัศวิน')) return '#0ea5e9'; 
-                if (n.includes('ณภัทร')) return '#10b981'; 
+                if (n.includes('กรพี')) return '#f97316';
+                if (n.includes('อธิบดี')) return '#8b5cf6';
+                if (n.includes('อัศวิน')) return '#0ea5e9';
+                if (n.includes('ณภัทร')) return '#10b981';
                 return defaultColors[i % defaultColors.length];
             });
 
@@ -1099,7 +1099,7 @@
                         datasets: [{
                             label: 'จำนวน Ticket',
                             data: deptData,
-                            backgroundColor: 'rgba(59, 130, 246, 0.8)', 
+                            backgroundColor: 'rgba(59, 130, 246, 0.8)',
                             hoverBackgroundColor: 'rgba(37, 99, 235, 1)',
                             borderRadius: 6,
                         }]
@@ -1107,9 +1107,9 @@
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
-                        animation: { duration: 800, easing: 'easeOutBounce' }, 
+                        animation: { duration: 800, easing: 'easeOutBounce' },
                         plugins: { legend: { display: false } },
-                        scales: { 
+                        scales: {
                             y: { beginAtZero: true, ticks: { stepSize: 1 } },
                             x: { grid: { display: false } }
                         }
@@ -1121,7 +1121,7 @@
             if (staffChartInstance) {
                 staffChartInstance.data.labels = staffLabels;
                 staffChartInstance.data.datasets[0].data = staffData;
-                staffChartInstance.data.datasets[0].backgroundColor = staffColors; 
+                staffChartInstance.data.datasets[0].backgroundColor = staffColors;
                 staffChartInstance.update();
             } else {
                 staffChartInstance = new Chart(ctxStaff, {
@@ -1130,17 +1130,17 @@
                         labels: staffLabels,
                         datasets: [{
                             data: staffData,
-                            backgroundColor: staffColors, 
+                            backgroundColor: staffColors,
                             borderWidth: 2,
                             borderColor: '#ffffff',
-                            hoverOffset: 8 
+                            hoverOffset: 8
                         }]
                     },
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
                         animation: { animateScale: true, animateRotate: true, duration: 1000 },
-                        plugins: { 
+                        plugins: {
                             legend: { position: 'right', labels: { usePointStyle: true, boxWidth: 8 } }
                         },
                         cutout: '65%'
@@ -1155,9 +1155,9 @@
                 return;
             }
 
-            let csvContent = "\uFEFF"; 
+            let csvContent = "\uFEFF";
             csvContent += toCsvRow(['วันที่', 'เวลา', 'ผู้ปฏิบัติงาน', 'รายละเอียดปัญหา', 'ประเภท', 'แผนก']) + '\n';
-            
+
             filteredData.forEach(row => {
                 csvContent += toCsvRow([row.date, row.time, row.operator, row.detail, row.type, row.dept]) + '\n';
             });
@@ -1189,20 +1189,20 @@
             isFetching = true;
             refreshButton.disabled = true;
             setApiStatus('กำลังโหลด...', 'text-blue-600');
-            
+
             try {
                 const response = await fetch(webAppUrl, { signal: controller.signal, headers: { Accept: 'application/json' } });
                 if (!response.ok) throw new Error(`Status: ${response.status}`);
                 const rawJson = await response.json();
                 if (!Array.isArray(rawJson)) throw new Error('รูปแบบข้อมูล API ไม่ถูกต้อง');
-                
+
                 rawData = processData(rawJson);
                 initMonthSelector();
                 initDeptFilter();
                 applyFilters(true);
                 setApiStatus(rawJson.length === 0 ? 'ไม่มีข้อมูล' : 'เชื่อมต่อสำเร็จ', rawJson.length === 0 ? 'text-slate-400' : 'text-emerald-600');
                 setLastUpdated();
-                
+
             } catch (error) {
                 console.error("API Error:", error);
                 setApiStatus(error.name === 'AbortError' ? 'หมดเวลารอข้อมูล' : 'เกิดข้อผิดพลาด', 'text-red-500');

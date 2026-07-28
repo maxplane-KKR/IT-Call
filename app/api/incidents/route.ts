@@ -33,7 +33,7 @@ const incidentSource = createIncidentSource({
   fetchSource: async () => {
     const response = await fetch(SOURCE_URL, {
       cache: "no-store",
-      signal: AbortSignal.timeout(30_000),
+      signal: AbortSignal.timeout(45_000),
     });
     if (!response.ok) throw new Error(`Apps Script returned ${response.status}`);
     return recentIncidentRows(await response.json(), { years: 3 });

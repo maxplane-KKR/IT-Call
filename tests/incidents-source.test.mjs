@@ -135,5 +135,5 @@ test("allows a cold Apps Script response enough time to seed the edge cache", as
     "utf8",
   );
 
-  assert.match(route, /AbortSignal\.timeout\(30_000\)/);
+  assert.match(route, /AbortSignal\.timeout\(45_000\)/);
 });

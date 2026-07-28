@@ -51,7 +51,13 @@ test("removes the temporary starter preview infrastructure", async () => {
   assert.match(layout, /IT On-call Compensation Desk/);
   assert.doesNotMatch(layout, /Starter Project|codex-preview|_sites-preview/);
   assert.doesNotMatch(packageJson, /react-loading-skeleton/);
-  assert.deepEqual(await readdir(new URL("../app/_sites-preview/", import.meta.url)), []);
+  const previewDirectory = await readdir(
+    new URL("../app/_sites-preview/", import.meta.url),
+  ).catch((error) => {
+    if (error?.code === "ENOENT") return [];
+    throw error;
+  });
+  assert.deepEqual(previewDirectory, []);
 });
 
 test("removes the access notice card from the operation log", async () => {

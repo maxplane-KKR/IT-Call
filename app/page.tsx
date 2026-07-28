@@ -76,7 +76,7 @@ export default function Home() {
     setRefreshing(true);
     setRefreshSeconds(300);
     try {
-      const response = await fetch(INCIDENTS_ENDPOINT, { cache: "no-store" });
+      const response = await fetch(INCIDENTS_ENDPOINT);
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
       const payload: unknown = await response.json();
       if (!Array.isArray(payload)) throw new Error("Malformed response");

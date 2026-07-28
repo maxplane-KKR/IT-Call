@@ -457,11 +457,6 @@ select:focus-visible {
 .events-heading { align-items: flex-end; }
 .events-heading .section-note { margin-top: 7px; }
 
-.access-notice { align-items: flex-start; background: rgba(255, 210, 122, 0.07); border: 1px solid rgba(255, 210, 122, 0.16); border-radius: var(--radius-sm); color: var(--muted); display: flex; gap: 10px; margin-bottom: 19px; padding: 12px 14px; }
-.access-notice p { font-size: 12px; line-height: 1.5; margin: 0; }
-.access-notice strong { color: var(--amber); }
-.notice-mark { align-items: center; border: 1px solid rgba(255, 210, 122, 0.5); border-radius: 50%; color: var(--amber); display: inline-flex; font-family: "Fira Code", monospace; font-size: 11px; height: 18px; justify-content: center; min-width: 18px; }
-
 .table-wrap { overflow-x: auto; }
 table { border-collapse: collapse; min-width: 800px; width: 100%; }
 th { color: var(--faint); font-family: "Fira Code", monospace; font-size: 10px; font-weight: 500; letter-spacing: 0.06em; padding: 0 12px 11px; text-align: left; text-transform: uppercase; }
@@ -622,7 +617,6 @@ body,
 .metric-card,
 .filter-control select,
 .theme-toggle,
-.access-notice,
 .record-card {
   transition: background 220ms var(--ease), background-color 220ms var(--ease), border-color 220ms var(--ease), color 220ms var(--ease), box-shadow 220ms var(--ease);
 }
@@ -731,11 +725,6 @@ html[data-theme="light"] .metric-card-warning strong { color: #985f00; }
 html[data-theme="light"] .analysis-badge { background: rgba(42, 101, 174, 0.07); }
 html[data-theme="light"] .bar-track { background: rgba(42, 101, 174, 0.12); }
 html[data-theme="light"] .share-avatar { background: rgba(47, 123, 218, 0.12); border-color: rgba(47, 123, 218, 0.24); }
-
-html[data-theme="light"] .access-notice {
-  background: rgba(255, 210, 122, 0.16);
-  border-color: rgba(190, 137, 37, 0.24);
-}
 
 html[data-theme="light"] td { border-top-color: rgba(42, 89, 137, 0.11); }
 html[data-theme="light"] tbody tr:hover { background: rgba(42, 101, 174, 0.055); }

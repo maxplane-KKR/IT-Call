@@ -1,10 +1,12 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   filterRecords,
+  INCIDENTS_ENDPOINT,
+  normalizeLiveRows,
   rateCard,
-  sampleRecords,
+  sortMonthsDescending,
   summarizeRecords,
   toCsv,
 } from "../lib/dashboard-data.mjs";
@@ -18,6 +20,19 @@ import {
 type FilterKey = "month" | "operator" | "eventType" | "department";
 type FilterState = Record<FilterKey, string>;
 type Theme = "dark" | "light";
+type DataStatus = "loading" | "success" | "error" | "refresh-error";
+type DashboardRecord = {
+  id: string;
+  date: string;
+  time: string;
+  month: string;
+  operator: string;
+  department: string;
+  eventType: string;
+  detail?: string;
+  compensation: number;
+  capped?: boolean;
+};
 
 const ALL = "ทั้งหมด";
 const filterLabels: Record<FilterKey, string> = {
@@ -25,13 +40,6 @@ const filterLabels: Record<FilterKey, string> = {
   operator: "ผู้ปฏิบัติงาน",
   eventType: "ประเภทเหตุการณ์",
   department: "แผนก",
-};
-
-const filterOptions: Record<FilterKey, string[]> = {
-  month: [ALL, ...new Set(sampleRecords.map((record) => record.month))],
-  operator: [ALL, ...new Set(sampleRecords.map((record) => record.operator))],
-  eventType: [ALL, "Tele", "ทั่วไป"],
-  department: [ALL, ...new Set(sampleRecords.map((record) => record.department))],
 };
 
 const initialFilters: FilterState = {
@@ -52,24 +60,55 @@ function formatDate(date: string) {
   return `${day}/${month}`;
 }
 
-function severityClass(severity: string) {
-  if (severity === "วิกฤต") return "tone-critical";
-  if (severity === "สูง") return "tone-high";
-  if (severity === "กลาง") return "tone-medium";
-  return "tone-low";
-}
-
 export default function Home() {
+  const [records, setRecords] = useState<DashboardRecord[]>([]);
   const [filters, setFilters] = useState<FilterState>(initialFilters);
   const [theme, setTheme] = useState<Theme>("dark");
   const [refreshSeconds, setRefreshSeconds] = useState(300);
   const [refreshing, setRefreshing] = useState(false);
   const [lastUpdated, setLastUpdated] = useState("ยังไม่มีการอัปเดต");
   const [exportMessage, setExportMessage] = useState("");
+  const [dataStatus, setDataStatus] = useState<DataStatus>("loading");
+  const [dataError, setDataError] = useState("");
+  const hasLoadedRecords = useRef(false);
+
+  const refresh = useCallback(async () => {
+    setRefreshing(true);
+    setRefreshSeconds(300);
+    try {
+      const response = await fetch(INCIDENTS_ENDPOINT, { cache: "no-store" });
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      const payload: unknown = await response.json();
+      if (!Array.isArray(payload)) throw new Error("Malformed response");
+
+      setRecords(normalizeLiveRows(payload));
+      setLastUpdated(
+        new Intl.DateTimeFormat("th-TH", {
+          dateStyle: "medium",
+          timeStyle: "short",
+        }).format(new Date()),
+      );
+      setDataStatus("success");
+      setDataError("");
+      hasLoadedRecords.current = true;
+    } catch (error) {
+      setDataStatus(hasLoadedRecords.current ? "refresh-error" : "error");
+      setDataError(error instanceof Error ? error.message : "โหลดข้อมูลไม่สำเร็จ");
+    } finally {
+      setRefreshing(false);
+    }
+  }, []);
+
+  const filterOptions = useMemo<Record<FilterKey, string[]>>(() => ({
+    month: [ALL, ...sortMonthsDescending(records)],
+    operator: [ALL, ...new Set(records.map((record) => record.operator))],
+    eventType: [ALL, ...new Set(records.map((record) => record.eventType))],
+    department: [ALL, ...new Set(records.map((record) => record.department).filter(Boolean))],
+  }), [records]);
 
   const visibleRecords = useMemo(
-    () => filterRecords(sampleRecords, filters),
-    [filters],
+    () => filterRecords(records, filters),
+    [records, filters],
   );
   const summary = useMemo(
     () => summarizeRecords(visibleRecords),
@@ -82,6 +121,14 @@ export default function Home() {
   );
   const maxHourValue = Math.max(1, ...summary.byHour.map((item) => item.value));
 
+  const statusText = dataStatus === "loading"
+    ? "กำลังโหลดข้อมูล"
+    : dataStatus === "success"
+      ? "ข้อมูลพร้อมใช้งาน"
+      : dataStatus === "refresh-error"
+        ? "ข้อมูลเดิมยังอยู่ · อัปเดตไม่สำเร็จ"
+        : "โหลดข้อมูลไม่สำเร็จ";
+
   useEffect(() => {
     const storedTheme = window.localStorage.getItem(THEME_STORAGE_KEY);
     const initialTheme: Theme = isTheme(storedTheme) ? (storedTheme as Theme) : "dark";
@@ -90,6 +137,12 @@ export default function Home() {
     const frame = window.requestAnimationFrame(() => setTheme(initialTheme));
     return () => window.cancelAnimationFrame(frame);
   }, []);
+
+  useEffect(() => {
+    // Initial fetch is the external synchronization performed by this effect.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    void refresh();
+  }, [refresh]);
 
   useEffect(() => {
     const timer = window.setInterval(() => {
@@ -118,29 +171,19 @@ export default function Home() {
 
   function handleRefresh() {
     if (refreshing) return;
-    setRefreshing(true);
     setExportMessage("");
-    window.setTimeout(() => {
-      setRefreshSeconds(300);
-      setLastUpdated(
-        new Intl.DateTimeFormat("th-TH", {
-          dateStyle: "medium",
-          timeStyle: "short",
-        }).format(new Date()),
-      );
-      setRefreshing(false);
-    }, 700);
+    void refresh();
   }
 
   function handleExport() {
     try {
-      const blob = new Blob([toCsv(visibleRecords)], {
+      const blob = new Blob(["\uFEFF", toCsv(visibleRecords)], {
         type: "text/csv;charset=utf-8;",
       });
       const url = URL.createObjectURL(blob);
       const anchor = document.createElement("a");
       anchor.href = url;
-      anchor.download = "it-oncall-compensation-local.csv";
+      anchor.download = "it-oncall-compensation.csv";
       anchor.click();
       URL.revokeObjectURL(url);
       setExportMessage(`ส่งออก ${visibleRecords.length} รายการแล้ว`);
@@ -166,7 +209,7 @@ export default function Home() {
           <div className="topbar-actions">
             <span className="preview-pill">
               <span className="status-dot" aria-hidden="true" />
-              LOCAL PREVIEW
+              LIVE DATA
             </span>
             <button
               className="theme-toggle"
@@ -203,9 +246,10 @@ export default function Home() {
             <div className="hero-meta" aria-live="polite">
               <span className="live-label">
                 <span className="status-dot" aria-hidden="true" />
-                ข้อมูลตัวอย่างสำหรับ local preview
+                ข้อมูลปฏิบัติการล่าสุด
               </span>
               <span>อัปเดตล่าสุด {lastUpdated}</span>
+              {dataError ? <span className="data-error" role="alert">{dataError}</span> : null}
             </div>
           </div>
 
@@ -217,7 +261,7 @@ export default function Home() {
                   {Math.floor(refreshSeconds / 60)}:{String(refreshSeconds % 60).padStart(2, "0")}
                 </p>
               </div>
-              <span className="status-chip">พร้อมใช้งาน</span>
+              <span className={`status-chip status-chip-${dataStatus}`}>{statusText}</span>
             </div>
             <div className="rate-grid">
               {rateCard.map((rate) => (
@@ -242,7 +286,7 @@ export default function Home() {
                 ล้างตัวกรอง
               </button>
             ) : (
-              <span className="filter-hint">แสดงข้อมูลตัวอย่างทั้งหมด</span>
+              <span className="filter-hint">{dataStatus === "loading" ? "กำลังซิงก์ข้อมูลจริง" : "แสดงข้อมูลล่าสุด"}</span>
             )}
           </div>
           <div className="filter-grid">
@@ -404,10 +448,6 @@ export default function Home() {
             </button>
           </div>
 
-          <div className="access-notice" role="note">
-            <span className="notice-mark" aria-hidden="true">i</span>
-            <p><strong>ข้อมูลจำกัดสิทธิ์:</strong> รายละเอียดและ HN แสดงเฉพาะผู้มีสิทธิ์เข้าถึงเท่านั้น · local preview ใช้ sample data</p>
-          </div>
           <p className="sr-only" aria-live="polite">{exportMessage}</p>
           {visibleRecords.length ? (
             <>
@@ -420,9 +460,6 @@ export default function Home() {
                       <th scope="col">ผู้ปฏิบัติงาน</th>
                       <th scope="col">แผนก</th>
                       <th scope="col">เหตุการณ์</th>
-                      <th scope="col">ระดับ</th>
-                      <th scope="col">ระยะเวลา</th>
-                      <th scope="col">ค่าตอบแทน</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -432,9 +469,6 @@ export default function Home() {
                         <td>{record.operator}</td>
                         <td>{record.department}</td>
                         <td><span className={`event-tag ${record.eventType === "Tele" ? "event-tag-blue" : "event-tag-green"}`}>{record.eventType}</span></td>
-                        <td><span className={`severity-tag ${severityClass(record.severity)}`}>{record.severity}</span></td>
-                        <td>{record.durationMinutes} นาที</td>
-                        <td><strong>{formatNumber(record.compensation)} บาท</strong>{record.capped ? <span className="capped-label">เพดาน</span> : null}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -443,9 +477,9 @@ export default function Home() {
               <div className="mobile-records">
                 {visibleRecords.map((record) => (
                   <article className="record-card" key={record.id}>
-                    <div className="record-card-top"><span className="record-date">{formatDate(record.date)} · {record.time}</span><span className={`severity-tag ${severityClass(record.severity)}`}>{record.severity}</span></div>
+                    <div className="record-card-top"><span className="record-date">{formatDate(record.date)} · {record.time}</span></div>
                     <div className="record-card-main"><strong>{record.operator}</strong><span>{record.department}</span></div>
-                    <div className="record-card-bottom"><span className={`event-tag ${record.eventType === "Tele" ? "event-tag-blue" : "event-tag-green"}`}>{record.eventType}</span><span>{record.durationMinutes} นาที</span><strong>{formatNumber(record.compensation)} บาท</strong></div>
+                    <div className="record-card-bottom"><span className={`event-tag ${record.eventType === "Tele" ? "event-tag-blue" : "event-tag-green"}`}>{record.eventType}</span></div>
                   </article>
                 ))}
               </div>
@@ -462,7 +496,6 @@ export default function Home() {
 
         <footer className="dashboard-footer">
           <span>IT ON-CALL COMPENSATION DESK</span>
-          <span>LOCAL RECONSTRUCTION / SAMPLE DATA</span>
         </footer>
       </div>
     </main>

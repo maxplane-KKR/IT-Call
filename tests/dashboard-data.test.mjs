@@ -2,7 +2,9 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import {
   filterRecords,
+  normalizeLiveRows,
   sampleRecords,
+  sortMonthsDescending,
   summarizeRecords,
   toCsv,
 } from "../lib/dashboard-data.mjs";
@@ -40,5 +42,80 @@ test("exports visible records as a CSV with a header", () => {
   const csv = toCsv(sampleRecords.slice(0, 2));
 
   assert.match(csv, /^วันที่,ผู้ปฏิบัติงาน,แผนก,ประเภทเหตุการณ์/);
-  assert.equal(csv.trim().split("\n").length, 3);
+  assert.match(csv, /สรุปรายได้รายบุคคล/);
+});
+
+test("adds per-operator income summaries with brief event details", () => {
+  const records = normalizeLiveRows([
+    { operator: "A", date: "1/7/2026", time: "20:00:00", detail: "VPN access", type: "X-ray - Tele", dept: "ER" },
+    { operator: "A", date: "1/7/2026", time: "21:00:00", detail: "ตรวจสอบระบบ", type: "X-ray - Tele", dept: "ER" },
+    { operator: "A", date: "1/7/2026", time: "22:00:00", detail: "รีเซ็ตรหัสผ่าน", type: "ทั่วไป", dept: "ER" },
+  ]);
+  const csv = toCsv(records);
+
+  assert.match(csv, /ผู้ปฏิบัติงาน,รายได้รวม \(บาท\),จำนวนรายการ,รายละเอียดโดยย่อ/);
+  assert.match(csv, /A,800,3,Tele 2 ครั้ง · ทั่วไป 1 ครั้ง/);
+});
+
+test("includes compensation conditions in the CSV", () => {
+  const csv = toCsv(sampleRecords.slice(0, 1));
+
+  assert.match(csv, /เงื่อนไขค่าตอบแทน/);
+  assert.match(csv, /ค่าเวร,100,บาท/);
+  assert.match(csv, /Tele,400,บาท/);
+  assert.match(csv, /ทั่วไป,200,บาท/);
+  assert.match(csv, /เพดาน,800,บาท/);
+});
+
+test("normalizes the previous version incident source into dashboard records", () => {
+  const [record] = normalizeLiveRows([{
+    timestamp: "23/7/2026, 10:00:00",
+    operator: "อัศวิน",
+    date: "23/7/2026",
+    time: "10:00:00",
+    detail: "VPN access",
+    type: "X-ray - Tele",
+    dept: "Xray",
+  }]);
+
+  assert.equal(record.operator, "อัศวิน");
+  assert.equal(record.date, "2026-07-23");
+  assert.equal(record.eventType, "Tele");
+  assert.equal(record.department, "Xray");
+  assert.equal(record.shiftKey, "อัศวิน|2026-07-23");
+});
+
+test("uses the previous version's per-shift base rate and cap", () => {
+  const records = normalizeLiveRows([
+    { operator: "A", date: "1/7/2026", time: "20:00:00", type: "X-ray - Tele", dept: "ER" },
+    { operator: "A", date: "1/7/2026", time: "21:00:00", type: "X-ray - Tele", dept: "ER" },
+    { operator: "A", date: "1/7/2026", time: "22:00:00", type: "ทั่วไป", dept: "ER" },
+  ]);
+
+  const summary = summarizeRecords(records);
+
+  assert.equal(summary.shifts, 1);
+  assert.equal(summary.paidCompensation, 800);
+  assert.equal(summary.cappedAmount, 300);
+  assert.equal(summary.teleEvents, 2);
+  assert.equal(summary.generalEvents, 1);
+});
+
+test("does not export removed level or duration columns", () => {
+  const csv = toCsv(normalizeLiveRows([
+    { operator: "A", date: "1/7/2026", time: "20:00:00", type: "ทั่วไป", dept: "ER" },
+  ]));
+
+  assert.doesNotMatch(csv, /ระดับ|ระยะเวลา/);
+});
+
+test("sorts month filter options from the latest data to the oldest", () => {
+  const months = sortMonthsDescending([
+    { month: "มกราคม 2563", date: "2020-01-02" },
+    { month: "กรกฎาคม 2569", date: "2026-07-23" },
+    { month: "มิถุนายน 2569", date: "2026-06-29" },
+    { month: "กรกฎาคม 2569", date: "2026-07-01" },
+  ]);
+
+  assert.deepEqual(months, ["กรกฎาคม 2569", "มิถุนายน 2569", "มกราคม 2563"]);
 });

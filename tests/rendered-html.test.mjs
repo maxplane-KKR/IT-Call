@@ -53,3 +53,34 @@ test("removes the temporary starter preview infrastructure", async () => {
   assert.doesNotMatch(packageJson, /react-loading-skeleton/);
   assert.deepEqual(await readdir(new URL("../app/_sites-preview/", import.meta.url)), []);
 });
+
+test("removes the access notice card from the operation log", async () => {
+  const page = await readFile(new URL("../app/page.tsx", import.meta.url), "utf8");
+
+  assert.doesNotMatch(page, /access-notice|ข้อมูลจำกัดสิทธิ์|notice-mark/);
+});
+
+test("uses neutral copy for the live data status", async () => {
+  const page = await readFile(new URL("../app/page.tsx", import.meta.url), "utf8");
+
+  assert.doesNotMatch(page, /เวอร์ชันก่อน/);
+  assert.match(page, /ข้อมูลปฏิบัติการล่าสุด/);
+});
+
+test("removes compensation from operation log entries", async () => {
+  const page = await readFile(new URL("../app/page.tsx", import.meta.url), "utf8");
+
+  assert.doesNotMatch(page, /<th scope="col">ค่าตอบแทน<\/th>|record\.compensation/);
+});
+
+test("adds a UTF-8 BOM when downloading CSV", async () => {
+  const page = await readFile(new URL("../app/page.tsx", import.meta.url), "utf8");
+
+  assert.match(page, /new Blob\(\["\\uFEFF", toCsv\(visibleRecords\)\]/);
+});
+
+test("removes the source disclosure footer label", async () => {
+  const page = await readFile(new URL("../app/page.tsx", import.meta.url), "utf8");
+
+  assert.doesNotMatch(page, /LIVE SOURCE \/ PREVIOUS VERSION DATA/);
+});

@@ -1,31 +1,28 @@
-import type { Metadata } from "next";
-import { headers } from "next/headers";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
-const title = "IT On-call | สรุปเวรและค่าตอบแทน";
-const description = "แดชบอร์ดติดตามเวร เหตุการณ์ และค่าตอบแทนทีมไอที";
+export const metadata: Metadata = {
+  title: "IT On-call Compensation Desk",
+  description: "Local preview of the IT on-call compensation dashboard.",
+  icons: {
+    icon: "/favicon.svg",
+    shortcut: "/favicon.svg",
+  },
+};
 
-export async function generateMetadata(): Promise<Metadata> {
-  const requestHeaders = await headers();
-  const host = requestHeaders.get("x-forwarded-host") ?? requestHeaders.get("host") ?? "localhost";
-  const protocol = requestHeaders.get("x-forwarded-proto") ?? (host.startsWith("localhost") ? "http" : "https");
-  const origin = `${protocol}://${host}`;
-  const image = `${origin}/og.png`;
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+};
 
-  return {
-    title,
-    description,
-    manifest: "/manifest-v2.webmanifest",
-    icons: {
-      icon: "/favicon-v3.ico",
-      shortcut: "/favicon-v3.ico",
-      apple: "/apple-touch-icon-v2.png",
-    },
-    openGraph: { title, description, images: [{ url: image, width: 1200, height: 630 }] },
-    twitter: { card: "summary_large_image", title, description, images: [image] },
-  };
-}
-
-export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  return <html lang="th"><body>{children}</body></html>;
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
+  return (
+    <html lang="th">
+      <body>{children}</body>
+    </html>
+  );
 }

@@ -1,6 +1,13 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  useCallback,
+  useDeferredValue,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import {
   filterRecords,
   INCIDENTS_ENDPOINT,
@@ -58,7 +65,6 @@ function formatDate(date: string) {
 export default function Home() {
   const [records, setRecords] = useState<DashboardRecord[]>([]);
   const [filters, setFilters] = useState<FilterState>(initialFilters);
-  const [refreshSeconds, setRefreshSeconds] = useState(300);
   const [refreshing, setRefreshing] = useState(false);
   const [lastUpdated, setLastUpdated] = useState("ยังไม่มีการอัปเดต");
   const [exportMessage, setExportMessage] = useState("");
@@ -69,7 +75,6 @@ export default function Home() {
 
   const refresh = useCallback(async () => {
     setRefreshing(true);
-    setRefreshSeconds(300);
     try {
       const response = await fetch(INCIDENTS_ENDPOINT);
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
@@ -101,9 +106,10 @@ export default function Home() {
     department: [ALL, ...new Set(records.map((record) => record.department).filter(Boolean))],
   }), [records]);
 
+  const deferredFilters = useDeferredValue(filters);
   const visibleRecords = useMemo(
-    () => filterRecords(records, filters),
-    [records, filters],
+    () => filterRecords(records, deferredFilters),
+    [records, deferredFilters],
   );
   const summary = useMemo(
     () => summarizeRecords(visibleRecords),
@@ -137,10 +143,10 @@ export default function Home() {
   useEffect(() => {
     const timer = window.setInterval(() => {
       if (document.visibilityState !== "visible") return;
-      setRefreshSeconds((current) => (current <= 1 ? 300 : current - 1));
-    }, 1000);
+      void refresh();
+    }, 300_000);
     return () => window.clearInterval(timer);
-  }, []);
+  }, [refresh]);
 
   function updateFilter(key: FilterKey, value: string) {
     setFilters((current) => ({ ...current, [key]: value }));
@@ -230,10 +236,8 @@ export default function Home() {
           <div className="status-card glass-card" aria-label="สถานะเวรและอัตราค่าตอบแทน">
             <div className="status-card-header">
               <div>
-                <p className="eyebrow">NEXT REFRESH</p>
-                <p className="refresh-countdown">
-                  {Math.floor(refreshSeconds / 60)}:{String(refreshSeconds % 60).padStart(2, "0")}
-                </p>
+                <p className="eyebrow">AUTO REFRESH</p>
+                <p className="refresh-countdown">5 MIN</p>
               </div>
               <span className={`status-chip status-chip-${dataStatus}`}>{statusText}</span>
             </div>
@@ -260,7 +264,9 @@ export default function Home() {
                 ล้างตัวกรอง
               </button>
             ) : (
-              <span className="filter-hint">{dataStatus === "loading" ? "กำลังซิงก์ข้อมูลจริง" : "แสดงข้อมูลล่าสุด"}</span>
+              <span className="filter-hint">
+                {dataStatus === "loading" ? "กำลังซิงก์ข้อมูลจริง" : "ข้อมูลย้อนหลัง 3 ปี"}
+              </span>
             )}
           </div>
           <div className="filter-grid">

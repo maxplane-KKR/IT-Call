@@ -89,3 +89,19 @@ test("removes the source disclosure footer label", async () => {
 
   assert.doesNotMatch(page, /LIVE SOURCE \/ PREVIOUS VERSION DATA/);
 });
+
+test("keeps filter controls responsive between automatic refreshes", async () => {
+  const page = await readFile(new URL("../app/page.tsx", import.meta.url), "utf8");
+
+  assert.match(page, /useDeferredValue\(filters\)/);
+  assert.match(page, /AUTO REFRESH/);
+  assert.match(page, /5 MIN/);
+  assert.match(page, /300_000/);
+  assert.doesNotMatch(page, /refreshSeconds|setRefreshSeconds|,\s*1000\)/);
+});
+
+test("labels the rolling three-year data scope", async () => {
+  const page = await readFile(new URL("../app/page.tsx", import.meta.url), "utf8");
+
+  assert.match(page, /ข้อมูลย้อนหลัง 3 ปี/);
+});

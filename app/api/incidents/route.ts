@@ -1,15 +1,42 @@
-import { createIncidentSource } from "../../../lib/incidents-source.mjs";
+import {
+  createIncidentSource,
+  recentIncidentRows,
+} from "../../../lib/incidents-source.mjs";
+import { getRequestExecutionContext } from "vinext/shims/request-context";
 
 const SOURCE_URL = "https://script.google.com/macros/s/AKfycbzet3nNEL9X8pEqB0YiqseO8GylRGTQZbtcCw4EVBfro19JkmPUouoCmVq6OjO2mMM2zA/exec";
+const EDGE_CACHE_KEY = new Request("https://it-oncall.internal/cache/incidents-rolling-3y-v1");
+
+function edgeCache() {
+  return (globalThis.caches as CacheStorage & { default?: Cache } | undefined)?.default ?? null;
+}
 
 const incidentSource = createIncidentSource({
+  readSharedCache: async () => {
+    const cache = edgeCache();
+    const response = cache ? await cache.match(EDGE_CACHE_KEY) : null;
+    return response ? response.json() : null;
+  },
+  writeSharedCache: async (entry) => {
+    const cache = edgeCache();
+    if (!cache) return;
+    await cache.put(
+      EDGE_CACHE_KEY,
+      Response.json(entry, {
+        headers: { "Cache-Control": "public, max-age=86400" },
+      }),
+    );
+  },
+  scheduleBackground: (promise) => {
+    getRequestExecutionContext()?.waitUntil(promise);
+  },
   fetchSource: async () => {
     const response = await fetch(SOURCE_URL, {
       cache: "no-store",
       signal: AbortSignal.timeout(15_000),
     });
     if (!response.ok) throw new Error(`Apps Script returned ${response.status}`);
-    return response.json();
+    return recentIncidentRows(await response.json(), { years: 3 });
   },
 });
 

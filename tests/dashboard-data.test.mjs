@@ -130,3 +130,20 @@ test("limits the operation log render window without dropping filtered totals", 
   );
   assert.equal(records.length, 225);
 });
+
+test("normalizes a production-sized Apps Script response within the interaction budget", () => {
+  const rows = Array.from({ length: 1_000 }, (_, index) => ({
+    operator: `Operator ${index % 4}`,
+    date: `${(index % 28) + 1}/7/2026`,
+    time: "20:00:00",
+    type: "X-ray - Tele",
+    dept: `Department ${index % 20}`,
+  }));
+  const startedAt = performance.now();
+
+  assert.equal(normalizeLiveRows(rows).length, rows.length);
+  assert.ok(
+    performance.now() - startedAt < 500,
+    "normalization should leave enough main-thread time for filter interactions",
+  );
+});

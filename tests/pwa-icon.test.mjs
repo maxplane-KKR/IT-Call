@@ -35,6 +35,7 @@ test("PWA assets use the supplied Edge Soft image without recreating the mark", 
 
 test("manifest exposes PNG install icons for Windows, Android, and iOS", () => {
   assert.match(manifest, /display:\s*\"standalone\"/);
+  assert.match(manifest, /orientation:\s*\"any\"/);
   assert.match(manifest, /src:\s*\"\/icon-192\.png\"/);
   assert.match(manifest, /src:\s*\"\/icon-512\.png\"/);
   assert.match(manifest, /src:\s*\"\/maskable-192\.png\"/);

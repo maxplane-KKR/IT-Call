@@ -46,8 +46,8 @@ test("keeps the supplied dashboard content and routes data through the edge API"
   assert.match(dashboard, /รายละเอียดปัญหา/);
   assert.match(dashboard, /รายการแจ้งปัญหา \(Log\)/);
   assert.match(appScript, /url:\s*'\/api\/incidents'/);
-  assert.match(appScript, /timeoutMs:\s*15000/);
-  assert.match(appScript, /fetch\(API_CONFIG\.url/);
+  assert.match(appScript, /timeoutMs:\s*50_000/);
+  assert.match(appScript, /fetchJsonWithRetry\(API_CONFIG\.url/);
   assert.match(dashboard, /Chart\.js|chart\.umd\.min\.js/);
   assert.match(dashboard, /width=device-width, initial-scale=1\.0/);
   assert.doesNotMatch(dashboard, /theme-toggle|โหมดสว่าง|โหมดมืด/i);

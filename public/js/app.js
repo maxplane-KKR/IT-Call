@@ -1,3 +1,5 @@
+import { fetchJsonWithRetry } from './fetch-resilience.js';
+
 /**
  * IT Call Center Analytics Web Application
  * Complete Self-Contained Controller (Works on HTTP/HTTPS and file:// protocol)
@@ -11,7 +13,7 @@
   // ==========================================================================
   const API_CONFIG = Object.freeze({
     url: '/api/incidents',
-    timeoutMs: 15000,
+    timeoutMs: 50_000,
     autoRefreshMs: 5 * 60 * 1000 // 5 minutes
   });
 
@@ -157,9 +159,6 @@
   async function fetchLiveData() {
     if (AppState.isFetching) return;
     
-    const controller = new AbortController();
-    const timeoutId = window.setTimeout(() => controller.abort(), API_CONFIG.timeoutMs);
-    
     AppState.isFetching = true;
     AppState.fetchError = null;
     notifyDataUpdated();
@@ -167,14 +166,10 @@
     let rawJson = null;
 
     try {
-      const response = await fetch(API_CONFIG.url, {
-        method: 'GET',
-        redirect: 'follow',
-        signal: controller.signal
+      rawJson = await fetchJsonWithRetry(API_CONFIG.url, {
+        timeoutMs: API_CONFIG.timeoutMs,
+        attempts: 2
       });
-
-      if (!response.ok) throw new Error(`HTTP Status ${response.status}`);
-      rawJson = await response.json();
 
     } catch (directError) {
       console.warn("Direct fetch error:", directError);
@@ -182,8 +177,6 @@
       AppState.isFetching = false;
       notifyDataUpdated();
       throw directError;
-    } finally {
-      window.clearTimeout(timeoutId);
     }
 
     if (!Array.isArray(rawJson)) {
@@ -204,7 +197,21 @@
   }
 
   function startAutoRefresh() {
-    window.setInterval(fetchLiveData, API_CONFIG.autoRefreshMs);
+    window.setInterval(() => {
+      fetchLiveData().catch(() => undefined);
+    }, API_CONFIG.autoRefreshMs);
+
+    window.addEventListener('online', () => {
+      fetchLiveData().catch(() => undefined);
+    });
+
+    document.addEventListener('visibilitychange', () => {
+      const isStale = !AppState.lastUpdated
+        || Date.now() - AppState.lastUpdated.getTime() >= API_CONFIG.autoRefreshMs;
+      if (document.visibilityState === 'visible' && isStale) {
+        fetchLiveData().catch(() => undefined);
+      }
+    });
   }
 
   // ==========================================================================

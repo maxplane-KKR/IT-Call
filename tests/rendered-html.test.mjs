@@ -33,30 +33,34 @@ test("redirects the root route to the supplied Skeuomorph dashboard", async () =
 });
 
 test("keeps the supplied dashboard content and routes data through the edge API", async () => {
-  const dashboard = await readFile(
-    new URL("../public/IT-Call-Skeuomorph.html", import.meta.url),
-    "utf8",
-  );
+  const [dashboard, appScript] = await Promise.all([
+    readFile(
+      new URL("../public/IT-Call-Skeuomorph.html", import.meta.url),
+      "utf8",
+    ),
+    readFile(new URL("../public/js/app.js", import.meta.url), "utf8"),
+  ]);
 
   assert.match(dashboard, /IT Call Center Analytics/);
   assert.match(dashboard, /สรุปยอดภาระงานรายบุคคล/);
   assert.match(dashboard, /รายละเอียดปัญหา/);
   assert.match(dashboard, /รายการแจ้งปัญหา \(Log\)/);
-  assert.match(dashboard, /const webAppUrl = '\/api\/incidents'/);
-  assert.match(dashboard, /const API_TIMEOUT_MS = 45000/);
+  assert.match(appScript, /url:\s*'\/api\/incidents'/);
+  assert.match(appScript, /timeoutMs:\s*15000/);
+  assert.match(appScript, /fetch\(API_CONFIG\.url/);
   assert.match(dashboard, /Chart\.js|chart\.umd\.min\.js/);
   assert.match(dashboard, /width=device-width, initial-scale=1\.0/);
   assert.doesNotMatch(dashboard, /theme-toggle|โหมดสว่าง|โหมดมืด/i);
 });
 
 test("keeps CSV export UTF-8 and incident details", async () => {
-  const dashboard = await readFile(
-    new URL("../public/IT-Call-Skeuomorph.html", import.meta.url),
+  const appScript = await readFile(
+    new URL("../public/js/app.js", import.meta.url),
     "utf8",
   );
 
-  assert.match(dashboard, /let csvContent = "\\uFEFF"/);
-  assert.match(dashboard, /row\.detail/);
+  assert.match(appScript, /let csvContent = "\\uFEFF"/);
+  assert.match(appScript, /row\.detail/);
 });
 
 test("removes the temporary starter preview infrastructure", async () => {

@@ -2,1697 +2,459 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IT Call Center Dashboard</title>
-        <!-- Google Fonts -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="description" content="IT Call Center Analytics Dashboard - ระบบวิเคราะห์ข้อมูลแจ้งซ่อมและรายงานภาระงาน IT Call Center">
+    <title>IT Call Center Analytics Web Application</title>
+
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700;800&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Tailwind CSS -->
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=Sarabun:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+
+    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com/3.4.17"></script>
-    <!-- Chart.js -->
+    <!-- Chart.js CDN -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
     <!-- Phosphor Icons -->
     <script src="https://unpkg.com/@phosphor-icons/web@2.1.1"></script>
-    <style>
-        body {
-            font-family: 'Sarabun', 'Tahoma', sans-serif;
-            background-color: #e8e0d0;
-            color: #2c2520;
-        }
-        body::before {
-            content: '';
-            position: fixed;
-            inset: 0;
-            background:
-                repeating-linear-gradient(
-                    0deg,
-                    transparent,
-                    transparent 2px,
-                    rgba(0,0,0,0.015) 2px,
-                    rgba(0,0,0,0.015) 4px
-                ),
-                radial-gradient(ellipse at 50% 0%, rgba(200,168,78,0.06) 0%, transparent 70%);
-            pointer-events: none;
-            z-index: 0;
-        }
-        main {
-            position: relative;
-            z-index: 1;
-        }
-        h1, h2, h3, h4, h5, h6, th, .font-kanit {
-            font-family: 'Kanit', sans-serif;
-        }
-        select, input, button, textarea, option {
-            font-family: 'Sarabun', 'Tahoma', sans-serif;
-        }
 
-        .glass-panel {
-            background: linear-gradient(180deg, #fefcf8 0%, #f6f0e4 100%);
-            border: 1px solid #d4c5a9;
-            border-top-color: #fefcf8;
-            border-bottom-color: #b8a88a;
-            border-radius: 14px;
-            box-shadow:
-                0 1px 0 rgba(255,255,255,0.8) inset,
-                0 -1px 0 rgba(0,0,0,0.04) inset,
-                0 4px 12px rgba(90,70,50,0.12),
-                0 1px 3px rgba(90,70,50,0.08);
-            transition: box-shadow 0.3s, transform 0.25s;
-        }
-        .glass-panel:hover {
-            box-shadow:
-                0 1px 0 rgba(255,255,255,0.8) inset,
-                0 -1px 0 rgba(0,0,0,0.04) inset,
-                0 8px 24px rgba(90,70,50,0.16),
-                0 2px 6px rgba(90,70,50,0.1);
-        }
-
-        .custom-scroll::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
-        }
-        .custom-scroll::-webkit-scrollbar-track {
-            background: #e0d8c8;
-            border-radius: 4px;
-            box-shadow: inset 0 1px 2px rgba(0,0,0,0.06);
-        }
-        .custom-scroll::-webkit-scrollbar-thumb {
-            background: linear-gradient(180deg, #c8b89a, #b8a88a);
-            border-radius: 4px;
-            border: 1px solid #a8987a;
-        }
-        .custom-scroll::-webkit-scrollbar-thumb:hover {
-            background: linear-gradient(180deg, #b8a88a, #a8987a);
-        }
-
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(18px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes popIn {
-            0% { opacity: 0; transform: scale(0.92); }
-            100% { opacity: 1; transform: scale(1); }
-        }
-        .animate-fade-in-up {
-            animation: fadeInUp 0.5s cubic-bezier(0.16,1,0.3,1) forwards;
-            opacity: 0;
-        }
-        .animate-pop {
-            animation: popIn 0.4s cubic-bezier(0.16,1,0.3,1) forwards;
-            opacity: 0;
-        }
-        .delay-100 { animation-delay: 100ms; }
-        .delay-200 { animation-delay: 200ms; }
-        .delay-300 { animation-delay: 300ms; }
-        .delay-400 { animation-delay: 400ms; }
-
-        .table-header th {
-            background: linear-gradient(to bottom, #e8e0d0, #ddd5c5);
-            color: #4a3a2a;
-            font-weight: 700;
-            text-transform: uppercase;
-            font-size: 0.75rem;
-            letter-spacing: 0.05em;
-            border-bottom: 1px solid #c8b8a0;
-        }
-
-        .mobile-metric-strip {
-            display: none;
-        }
-
-        .mobile-hr-list,
-        .mobile-log-list {
-            display: none;
-        }
-
-        @media (max-width: 600px) {
-            body,
-            main {
-                max-width: 100%;
-                overflow-x: hidden;
-            }
-
-            main {
-                padding: 12px !important;
-            }
-
-            .desktop-metric-grid {
-                display: none !important;
-            }
-
-            .mobile-metric-strip {
-                display: grid;
-                grid-template-columns: repeat(4, minmax(0, 1fr));
-                gap: 6px;
-                width: 100%;
-                margin-bottom: 1.5rem;
-            }
-
-            .mobile-metric-card {
-                min-width: 0;
-                min-height: 92px;
-                padding: 9px 5px 8px;
-                border: 1px solid #d4c5a9;
-                border-bottom-width: 3px;
-                border-radius: 12px;
-                background: linear-gradient(180deg, #fefcf8 0%, #f6f0e4 100%);
-                box-shadow: 0 2px 7px rgba(90,70,50,0.12);
-                display: grid;
-                grid-template-rows: 27px auto auto;
-                align-items: center;
-                justify-items: center;
-                overflow: hidden;
-            }
-
-            .mobile-metric-card > i {
-                font-size: 22px;
-                line-height: 1;
-            }
-
-            .mobile-metric-card > span {
-                max-width: 100%;
-                color: #64748b;
-                font-size: 9px;
-                font-weight: 600;
-                line-height: 1.1;
-                white-space: nowrap;
-            }
-
-            .mobile-metric-value {
-                display: block;
-                max-width: 100%;
-                color: #1e293b;
-                font-family: 'Kanit', sans-serif;
-                font-size: clamp(12px, 3.5vw, 15px);
-                font-weight: 800;
-                line-height: 1.2;
-                overflow: hidden;
-                text-align: center;
-                text-overflow: ellipsis;
-                white-space: nowrap;
-            }
-
-            .mobile-metric-card-blue { color: #2563eb; border-bottom-color: #3b82f6; }
-            .mobile-metric-card-purple { color: #9333ea; border-bottom-color: #a855f7; }
-            .mobile-metric-card-orange { color: #ea580c; border-bottom-color: #f97316; }
-            .mobile-metric-card-green { color: #059669; border-bottom-color: #10b981; }
-            .mobile-metric-card-green .mobile-metric-value { color: #059669; }
-
-            .hr-report-panel {
-                padding: 16px !important;
-                border-radius: 20px !important;
-            }
-
-            .hr-report-heading {
-                margin-bottom: 16px !important;
-            }
-
-            .hr-report-heading h3 {
-                align-items: flex-start;
-                font-size: 16px;
-                line-height: 1.35;
-            }
-
-            .hr-actions {
-                display: grid !important;
-                grid-template-columns: 1fr;
-                width: 100%;
-            }
-
-            .hr-actions button {
-                justify-content: center;
-                min-height: 44px;
-                width: 100%;
-            }
-
-            .desktop-hr-table {
-                display: none !important;
-            }
-
-            .mobile-hr-list {
-                display: block;
-                min-width: 0;
-                width: 100%;
-            }
-
-            .mobile-hr-row {
-                display: grid;
-                grid-template-columns: 24px minmax(0, 1fr) 42px 58px;
-                gap: 7px;
-                align-items: center;
-                min-width: 0;
-                padding: 12px 0;
-                border-bottom: 1px solid #eadfd0;
-            }
-
-            .mobile-hr-rank {
-                color: #64748b;
-                font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-                font-size: 12px;
-                text-align: center;
-            }
-
-            .mobile-hr-identity {
-                display: flex;
-                align-items: center;
-                gap: 7px;
-                min-width: 0;
-            }
-
-            .mobile-hr-avatar {
-                display: grid;
-                flex: 0 0 26px;
-                width: 26px;
-                height: 26px;
-                place-items: center;
-                border-radius: 999px;
-                background: #ffe4e8;
-                color: #be123c;
-                font-size: 11px;
-                font-weight: 700;
-            }
-
-            .mobile-hr-name {
-                min-width: 0;
-                overflow: hidden;
-                color: #334155;
-                font-size: 13px;
-                line-height: 1.25;
-                text-overflow: ellipsis;
-                white-space: nowrap;
-            }
-
-            .mobile-hr-count {
-                color: #e11d48;
-                font-family: 'Kanit', sans-serif;
-                font-size: 15px;
-                text-align: right;
-            }
-
-            .mobile-hr-share {
-                display: grid;
-                gap: 4px;
-                min-width: 0;
-            }
-
-            .mobile-hr-percentage {
-                color: #64748b;
-                font-size: 10px;
-                text-align: right;
-            }
-
-            .mobile-hr-track {
-                height: 5px;
-                overflow: hidden;
-                border-radius: 999px;
-                background: #f1e8dd;
-            }
-
-            .mobile-hr-bar {
-                display: block;
-                height: 100%;
-                border-radius: inherit;
-                background: linear-gradient(90deg, #fb7185, #e11d48);
-            }
-
-            .mobile-hr-total {
-                display: flex;
-                justify-content: space-between;
-                gap: 12px;
-                margin: 12px -16px -16px;
-                padding: 14px 16px;
-                border-radius: 0 0 18px 18px;
-                background: #f8fafc;
-                color: #334155;
-            }
-
-            .mobile-hr-total strong:last-child {
-                color: #e11d48;
-                font-family: 'Kanit', sans-serif;
-                font-size: 18px;
-            }
-
-            .mobile-report-empty {
-                padding: 28px 12px;
-                color: #94a3b8;
-                font-size: 13px;
-                text-align: center;
-                overflow-wrap: anywhere;
-            }
-
-            .log-panel {
-                border-radius: 20px !important;
-            }
-
-            .log-toolbar {
-                padding: 16px !important;
-            }
-
-            .log-filters {
-                display: grid !important;
-                grid-template-columns: minmax(0, 1fr);
-                gap: 10px !important;
-                min-width: 0;
-                width: 100% !important;
-            }
-
-            .log-filters > div,
-            .log-filters select,
-            .log-filters input,
-            .log-filters button {
-                min-width: 0 !important;
-                width: 100% !important;
-            }
-
-            .log-filters button {
-                justify-content: center;
-                min-height: 44px;
-            }
-
-            .desktop-log-table {
-                display: none !important;
-            }
-
-            .mobile-log-list {
-                display: grid;
-                grid-template-columns: minmax(0, 1fr);
-                gap: 10px;
-                min-width: 0;
-                width: 100%;
-                padding: 12px;
-                background: rgba(248, 250, 252, 0.55);
-            }
-
-            .mobile-log-card {
-                display: grid;
-                gap: 11px;
-                min-width: 0;
-                width: 100%;
-                padding: 13px;
-                border: 1px solid #dbe3ec;
-                border-left: 3px solid #34b88a;
-                border-radius: 14px;
-                background: rgba(255, 255, 255, 0.9);
-                box-shadow: 0 2px 7px rgba(51, 65, 85, 0.07);
-            }
-
-            .mobile-log-card > * {
-                min-width: 0;
-            }
-
-            .mobile-log-card-header {
-                display: flex;
-                align-items: center;
-                justify-content: space-between;
-                gap: 10px;
-            }
-
-            .mobile-log-date {
-                color: #334155;
-                font-size: 13px;
-            }
-
-            .mobile-log-time {
-                flex: 0 0 auto;
-                padding: 4px 7px;
-                border: 1px solid #dbe3ec;
-                border-radius: 6px;
-                background: #f1f5f9;
-                color: #475569;
-                font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-                font-size: 11px;
-            }
-
-            .mobile-log-detail {
-                margin: 0;
-                color: #1e293b;
-                font-size: 14px;
-                font-weight: 600;
-                line-height: 1.55;
-                overflow-wrap: anywhere;
-                word-break: break-word;
-            }
-
-            .mobile-log-meta {
-                display: flex;
-                flex-wrap: wrap;
-                gap: 6px;
-                min-width: 0;
-            }
-
-            .mobile-log-type,
-            .mobile-log-department {
-                max-width: 100%;
-                padding: 4px 8px;
-                overflow: hidden;
-                border-radius: 999px;
-                font-size: 11px;
-                font-weight: 700;
-                line-height: 1.2;
-                text-overflow: ellipsis;
-                white-space: nowrap;
-            }
-
-            .mobile-log-type {
-                border: 1px solid #bfdbfe;
-                background: #dbeafe;
-                color: #1d4ed8;
-            }
-
-            .mobile-log-department {
-                border: 1px solid #bbf7d0;
-                background: #dcfce7;
-                color: #047857;
-            }
-
-            .mobile-log-operator {
-                display: flex;
-                align-items: center;
-                gap: 8px;
-                min-width: 0;
-                padding-top: 10px;
-                border-top: 1px solid #eef2f7;
-            }
-
-            .mobile-log-operator-avatar {
-                display: grid;
-                flex: 0 0 26px;
-                width: 26px;
-                height: 26px;
-                place-items: center;
-                border-radius: 999px;
-                background: linear-gradient(145deg, #1e3a5f, #0f172a);
-                color: #fff;
-                font-size: 11px;
-                font-weight: 700;
-            }
-
-            .mobile-log-operator-name {
-                min-width: 0;
-                overflow: hidden;
-                color: #475569;
-                font-size: 12px;
-                text-overflow: ellipsis;
-                white-space: nowrap;
-            }
-
-            .log-panel #tablePagination {
-                align-items: stretch;
-                padding: 12px !important;
-            }
-
-            .log-panel #tableRecordInfo {
-                width: 100%;
-                text-align: center;
-            }
-
-            .log-panel #tablePagination > div {
-                justify-content: center;
-                width: 100%;
-            }
-        }
-    </style>
+    <!-- Custom UI-UX Pro Max Design System Styles -->
+    <link rel="stylesheet" href="./css/styles.css?v=20260729-3">
 </head>
-<body class="text-slate-800 h-screen flex flex-col overflow-hidden">
+<body class="text-slate-800 h-screen flex flex-col overflow-hidden antialiased">
 
-    <!-- Header -->
-    <header class="bg-gradient-to-r from-[#1a2535] to-[#2a3a50] text-white shadow-[0_4px_16px_rgba(0,0,0,0.3)] py-4 px-6 flex flex-col sm:flex-row justify-between items-center z-20 gap-4">
-        <div class="flex items-center gap-3 w-full sm:w-auto">
-            <div class="p-2 bg-white/10 rounded-xl backdrop-blur-sm">
-                <i class="ph ph-headset text-3xl text-blue-300"></i>
+    <!-- App Main Container (Strict 100vw Max Width) -->
+    <div id="app-container" class="flex-1 flex flex-col w-full max-w-[100vw] overflow-x-hidden overflow-y-auto custom-scroll pb-24 md:pb-6">
+
+        <!-- Header (Original Dark Navy Gradient) -->
+        <header class="bg-gradient-to-r from-[#1a2535] to-[#2a3a50] text-white shadow-[0_4px_16px_rgba(0,0,0,0.3)] py-4 px-4 md:px-6 flex items-center justify-between z-20 sticky top-0">
+            <div class="flex items-center gap-3">
+                <div class="p-2 bg-white/10 rounded-xl backdrop-blur-sm">
+                    <i class="ph ph-headset text-2xl md:text-3xl text-blue-300"></i>
+                </div>
+                <div>
+                    <h1 class="text-base md:text-xl font-bold font-heading tracking-wide leading-tight text-white">IT Call Center Analytics</h1>
+                    <p class="text-[11px] md:text-xs text-blue-200 opacity-80 font-medium">ระบบวิเคราะห์ข้อมูลแจ้งซ่อมและปัญหาไอที</p>
+                </div>
             </div>
-            <div>
-                <h1 class="text-xl font-bold tracking-wide">IT Call Center Analytics</h1>
-                <p class="text-xs text-blue-200 opacity-80">ระบบวิเคราะห์ข้อมูลแจ้งซ่อมและปัญหาไอที</p>
+
+            <div class="flex items-center gap-2.5 md:gap-4 text-sm">
+                <!-- Test API Link -->
+                <a href="https://script.google.com/macros/s/AKfycbzet3nNEL9X8pEqB0YiqseO8GylRGTQZbtcCw4EVBfro19JkmPUouoCmVq6OjO2mMM2zA/exec"
+                   target="_blank" rel="noopener noreferrer"
+                   class="hidden sm:flex items-center gap-1 bg-white/10 hover:bg-white/20 text-blue-200 hover:text-white px-3 py-1.5 rounded-lg text-xs font-medium transition-all shadow-sm">
+                    <i class="ph ph-database"></i> ทดสอบ API
+                </a>
+
+                <!-- Refresh Button -->
+                <button type="button" class="refresh-btn bg-white/10 hover:bg-white/20 text-blue-100 p-2 md:px-3 md:py-1.5 rounded-lg transition-all active:scale-95 disabled:opacity-50 flex items-center gap-1" aria-label="รีเฟรชข้อมูล">
+                    <i class="ph ph-arrows-clockwise text-lg"></i>
+                    <span class="hidden md:inline text-xs font-bold">รีเฟรช</span>
+                </button>
+
+                <!-- Live Status Badge -->
+                <div class="bg-emerald-500/20 text-emerald-100 border border-emerald-500/40 px-3 py-1.5 rounded-full flex items-center gap-2 text-xs font-bold shadow-sm">
+                    <div class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_8px_rgba(52,211,153,0.8)]"></div>
+                    <span class="hidden sm:inline">Live Data</span>
+                </div>
+
+                <span id="lastUpdated" class="hidden lg:block text-xs text-blue-200 font-mono"></span>
+                <span id="currentDate" class="hidden md:block font-medium text-xs text-blue-100 border-l border-blue-400/30 pl-3"></span>
             </div>
-        </div>
-        <div class="flex flex-wrap items-center justify-end gap-4 text-sm w-full sm:w-auto">
-            <a href="https://script.google.com/macros/s/AKfycbzet3nNEL9X8pEqB0YiqseO8GylRGTQZbtcCw4EVBfro19JkmPUouoCmVq6OjO2mMM2zA/exec" target="_blank" rel="noopener noreferrer" class="text-xs text-blue-200 hover:text-white transition-colors flex items-center gap-1 bg-white/10 px-3 py-1.5 rounded-lg hover:bg-white/20">
-                <i class="ph ph-database"></i> ทดสอบ API
-            </a>
-            <button type="button" id="refreshBtn" aria-label="รีเฟรชข้อมูล" title="รีเฟรชข้อมูล" class="bg-white/10 hover:bg-white/20 text-blue-100 px-3 py-1.5 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-wait">
-                <i class="ph ph-arrows-clockwise"></i>
+        </header>
+
+        <!-- Dynamic Main Content Wrapper -->
+        <main class="flex-1 w-full max-w-[100vw] overflow-x-hidden p-4 md:p-6 lg:p-8">
+
+            <!-- Month Selector Visual Timeline (Skeuomorphic Style) -->
+            <section class="mb-6 animate-fade-in">
+                <div class="flex items-center justify-between mb-3">
+                    <h2 class="text-base md:text-lg font-bold text-slate-800 flex items-center gap-2 font-heading">
+                        <i class="ph ph-calendar-check text-blue-600 text-lg"></i> เลือกช่วงเวลา (เดือน)
+                    </h2>
+                    <span id="recordCount" class="text-xs font-bold text-slate-700 skeuo-badge px-3 py-1 rounded-lg">กำลังโหลด...</span>
+                </div>
+
+                <div class="relative flex items-center group/timeline">
+                    <button type="button" id="scrollLeftBtn" aria-label="เลื่อนซ้าย" class="absolute left-0 z-20 w-9 h-9 flex items-center justify-center skeuo-btn rounded-full text-slate-700 hidden">
+                        <i class="ph ph-caret-left font-bold text-lg"></i>
+                    </button>
+
+                    <div id="monthSelector" class="flex gap-3 overflow-x-auto py-2 px-2 w-full no-scrollbar scroll-smooth relative z-0">
+                        <button type="button" class="px-5 py-2.5 skeuo-btn skeuo-btn-primary whitespace-nowrap">กำลังโหลดข้อมูล...</button>
+                    </div>
+
+                    <button type="button" id="scrollRightBtn" aria-label="เลื่อนขวา" class="absolute right-0 z-20 w-9 h-9 flex items-center justify-center skeuo-btn rounded-full text-slate-700 hidden">
+                        <i class="ph ph-caret-right font-bold text-lg"></i>
+                    </button>
+                </div>
+            </section>
+
+            <!-- ===================================================================
+                 DESKTOP VIEW (Visible on >= 768px screens)
+                 =================================================================== -->
+            <div id="desktop-layout" class="hidden md:block space-y-6">
+
+                <!-- Metric Cards Grid -->
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
+                    <!-- Metric 1: Total Tickets -->
+                    <div class="glass-card p-6 border-b-4 border-b-blue-500 flex items-center gap-5 glass-card-interactive">
+                        <div class="p-4 bg-gradient-to-br from-blue-100 to-blue-50 border border-blue-200 rounded-2xl text-blue-600 shadow-inner">
+                            <i class="ph ph-ticket text-3xl"></i>
+                        </div>
+                        <div>
+                            <p class="text-xs text-slate-500 font-medium mb-1">Ticket ทั้งหมด</p>
+                            <h2 class="text-3xl font-extrabold text-slate-800 tracking-tight font-heading" id="totalTickets">0</h2>
+                        </div>
+                    </div>
+
+                    <!-- Metric 2: Top Dept -->
+                    <div class="glass-card p-6 border-b-4 border-b-purple-500 flex items-center gap-5 glass-card-interactive">
+                        <div class="p-4 bg-gradient-to-br from-purple-100 to-purple-50 border border-purple-200 rounded-2xl text-purple-600 shadow-inner">
+                            <i class="ph ph-buildings text-3xl"></i>
+                        </div>
+                        <div class="overflow-hidden">
+                            <p class="text-xs text-slate-500 font-medium mb-1">แผนกที่แจ้งเยอะสุด</p>
+                            <h2 class="text-lg font-bold text-slate-800 truncate font-heading" id="topDept">-</h2>
+                        </div>
+                    </div>
+
+                    <!-- Metric 3: Top Staff -->
+                    <div class="glass-card p-6 border-b-4 border-b-orange-500 flex items-center gap-5 glass-card-interactive">
+                        <div class="p-4 bg-gradient-to-br from-orange-100 to-orange-50 border border-orange-200 rounded-2xl text-orange-600 shadow-inner">
+                            <i class="ph ph-user-gear text-3xl"></i>
+                        </div>
+                        <div class="overflow-hidden">
+                            <p class="text-xs text-slate-500 font-medium mb-1">ผู้รับเรื่องเยอะสุด</p>
+                            <h2 class="text-lg font-bold text-slate-800 truncate font-heading" id="topStaff">-</h2>
+                        </div>
+                    </div>
+
+                    <!-- Metric 4: API Connection Status -->
+                    <div class="glass-card p-6 border-b-4 border-b-emerald-500 flex items-center gap-5 glass-card-interactive">
+                        <div class="p-4 bg-gradient-to-br from-emerald-100 to-emerald-50 border border-emerald-200 rounded-2xl text-emerald-600 shadow-inner">
+                            <i class="ph ph-check-circle text-3xl"></i>
+                        </div>
+                        <div>
+                            <p class="text-xs text-slate-500 font-medium mb-1">สถานะดึงข้อมูล</p>
+                            <h2 class="api-status-badge text-lg font-bold text-emerald-600 font-heading">เชื่อมต่อสำเร็จ</h2>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- HR Compensation Summary Section -->
+                <div class="glass-card p-6 border-t-4 border-t-rose-500">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+                        <div>
+                            <h3 class="text-base md:text-lg font-bold text-slate-800 flex items-center gap-2 font-heading">
+                                <i class="ph ph-users-three text-rose-600 text-xl"></i> สรุปยอดภาระงานรายบุคคล (สำหรับจ่าย HR / On-Call)
+                            </h3>
+                            <p class="text-xs text-slate-500 mt-1" id="hrReportSubtitle">ยอดสรุปประจำเดือน...</p>
+                        </div>
+                        <div class="flex flex-wrap items-center gap-3">
+                            <button type="button" class="export-hr-btn skeuo-btn skeuo-btn-emerald px-4 py-2 text-xs flex items-center gap-2">
+                                <i class="ph ph-file-csv text-lg"></i> โหลด CSV ค่าตอบแทน (HR)
+                            </button>
+                            <button type="button" class="copy-hr-btn skeuo-btn px-4 py-2 text-xs flex items-center gap-2 text-rose-700">
+                                <i class="ph ph-copy text-lg text-rose-600"></i> คัดลอกข้อมูลสรุป
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="overflow-x-auto rounded-xl border border-slate-300 shadow-inner">
+                        <table class="w-full text-left text-sm text-slate-700">
+                            <thead class="bg-gradient-to-b from-rose-100 to-rose-50 text-rose-900 font-bold border-b-2 border-rose-200">
+                                <tr>
+                                    <th class="px-6 py-3.5 w-20">ลำดับ</th>
+                                    <th class="px-6 py-3.5">ผู้ปฏิบัติงาน (ออนคอล)</th>
+                                    <th class="px-6 py-3.5 text-right">จำนวนเคสที่รับ (Ticket)</th>
+                                    <th class="px-6 py-3.5 text-right w-44">สัดส่วน (%)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="hrTableBody" class="divide-y divide-slate-200 bg-white/70">
+                                <!-- HR Table Dynamic Rows -->
+                            </tbody>
+                            <tfoot class="bg-slate-100 font-bold text-slate-800 border-t-2 border-slate-300">
+                                <tr>
+                                    <td colspan="2" class="px-6 py-4 text-right">รวมทั้งหมด (ยอดเคสในเดือนนี้)</td>
+                                    <td id="hrTotal" class="px-6 py-4 text-right text-rose-600 text-lg font-mono">0</td>
+                                    <td class="px-6 py-4 text-right font-mono">100%</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Desktop Charts (2x2 Grid) -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- Daily Trend Chart -->
+                    <div class="glass-card p-6">
+                        <h3 class="text-base font-bold text-slate-800 mb-4 flex items-center gap-2 font-heading">
+                            <i class="ph ph-trend-up text-indigo-600 text-xl"></i> ปริมาณปัญหาแยกตามวัน
+                        </h3>
+                        <div class="relative h-64 w-full">
+                            <canvas id="dailyChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Peak Hours Chart -->
+                    <div class="glass-card p-6">
+                        <h3 class="text-base font-bold text-slate-800 mb-4 flex items-center gap-2 font-heading">
+                            <i class="ph ph-clock text-rose-600 text-xl"></i> วิเคราะห์ช่วงเวลาพีก (Peak Hours)
+                        </h3>
+                        <div class="relative h-64 w-full">
+                            <canvas id="timeChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Department Chart -->
+                    <div class="glass-card p-6">
+                        <h3 class="text-base font-bold text-slate-800 mb-4 flex items-center gap-2 font-heading">
+                            <i class="ph ph-chart-bar text-blue-600 text-xl"></i> สัดส่วนการแจ้งปัญหาแบ่งตามแผนก
+                        </h3>
+                        <div class="relative h-64 w-full">
+                            <canvas id="deptChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Staff Distribution Chart -->
+                    <div class="glass-card p-6">
+                        <h3 class="text-base font-bold text-slate-800 mb-4 flex items-center gap-2 font-heading">
+                            <i class="ph ph-chart-pie-slice text-purple-600 text-xl"></i> สัดส่วนผู้ปฏิบัติงาน
+                        </h3>
+                        <div class="relative h-64 w-full flex justify-center">
+                            <canvas id="staffChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Desktop Log Table -->
+                <div class="glass-card overflow-hidden">
+                    <div class="p-5 border-b border-slate-300 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white/40">
+                        <h3 class="text-base font-bold text-slate-800 flex items-center gap-2 font-heading">
+                            <i class="ph ph-list-dashes text-emerald-600 text-xl"></i> รายการแจ้งปัญหา (Log)
+                        </h3>
+
+                        <div class="flex flex-wrap items-center gap-3 w-full sm:w-auto">
+                            <!-- Dept Filter -->
+                            <div class="relative w-full sm:w-auto">
+                                <select id="deptFilter" aria-label="กรองตามแผนก" class="w-full sm:w-44 pl-4 pr-8 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs font-semibold text-slate-800 focus:outline-none appearance-none cursor-pointer">
+                                    <option value="all">ทุกแผนก</option>
+                                </select>
+                                <i class="ph ph-caret-down absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none"></i>
+                            </div>
+
+                            <!-- Search Input -->
+                            <div class="relative w-full sm:w-auto">
+                                <i class="ph ph-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-500"></i>
+                                <input type="text" id="searchInput" placeholder="ค้นหาปัญหา, ชื่อผู้รับเรื่อง..."
+                                       class="w-full sm:w-64 pl-10 pr-4 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs text-slate-800 placeholder-slate-500 focus:outline-none">
+                            </div>
+
+                            <!-- Export Raw CSV -->
+                            <button type="button" class="export-raw-btn skeuo-btn skeuo-btn-emerald px-4 py-2 text-xs flex items-center gap-2">
+                                <i class="ph ph-download-simple text-base"></i> CSV ข้อมูลดิบ
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm text-slate-700">
+                            <thead class="bg-gradient-to-b from-slate-100 to-slate-200 text-slate-800 uppercase font-bold text-xs tracking-wider border-b border-slate-300">
+                                <tr>
+                                    <th class="px-6 py-4">วันที่แจ้ง</th>
+                                    <th class="px-6 py-4">เวลา</th>
+                                    <th class="px-6 py-4">รายละเอียดปัญหา</th>
+                                    <th class="px-6 py-4">ประเภท</th>
+                                    <th class="px-6 py-4">แผนกที่แจ้ง</th>
+                                    <th class="px-6 py-4">ผู้ปฏิบัติงาน</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tableBody" class="divide-y divide-slate-200 bg-white/60">
+                                <!-- Log Data Dynamic Rows -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div id="tablePagination" class="px-6 py-4 border-t border-slate-300 flex flex-wrap items-center justify-between gap-3 bg-slate-100/60">
+                        <span id="tableRecordInfo" class="text-xs text-slate-600 font-medium"></span>
+                        <div class="flex items-center gap-2">
+                            <button type="button" id="prevPageBtn" class="skeuo-btn px-3.5 py-1.5 text-xs text-slate-700 disabled:opacity-40">ก่อนหน้า</button>
+                            <span id="pageInfo" class="text-xs text-slate-700 font-mono font-bold"></span>
+                            <button type="button" id="nextPageBtn" class="skeuo-btn px-3.5 py-1.5 text-xs text-slate-700 disabled:opacity-40">ถัดไป</button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- ===================================================================
+                 DEDICATED MOBILE VIEW (Visible on < 768px screens)
+                 Full 100vw width without horizontal scrolling
+                 =================================================================== -->
+            <div id="mobile-layout" class="block md:hidden w-full max-w-[100vw] overflow-x-hidden space-y-4">
+
+                <!-- SECTION 1: MOBILE DASHBOARD TAB -->
+                <div id="mobile-section-dashboard" class="space-y-4">
+                    <!-- Compact Metrics Grid -->
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="glass-card p-3.5 border-l-4 border-l-blue-500">
+                            <p class="text-[11px] text-slate-500 font-medium">Ticket ทั้งหมด</p>
+                            <h3 class="text-2xl font-extrabold text-slate-800 font-heading mt-0.5" id="mobileTotalTickets">0</h3>
+                        </div>
+                        <div class="glass-card p-3.5 border-l-4 border-l-emerald-500">
+                            <p class="text-[11px] text-slate-500 font-medium">สถานะ API</p>
+                            <h3 class="api-status-badge text-sm font-bold text-emerald-600 font-heading mt-1">เชื่อมต่อสำเร็จ</h3>
+                        </div>
+                        <div class="glass-card p-3.5 border-l-4 border-l-purple-500">
+                            <p class="text-[11px] text-slate-500 font-medium">แผนกแจ้งเยอะสุด</p>
+                            <h3 class="text-sm font-bold text-slate-800 truncate font-heading mt-1" id="mobileTopDept">-</h3>
+                        </div>
+                        <div class="glass-card p-3.5 border-l-4 border-l-orange-500">
+                            <p class="text-[11px] text-slate-500 font-medium">ผู้รับเรื่องเยอะสุด</p>
+                            <h3 class="text-sm font-bold text-slate-800 truncate font-heading mt-1" id="mobileTopStaff">-</h3>
+                        </div>
+                    </div>
+
+                    <!-- Quick Overview Chart Card -->
+                    <div class="glass-card p-4">
+                        <div class="flex items-center justify-between mb-3">
+                            <h3 class="text-xs font-bold text-slate-800 flex items-center gap-1.5 font-heading">
+                                <i class="ph ph-trend-up text-indigo-600 text-base"></i> สรุปแนวโน้มปัญหา
+                            </h3>
+                            <button type="button" onclick="window.setMobileTab && window.setMobileTab('charts')" class="text-[11px] text-blue-600 font-semibold flex items-center gap-0.5">
+                                ดูทั้งหมด <i class="ph ph-caret-right"></i>
+                            </button>
+                        </div>
+                        <div class="relative h-48 w-full">
+                            <canvas id="mobileSummaryChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECTION 2: MOBILE HR REPORT TAB -->
+                <div id="mobile-section-hr" class="hidden space-y-4">
+                    <div class="glass-card p-4 border-t-4 border-t-rose-500">
+                        <div class="flex items-center justify-between mb-3">
+                            <div>
+                                <h3 class="text-sm font-bold text-slate-800 font-heading">สรุปภาระงานรายบุคคล (HR)</h3>
+                                <p id="mobileHRSubtitle" class="text-[11px] text-slate-500 mt-0.5"></p>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-2 mb-4">
+                            <button type="button" class="export-hr-btn skeuo-btn skeuo-btn-emerald p-2.5 text-xs flex items-center justify-center gap-1.5">
+                                <i class="ph ph-file-csv text-base"></i> โหลด CSV
+                            </button>
+                            <button type="button" class="copy-hr-btn skeuo-btn p-2.5 text-xs text-rose-700 flex items-center justify-center gap-1.5">
+                                <i class="ph ph-copy text-base text-rose-600"></i> คัดลอกข้อมูล
+                            </button>
+                        </div>
+
+                        <div id="mobileHRContainer" class="space-y-2.5">
+                            <!-- Mobile HR Dynamic Touch Cards -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECTION 3: MOBILE CHARTS TAB -->
+                <div id="mobile-section-charts" class="hidden space-y-4">
+                    <div class="glass-card p-4">
+                        <h3 class="text-xs font-bold text-slate-800 mb-3 flex items-center gap-1.5 font-heading">
+                            <i class="ph ph-clock text-rose-600"></i> วิเคราะห์ช่วงเวลาพีก
+                        </h3>
+                        <div class="relative h-48 w-full">
+                            <canvas id="mobileTimeChart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="glass-card p-4">
+                        <h3 class="text-xs font-bold text-slate-800 mb-3 flex items-center gap-1.5 font-heading">
+                            <i class="ph ph-chart-bar text-blue-600"></i> สัดส่วนแบ่งตามแผนก
+                        </h3>
+                        <div class="relative h-48 w-full">
+                            <canvas id="mobileDeptChart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="glass-card p-4">
+                        <h3 class="text-xs font-bold text-slate-800 mb-3 flex items-center gap-1.5 font-heading">
+                            <i class="ph ph-chart-pie-slice text-purple-600"></i> สัดส่วนผู้ปฏิบัติงาน
+                        </h3>
+                        <div class="relative h-48 w-full flex justify-center">
+                            <canvas id="mobileStaffChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECTION 4: MOBILE TICKET LOG TAB -->
+                <div id="mobile-section-log" class="hidden space-y-3">
+                    <div class="glass-card p-3 space-y-2.5">
+                        <div class="flex items-center gap-2">
+                            <div class="relative flex-1">
+                                <i class="ph ph-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-xs"></i>
+                                <input type="text" id="mobileSearchInput" placeholder="ค้นหาปัญหา, ชื่อผู้รับเรื่อง..."
+                                       class="w-full pl-8 pr-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs text-slate-800 placeholder-slate-500 focus:outline-none">
+                            </div>
+                            <button type="button" class="export-raw-btn skeuo-btn skeuo-btn-emerald p-2 text-xs flex items-center justify-center min-w-[40px]" title="โหลด CSV">
+                                <i class="ph ph-download-simple text-base"></i>
+                            </button>
+                        </div>
+
+                        <div class="relative w-full">
+                            <select id="mobileDeptFilter" aria-label="กรองตามแผนก" class="w-full pl-3 pr-8 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs text-slate-700 focus:outline-none appearance-none font-medium">
+                                <option value="all">ทุกแผนก</option>
+                            </select>
+                            <i class="ph ph-caret-down absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none"></i>
+                        </div>
+                    </div>
+
+                    <!-- Mobile Stacked Touch Cards -->
+                    <div id="mobileLogContainer" class="space-y-2.5">
+                        <!-- Dynamic Mobile Log Cards -->
+                    </div>
+
+                    <!-- Mobile Pagination -->
+                    <div class="glass-card p-3 flex items-center justify-between text-xs">
+                        <button type="button" id="mobilePrevBtn" class="skeuo-btn px-3 py-1.5 text-slate-700 disabled:opacity-40">ก่อนหน้า</button>
+                        <span id="mobileLogPageInfo" class="text-[11px] text-slate-600 font-mono font-bold"></span>
+                        <button type="button" id="mobileNextBtn" class="skeuo-btn px-3 py-1.5 text-slate-700 disabled:opacity-40">ถัดไป</button>
+                    </div>
+                </div>
+
+            </div>
+
+        </main>
+
+        <!-- Dedicated Mobile Bottom Navigation Bar -->
+        <nav class="mobile-bottom-nav md:hidden" aria-label="เมนูหลักสำหรับมือถือ">
+            <button type="button" class="mobile-nav-item active" data-tab="dashboard">
+                <i class="ph ph-squares-four"></i>
+                <span>แดชบอร์ด</span>
             </button>
-            <div class="bg-emerald-500/20 text-emerald-100 border border-emerald-500/30 px-3 py-1.5 rounded-full flex items-center gap-2 font-medium" aria-live="polite">
-                <div class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_8px_rgba(52,211,153,0.8)]"></div>
-                Live Data
-            </div>
-            <span id="lastUpdated" class="hidden lg:block text-xs text-blue-200"></span>
-            <span id="currentDate" class="hidden md:block font-medium text-blue-100"></span>
-        </div>
-    </header>
+            <button type="button" class="mobile-nav-item" data-tab="hr">
+                <i class="ph ph-users-three"></i>
+                <span>สรุป HR</span>
+            </button>
+            <button type="button" class="mobile-nav-item" data-tab="charts">
+                <i class="ph ph-chart-line-up"></i>
+                <span>กราฟสถิติ</span>
+            </button>
+            <button type="button" class="mobile-nav-item" data-tab="log">
+                <i class="ph ph-list-dashes"></i>
+                <span>รายการ Log</span>
+            </button>
+        </nav>
 
-    <main class="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8 custom-scroll">
-
-        <!-- Interactive Month Selector (Visual Timeline) -->
-        <div class="mb-8 animate-fade-in-up">
-            <div class="flex items-center justify-between mb-3">
-                <h2 class="text-lg font-bold text-slate-700 flex items-center gap-2 font-kanit">
-                    <i class="ph ph-calendar-check text-blue-600"></i> เลือกช่วงเวลา (เดือน)
-                </h2>
-                <span class="text-xs font-medium text-slate-400 bg-slate-200 px-2 py-1 rounded-md" id="recordCount">รอข้อมูล...</span>
-            </div>
-
-            <div class="relative flex items-center group/timeline">
-                <div class="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-[#e8e0d0] to-transparent z-10 pointer-events-none rounded-l-lg"></div>
-
-                <button type="button" id="scrollLeftBtn" aria-label="เลื่อนรายการเดือนไปทางซ้าย" class="absolute left-0 z-20 w-10 h-10 flex items-center justify-center bg-white/90 backdrop-blur border border-slate-200 rounded-full shadow-lg text-slate-600 hover:text-blue-600 hover:bg-white hover:scale-110 transition-all duration-300 opacity-0 group-hover/timeline:opacity-100 hidden focus:outline-none -ml-3">
-                    <i class="ph ph-caret-left font-bold text-xl"></i>
-                </button>
-
-                <div id="monthSelector" class="flex gap-3 overflow-x-auto py-2 px-4 w-full no-scrollbar scroll-smooth relative z-0">
-                    <button class="px-5 py-2.5 rounded-xl text-sm font-bold bg-blue-600 text-white shadow-md shadow-blue-500/30 whitespace-nowrap transition-all">กำลังโหลดข้อมูล...</button>
-                </div>
-
-                <button type="button" id="scrollRightBtn" aria-label="เลื่อนรายการเดือนไปทางขวา" class="absolute right-0 z-20 w-10 h-10 flex items-center justify-center bg-white/90 backdrop-blur border border-slate-200 rounded-full shadow-lg text-slate-600 hover:text-blue-600 hover:bg-white hover:scale-110 transition-all duration-300 opacity-0 group-hover/timeline:opacity-100 hidden focus:outline-none -mr-3">
-                    <i class="ph ph-caret-right font-bold text-xl"></i>
-                </button>
-
-                <div class="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-[#e8e0d0] to-transparent z-10 pointer-events-none rounded-r-lg"></div>
-            </div>
+        <!-- Toast Notification Container -->
+        <div id="toast" class="skeuo-btn bg-slate-900 text-white px-6 py-3 rounded-xl shadow-2xl flex items-center gap-3 z-50">
+            <i class="ph ph-check-circle text-emerald-400 text-xl"></i>
+            <span class="toast-message text-sm font-medium">ดำเนินการเรียบร้อยแล้ว</span>
         </div>
 
-        <!-- Key Metrics Cards -->
-        <div class="desktop-metric-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <div class="glass-panel p-6 rounded-2xl shadow-sm border border-slate-200 flex items-center gap-5 border-b-4 border-b-blue-500 animate-fade-in-up delay-100 hover:-translate-y-1 transition-transform duration-300">
-                <div class="p-4 bg-gradient-to-br from-blue-100 to-blue-50 rounded-2xl text-blue-600 shadow-inner">
-                    <i class="ph ph-ticket text-3xl"></i>
-                </div>
-                <div>
-                    <p class="text-sm text-slate-500 font-medium mb-1">Ticket ทั้งหมด</p>
-                    <h2 class="text-4xl font-black text-slate-800 tracking-tight" id="totalTickets">0</h2>
-                </div>
-            </div>
-
-            <div class="glass-panel p-6 rounded-2xl shadow-sm border border-slate-200 flex items-center gap-5 border-b-4 border-b-purple-500 animate-fade-in-up delay-200 hover:-translate-y-1 transition-transform duration-300">
-                <div class="p-4 bg-gradient-to-br from-purple-100 to-purple-50 rounded-2xl text-purple-600 shadow-inner">
-                    <i class="ph ph-buildings text-3xl"></i>
-                </div>
-                <div class="w-full overflow-hidden">
-                    <p class="text-sm text-slate-500 font-medium mb-1">แผนกที่แจ้งเยอะสุด</p>
-                    <h2 class="text-xl font-bold text-slate-800 truncate" id="topDept">-</h2>
-                </div>
-            </div>
-
-            <div class="glass-panel p-6 rounded-2xl shadow-sm border border-slate-200 flex items-center gap-5 border-b-4 border-b-orange-500 animate-fade-in-up delay-300 hover:-translate-y-1 transition-transform duration-300">
-                <div class="p-4 bg-gradient-to-br from-orange-100 to-orange-50 rounded-2xl text-orange-600 shadow-inner">
-                    <i class="ph ph-user-gear text-3xl"></i>
-                </div>
-                <div class="w-full overflow-hidden">
-                    <p class="text-sm text-slate-500 font-medium mb-1">ผู้รับเรื่องเยอะสุด</p>
-                    <h2 class="text-xl font-bold text-slate-800 truncate" id="topStaff">-</h2>
-                </div>
-            </div>
-
-            <div class="glass-panel p-6 rounded-2xl shadow-sm border border-slate-200 flex items-center gap-5 border-b-4 border-b-emerald-500 animate-fade-in-up delay-400 hover:-translate-y-1 transition-transform duration-300">
-                <div class="p-4 bg-gradient-to-br from-emerald-100 to-emerald-50 rounded-2xl text-emerald-600 shadow-inner">
-                    <i class="ph ph-check-circle text-3xl"></i>
-                </div>
-                <div>
-                    <p class="text-sm text-slate-500 font-medium mb-1">สถานะดึงข้อมูล</p>
-                    <h2 class="text-xl font-bold text-emerald-600" id="apiStatus">รอสักครู่</h2>
-                </div>
-            </div>
-        </div>
-
-        <div class="mobile-metric-strip" role="group" aria-label="ตัวชี้วัดสำคัญบนมือถือ">
-            <article class="mobile-metric-card mobile-metric-card-blue" data-metric-label="Ticket" aria-label="Ticket: 0">
-                <i class="ph ph-ticket" aria-hidden="true"></i>
-                <span>Ticket</span>
-                <strong class="mobile-metric-value" id="mobileTotalTickets" title="0">0</strong>
-            </article>
-            <article class="mobile-metric-card mobile-metric-card-purple" data-metric-label="แผนก" aria-label="แผนก: -">
-                <i class="ph ph-buildings" aria-hidden="true"></i>
-                <span>แผนก</span>
-                <strong class="mobile-metric-value" id="mobileTopDept" title="-">-</strong>
-            </article>
-            <article class="mobile-metric-card mobile-metric-card-orange" data-metric-label="ผู้รับ" aria-label="ผู้รับ: -">
-                <i class="ph ph-user-gear" aria-hidden="true"></i>
-                <span>ผู้รับ</span>
-                <strong class="mobile-metric-value" id="mobileTopStaff" title="-">-</strong>
-            </article>
-            <article class="mobile-metric-card mobile-metric-card-green" data-metric-label="สถานะ" aria-label="สถานะ: รอสักครู่">
-                <i class="ph ph-check-circle" aria-hidden="true"></i>
-                <span>สถานะ</span>
-                <strong class="mobile-metric-value" id="mobileApiStatus" title="รอสักครู่">รอ</strong>
-            </article>
-        </div>
-
-        <!-- รายงานสรุปสำหรับ HR -->
-        <div class="hr-report-panel glass-panel p-6 rounded-3xl shadow-sm border border-slate-200 mb-8 animate-pop delay-100 border-t-4 border-t-rose-500">
-            <div class="hr-report-heading flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
-                <div>
-                    <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
-                        <i class="ph ph-users-three text-rose-500 text-xl"></i> สรุปยอดภาระงานรายบุคคล (สำหรับจ่าย HR / On-Call)
-                    </h3>
-                    <p class="text-sm text-slate-500 mt-1" id="hrReportSubtitle">ยอดสรุปประจำเดือน...</p>
-                </div>
-                <div class="hr-actions flex flex-wrap items-center gap-2">
-                    <!-- ปุ่มใหม่: ออกรายงาน CSV ตามสูตรเป๊ะๆ -->
-                    <button type="button" id="exportHRBtn" class="bg-emerald-50 text-emerald-600 hover:bg-emerald-100 hover:border-emerald-300 border border-emerald-200 px-4 py-2 rounded-xl text-sm font-bold transition-all shadow-sm flex items-center gap-2">
-                        <i class="ph ph-file-csv text-lg"></i> <span>โหลด CSV ค่าตอบแทน (HR)</span>
-                    </button>
-                    <!-- ปุ่มเดิม: คัดลอกตาราง -->
-                    <button type="button" id="copyBtn" class="bg-white text-rose-600 hover:bg-rose-50 hover:border-rose-300 border border-slate-200 px-4 py-2 rounded-xl text-sm font-bold transition-all shadow-sm flex items-center gap-2">
-                        <i class="ph ph-copy text-lg"></i> <span>คัดลอกข้อมูลสรุป</span>
-                    </button>
-                </div>
-            </div>
-
-            <div class="desktop-hr-table overflow-x-auto custom-scroll">
-                <table class="w-full text-left text-sm text-slate-700" id="hrTable">
-                    <thead class="bg-rose-50/50 text-rose-900 font-bold border-b-2 border-rose-100">
-                        <tr>
-                            <th class="px-6 py-3 w-20">ลำดับ</th>
-                            <th class="px-6 py-3">ผู้ปฏิบัติงาน (ออนคอล)</th>
-                            <th class="px-6 py-3 text-right">จำนวนเคสที่รับ (Ticket)</th>
-                            <th class="px-6 py-3 text-right w-40">สัดส่วน (%)</th>
-                        </tr>
-                    </thead>
-                    <tbody id="hrTableBody" class="divide-y divide-slate-100">
-                        <!-- HR Data -->
-                    </tbody>
-                    <tfoot class="bg-slate-50 font-bold text-slate-800 border-t-2 border-slate-200">
-                        <tr>
-                            <td colspan="2" class="px-6 py-4 text-right">รวมทั้งหมด (ยอดเคสในเดือนนี้)</td>
-                            <td id="hrTotal" class="px-6 py-4 text-right text-rose-600 text-lg">0</td>
-                            <td class="px-6 py-4 text-right">100%</td>
-                        </tr>
-                    </tfoot>
-                </table>
-            </div>
-            <div id="mobileHrList" class="mobile-hr-list" role="list" aria-live="polite"></div>
-        </div>
-
-        <!-- กราฟรายวัน & กราฟช่วงเวลาพีก -->
-        <div class="glass-panel p-6 rounded-3xl shadow-sm border border-slate-200 mb-8 w-full animate-pop delay-200">
-            <div class="flex flex-col md:flex-row gap-8">
-                <div class="w-full md:w-1/2">
-                    <h3 class="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2 font-kanit">
-                        <i class="ph ph-trend-up text-indigo-500 text-xl"></i> ปริมาณปัญหาแยกตามวัน
-                    </h3>
-                    <div class="relative h-72 w-full">
-                        <canvas id="dailyChart"></canvas>
-                    </div>
-                </div>
-
-                <div class="w-full md:w-1/2 border-t md:border-t-0 md:border-l border-slate-100 pt-6 md:pt-0 md:pl-8">
-                    <h3 class="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2 font-kanit">
-                        <i class="ph ph-clock text-rose-500 text-xl"></i> วิเคราะห์ช่วงเวลาพีก (Peak Hours)
-                    </h3>
-                    <div class="relative h-72 w-full">
-                        <canvas id="timeChart"></canvas>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
-            <div class="glass-panel p-6 rounded-3xl shadow-sm border border-slate-200 lg:col-span-2 animate-pop delay-300">
-                <h3 class="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2 font-kanit">
-                    <i class="ph ph-chart-bar text-blue-500 text-xl"></i> สัดส่วนการแจ้งปัญหาแบ่งตามแผนก
-                </h3>
-                <div class="relative h-72 w-full">
-                    <canvas id="deptChart"></canvas>
-                </div>
-            </div>
-
-            <div class="glass-panel p-6 rounded-3xl shadow-sm border border-slate-200 animate-pop delay-400">
-                <h3 class="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2 font-kanit">
-                    <i class="ph ph-chart-pie-slice text-purple-500 text-xl"></i> สัดส่วนผู้ปฏิบัติงาน
-                </h3>
-                <div class="relative h-72 w-full flex justify-center">
-                    <canvas id="staffChart"></canvas>
-                </div>
-            </div>
-        </div>
-
-        <!-- Data Table -->
-        <div class="log-panel glass-panel rounded-3xl shadow-sm border border-slate-200 overflow-hidden animate-fade-in-up delay-400">
-            <div class="log-toolbar p-6 border-b border-slate-200 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white/50">
-                <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
-                    <i class="ph ph-list-dashes text-emerald-500 text-xl"></i> รายการแจ้งปัญหา (Log)
-                </h3>
-                <div class="log-filters flex flex-wrap items-center gap-3 w-full sm:w-auto">
-                    <div class="relative w-full sm:w-auto">
-                        <select id="deptFilter" aria-label="กรองตามแผนก" class="pl-4 pr-8 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all shadow-sm appearance-none cursor-pointer font-medium text-slate-700 min-w-[140px]">
-                            <option value="all">ทุกแผนก</option>
-                        </select>
-                        <i class="ph ph-caret-down absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400 pointer-events-none"></i>
-                    </div>
-                    <div class="relative w-full sm:w-auto">
-                        <i class="ph ph-magnifying-glass absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400"></i>
-                        <input type="text" id="searchInput" aria-label="ค้นหาปัญหาหรือชื่อผู้รับเรื่อง" placeholder="ค้นหาปัญหา, ชื่อผู้รับเรื่อง..."
-                               class="pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white w-full sm:w-64 transition-all shadow-sm">
-                    </div>
-                    <button type="button" id="exportRawBtn" class="bg-emerald-500 hover:bg-emerald-600 text-white p-2.5 rounded-xl transition-colors shadow-sm shadow-emerald-500/30 flex items-center gap-2 whitespace-nowrap" title="โหลดข้อมูลดิบเป็น Excel">
-                        <i class="ph ph-download-simple text-lg"></i> <span class="text-sm font-bold">CSV ข้อมูลดิบ</span>
-                    </button>
-                </div>
-            </div>
-            <div class="desktop-log-table overflow-x-auto custom-scroll">
-                <table class="w-full text-left text-sm text-slate-600">
-                    <thead class="bg-slate-50/80 text-slate-700 uppercase font-bold text-xs tracking-wider border-b border-slate-200">
-                        <tr>
-                            <th class="px-6 py-4">วันที่แจ้ง</th>
-                            <th class="px-6 py-4">เวลา</th>
-                            <th class="px-6 py-4">รายละเอียดปัญหา</th>
-                            <th class="px-6 py-4">ประเภท</th>
-                            <th class="px-6 py-4">แผนกที่แจ้ง</th>
-                            <th class="px-6 py-4">ผู้ปฏิบัติงาน</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tableBody" class="divide-y divide-slate-100 bg-white/60">
-                        <!-- Data will be injected here -->
-                    </tbody>
-                </table>
-            </div>
-            <div id="mobileLogList" class="mobile-log-list" role="list" aria-live="polite"></div>
-            <div id="tablePagination" class="hidden px-6 py-4 border-t border-slate-200 bg-white/50 flex flex-wrap items-center justify-between gap-3">
-                <span id="tableRecordInfo" class="text-sm text-slate-500" aria-live="polite"></span>
-                <div class="flex items-center gap-2">
-                    <button type="button" id="prevPageBtn" class="px-3 py-1.5 rounded-lg border border-slate-200 text-sm font-medium hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed">ก่อนหน้า</button>
-                    <span id="pageInfo" class="text-sm text-slate-600"></span>
-                    <button type="button" id="nextPageBtn" class="px-3 py-1.5 rounded-lg border border-slate-200 text-sm font-medium hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed">ถัดไป</button>
-                </div>
-            </div>
-        </div>
-
-    </main>
-
-    <!-- Notification Toast สำหรับ Copy -->
-    <div id="toast" class="fixed bottom-5 right-5 bg-slate-800 text-white px-6 py-3 rounded-xl shadow-2xl transform translate-y-20 opacity-0 transition-all duration-300 flex items-center gap-3 z-50">
-        <i class="ph ph-check-circle text-emerald-400 text-xl"></i>
-        <span class="font-medium">คัดลอกเรียบร้อยแล้ว</span>
     </div>
 
-    <script type="module">
-        import { setMetricPair } from "/mobile-metrics.mjs";
-        import {
-            buildMobileHrRows,
-            buildMobileLogRows,
-            renderMobileHrList,
-            renderMobileLogList,
-        } from "/mobile-reports.mjs";
-
-        let rawData = [];
-        let filteredData = [];
-        let activeMonthKey = 'all';
-        let activeMonthDisplay = 'ภาพรวมทั้งหมด (All Time)';
-
-        let deptChartInstance = null;
-        let staffChartInstance = null;
-        let dailyChartInstance = null;
-        let timeChartInstance = null;
-        let tablePage = 1;
-        let isFetching = false;
-        let searchDebounceTimer = null;
-
-        const PAGE_SIZE = 100;
-        const API_TIMEOUT_MS = 45000;
-        const AUTO_REFRESH_MS = 5 * 60 * 1000;
-        const PAYMENT_RULES = Object.freeze({ basePay: 100, telePay: 400, generalPay: 200, dailyCap: 800 });
-        const TELE_TYPE_KEYS = new Set(['x-ray-tele']);
-
-        const thaiMonths = ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."];
-
-        function parseDate(value) {
-            const text = String(value ?? '').trim();
-            const match = text.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
-            if (!match) return null;
-
-            const [, dayText, monthText, yearText] = match;
-            const date = new Date(Number(yearText), Number(monthText) - 1, Number(dayText));
-            return date.getFullYear() === Number(yearText) &&
-                   date.getMonth() === Number(monthText) - 1 &&
-                   date.getDate() === Number(dayText) ? date : null;
-        }
-
-        function normalizeType(value) {
-            return String(value ?? '').trim().toLowerCase().replace(/\s+/g, '');
-        }
-
-        function getOperatorName(row) {
-            const name = String(row.operator ?? '').trim();
-            return name || 'ไม่ระบุชื่อ';
-        }
-
-        function getShiftKey(row) {
-            const explicitShiftId = row.shiftId ?? row.shift_id ?? row.shift;
-            return explicitShiftId ? `shift:${String(explicitShiftId).trim()}` : `date:${String(row.date ?? '').trim() || 'ไม่ระบุวัน'}`;
-        }
-
-        function isTeleCase(row) {
-            return TELE_TYPE_KEYS.has(normalizeType(row.type));
-        }
-
-        function getStaffCounts(data) {
-            return data.reduce((counts, row) => {
-                const name = getOperatorName(row);
-                counts[name] = (counts[name] || 0) + 1;
-                return counts;
-            }, {});
-        }
-
-        function processData(data) {
-            const textFields = ['date', 'time', 'detail', 'type', 'dept', 'operator'];
-            return data.filter(row => row && typeof row === 'object' && !Array.isArray(row)).map(source => {
-                const row = { ...source };
-                textFields.forEach(field => {
-                    row[field] = row[field] == null ? '' : String(row[field]).trim();
-                });
-                let parsedDate = null;
-                let monthKey = "unknown";
-                let monthDisplay = "ไม่ระบุเดือน";
-                let dayNum = "0";
-                let hourKey = "ไม่ระบุ";
-
-                if (row.date) {
-                    const parts = String(row.date).split('/');
-                    parsedDate = parseDate(row.date);
-                    if (parsedDate && parts.length === 3) {
-                        const y = parsedDate.getFullYear();
-                        const m = String(parsedDate.getMonth() + 1).padStart(2, '0');
-                        monthKey = `${y}-${m}`;
-                        monthDisplay = `${thaiMonths[parsedDate.getMonth()]} ${y}`;
-                        dayNum = parts[0];
-                    }
-                }
-
-                if (row.time) {
-                    const timeParts = String(row.time).trim().split(':');
-                    const hour = Number(timeParts[0]);
-                    if (Number.isInteger(hour) && hour >= 0 && hour <= 23) {
-                        hourKey = String(hour).padStart(2, '0') + ":00";
-                    }
-                }
-
-                return { ...row, _parsedDate: parsedDate, _monthKey: monthKey, _monthDisplay: monthDisplay, _dayNum: dayNum, _hourKey: hourKey };
-            }).sort((a, b) => {
-                if(!a._parsedDate) return 1;
-                if(!b._parsedDate) return -1;
-                return b._parsedDate - a._parsedDate;
-            });
-        }
-
-        function scrollTimeline(amount) {
-            const container = document.getElementById('monthSelector');
-            if (container) {
-                container.scrollBy({ left: amount, behavior: 'smooth' });
-            }
-        }
-
-        function updateScrollButtons() {
-            const container = document.getElementById('monthSelector');
-            const leftBtn = document.getElementById('scrollLeftBtn');
-            const rightBtn = document.getElementById('scrollRightBtn');
-
-            if (!container || !leftBtn || !rightBtn) return;
-
-            if (container.scrollLeft <= 0) {
-                leftBtn.classList.add('hidden');
-                leftBtn.classList.remove('flex');
-            } else {
-                leftBtn.classList.remove('hidden');
-                leftBtn.classList.add('flex');
-            }
-
-            if (Math.ceil(container.scrollLeft + container.clientWidth) >= container.scrollWidth - 1) {
-                rightBtn.classList.add('hidden');
-                rightBtn.classList.remove('flex');
-            } else {
-                rightBtn.classList.remove('hidden');
-                rightBtn.classList.add('flex');
-            }
-        }
-
-        function initMonthSelector() {
-            const container = document.getElementById('monthSelector');
-            if(!container) return;
-
-            container.innerHTML = '';
-
-            const uniqueMonths = new Map();
-            rawData.forEach(row => {
-                if(row._monthKey !== 'unknown') {
-                    uniqueMonths.set(row._monthKey, row._monthDisplay);
-                }
-            });
-
-            const sortedMonthKeys = Array.from(uniqueMonths.keys()).sort().reverse();
-            if (activeMonthKey !== 'all' && !uniqueMonths.has(activeMonthKey)) {
-                activeMonthKey = 'all';
-                activeMonthDisplay = 'ภาพรวมทั้งหมด (All Time)';
-            }
-
-            container.appendChild(createMonthButton('all', 'ภาพรวมทั้งหมด (All Time)'));
-            sortedMonthKeys.forEach(key => {
-                container.appendChild(createMonthButton(key, uniqueMonths.get(key)));
-            });
-
-            updateActiveMonthButton();
-            setTimeout(updateScrollButtons, 100);
-
-            container.onscroll = updateScrollButtons;
-        }
-
-        function createMonthButton(key, text) {
-            const btn = document.createElement('button');
-            btn.dataset.month = key;
-            btn.textContent = text;
-            btn.className = `month-btn px-5 py-2.5 rounded-xl text-sm font-bold whitespace-nowrap transition-all duration-300 border `;
-
-            btn.addEventListener('click', () => {
-                activeMonthKey = key;
-                activeMonthDisplay = text;
-                updateActiveMonthButton();
-                applyFilters();
-            });
-            return btn;
-        }
-
-        function updateActiveMonthButton() {
-            const buttons = document.querySelectorAll('.month-btn');
-            buttons.forEach(btn => {
-                if (btn.dataset.month === activeMonthKey) {
-                    btn.className = `month-btn px-5 py-2.5 rounded-xl text-sm font-bold whitespace-nowrap transition-all duration-300 shadow-md transform scale-105 bg-blue-600 text-white border-blue-600 shadow-blue-500/30`;
-                } else {
-                    btn.className = `month-btn px-5 py-2.5 rounded-xl text-sm font-bold whitespace-nowrap transition-all duration-300 bg-white text-slate-600 border-slate-200 hover:bg-slate-50 hover:border-blue-300`;
-                }
-            });
-        }
-
-        function initDeptFilter() {
-            const select = document.getElementById('deptFilter');
-            if(!select) return;
-
-            const uniqueDepts = [...new Set(rawData.map(r => r.dept).filter(d => d && d.trim() !== ''))].sort();
-            const currentValue = select.value;
-
-            select.innerHTML = '<option value="all">ทุกแผนก</option>';
-            uniqueDepts.forEach(dept => {
-                const option = document.createElement('option');
-                option.value = dept;
-                option.textContent = dept;
-                select.appendChild(option);
-            });
-
-            if(uniqueDepts.includes(currentValue)) {
-                select.value = currentValue;
-            }
-
-            select.onchange = () => applyFilters(true);
-        }
-
-        function applyFilters(resetPage = true) {
-            if (resetPage) tablePage = 1;
-            const searchEl = document.getElementById('searchInput');
-            const searchTerm = searchEl ? searchEl.value.toLowerCase() : '';
-            const deptEl = document.getElementById('deptFilter');
-            const selectedDept = deptEl ? deptEl.value : 'all';
-
-            filteredData = rawData.filter(row => {
-                const matchMonth = activeMonthKey === 'all' || row._monthKey === activeMonthKey;
-                const matchDept = selectedDept === 'all' || row.dept === selectedDept;
-
-                const matchSearch = (row.detail && row.detail.toLowerCase().includes(searchTerm)) ||
-                                  (row.operator && row.operator.toLowerCase().includes(searchTerm)) ||
-                                  (row.dept && row.dept.toLowerCase().includes(searchTerm));
-
-                return matchMonth && matchDept && matchSearch;
-            });
-
-            document.getElementById('recordCount').textContent = `พบ ${filteredData.length} รายการ`;
-
-            updateMetrics(filteredData);
-            renderHRReport(filteredData);
-            renderDailyChart(filteredData);
-            renderTimeChart(filteredData);
-            renderCharts(filteredData);
-            renderTable(filteredData);
-        }
-
-        function updateMetrics(data) {
-            const totalEl = document.getElementById('totalTickets');
-            totalEl.style.opacity = '0.5';
-            setTimeout(() => {
-                setMetricPair(document, 'totalTickets', 'mobileTotalTickets', data.length);
-                totalEl.style.opacity = '1';
-            }, 150);
-
-            if(data.length === 0) {
-                setMetricPair(document, 'topDept', 'mobileTopDept', "-");
-                setMetricPair(document, 'topStaff', 'mobileTopStaff', "-");
-                return;
-            }
-
-            const deptCounts = data.reduce((acc, curr) => {
-                if(curr.dept) acc[curr.dept] = (acc[curr.dept] || 0) + 1;
-                return acc;
-            }, {});
-            const topDept = Object.keys(deptCounts).length > 0 ? Object.keys(deptCounts).reduce((a, b) => deptCounts[a] > deptCounts[b] ? a : b, "-") : "-";
-            setMetricPair(document, 'topDept', 'mobileTopDept', topDept);
-
-            const staffCounts = data.reduce((acc, curr) => {
-                if(curr.operator) acc[curr.operator] = (acc[curr.operator] || 0) + 1;
-                return acc;
-            }, {});
-            const topStaff = Object.keys(staffCounts).length > 0 ? Object.keys(staffCounts).reduce((a, b) => staffCounts[a] > staffCounts[b] ? a : b, "-") : "-";
-            setMetricPair(document, 'topStaff', 'mobileTopStaff', topStaff);
-        }
-
-        function appendTextCell(row, className, value, tagName = 'td') {
-            const cell = document.createElement(tagName);
-            cell.className = className;
-            cell.textContent = value;
-            row.appendChild(cell);
-            return cell;
-        }
-
-        function renderHRReport(data) {
-            const tbody = document.getElementById('hrTableBody');
-            const subtitle = document.getElementById('hrReportSubtitle');
-            const staffCounts = getStaffCounts(data);
-            tbody.replaceChildren();
-            subtitle.textContent = `ข้อมูล: ${activeMonthDisplay} | ยอดรวมทั้งหมด ${data.length} รายการ`;
-            renderMobileHrList(
-                document,
-                document.getElementById('mobileHrList'),
-                buildMobileHrRows(staffCounts, data.length),
-                data.length
-            );
-
-            if (data.length === 0) {
-                const row = document.createElement('tr');
-                appendTextCell(row, 'text-center py-8 text-slate-400', 'ไม่มีข้อมูลในเดือนหรือคำค้นหานี้');
-                row.firstChild.colSpan = 4;
-                tbody.appendChild(row);
-                document.getElementById('hrTotal').textContent = '0';
-                return;
-            }
-
-            const sortedStaff = Object.entries(staffCounts).sort((a, b) => b[1] - a[1]);
-            const totalTickets = data.length;
-            const fragment = document.createDocumentFragment();
-
-            sortedStaff.forEach(([name, count], index) => {
-                const percentage = ((count / totalTickets) * 100).toFixed(1);
-                const row = document.createElement('tr');
-                row.className = 'hover:bg-rose-50/50 transition-colors';
-                appendTextCell(row, 'px-6 py-3 text-slate-500 font-mono', index + 1);
-
-                const nameCell = document.createElement('td');
-                nameCell.className = 'px-6 py-3 font-bold text-slate-800';
-                const nameWrap = document.createElement('div');
-                nameWrap.className = 'flex items-center gap-2';
-                const avatar = document.createElement('div');
-                avatar.className = 'w-6 h-6 rounded-full bg-rose-100 text-rose-700 flex items-center justify-center text-xs shadow-sm';
-                avatar.textContent = name.charAt(0);
-                const nameText = document.createElement('span');
-                nameText.textContent = name;
-                nameWrap.append(avatar, nameText);
-                nameCell.appendChild(nameWrap);
-                row.appendChild(nameCell);
-
-                appendTextCell(row, 'px-6 py-3 text-right font-bold text-rose-600', count);
-                const percentageCell = document.createElement('td');
-                percentageCell.className = 'px-6 py-3 text-right';
-                const percentageWrap = document.createElement('div');
-                percentageWrap.className = 'flex items-center justify-end gap-2';
-                const percentageText = document.createElement('span');
-                percentageText.className = 'text-slate-500 text-xs w-10';
-                percentageText.textContent = `${percentage}%`;
-                const track = document.createElement('div');
-                track.className = 'w-16 h-1.5 bg-slate-100 rounded-full overflow-hidden';
-                const bar = document.createElement('div');
-                bar.className = 'h-full bg-rose-400 rounded-full';
-                bar.style.width = `${percentage}%`;
-                track.appendChild(bar);
-                percentageWrap.append(percentageText, track);
-                percentageCell.appendChild(percentageWrap);
-                row.appendChild(percentageCell);
-                fragment.appendChild(row);
-            });
-
-            tbody.appendChild(fragment);
-            document.getElementById('hrTotal').textContent = totalTickets;
-        }
-
-        // ==========================================
-        // ฟังก์ชันคำนวณเงินค่าตอบแทน ส่งออกเป็น CSV สเปกเป๊ะๆ ตามกฎ HR
-        // ==========================================
-        function escapeCsvCell(value) {
-            let text = String(value ?? '');
-            if (/^\s*[=+\-@]/.test(text)) text = `'${text}`;
-            return `"${text.replace(/"/g, '""')}"`;
-        }
-
-        function toCsvRow(values) {
-            return values.map(escapeCsvCell).join(',');
-        }
-
-        function downloadCsv(csvContent, fileName) {
-            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement('a');
-            const url = URL.createObjectURL(blob);
-            link.href = url;
-            link.download = fileName;
-            link.style.visibility = 'hidden';
-            document.body.appendChild(link);
-            link.click();
-            link.remove();
-            URL.revokeObjectURL(url);
-        }
-
-        function exportHRCompensationCSV() {
-            if(filteredData.length === 0) {
-                alert("ไม่มีข้อมูลสำหรับคำนวณ");
-                return;
-            }
-
-            // โครงสร้าง Object จัดกลุ่ม: Operator -> Date -> เคส
-            const staffWork = {};
-
-            filteredData.forEach(row => {
-                const operator = getOperatorName(row);
-                const date = String(row.date ?? '').trim() || "ไม่ระบุวัน";
-                const shiftKey = getShiftKey(row);
-
-                // ตรวจสอบว่าเป็น Tele หรือไม่ จากช่อง Type (ต้องเป็น "X-ray - Tele" เท่านั้น ตามที่คุณระบุ)
-                const isTele = isTeleCase(row);
-
-                if (!staffWork[operator]) staffWork[operator] = {};
-                if (!staffWork[operator][shiftKey]) {
-                    staffWork[operator][shiftKey] = { date, parsedDate: row._parsedDate, tele: 0, general: 0 };
-                }
-
-                if (isTele) {
-                    staffWork[operator][shiftKey].tele += 1;
-                } else {
-                    staffWork[operator][shiftKey].general += 1;
-                }
-            });
-
-            // ใส่ BOM ให้ Excel แสดงภาษาไทยได้ถูกต้อง
-            let csvContent = "\uFEFF";
-            csvContent += `รายงานคำนวณค่าตอบแทน On-call: ${activeMonthDisplay}\n`;
-            csvContent += "กฎการคำนวณ:,1. On-call พื้นฐาน 100/เวร,2. ตามระบบ Tele 400/ครั้ง,3. ทั่วไป 200/ครั้ง,(ลิมิตรวมไม่เกิน 800/เวร)\n\n";
-            csvContent += "ผู้ปฏิบัติงาน,วันที่เข้าเวร,จำนวนเคส Tele (400),จำนวนเคสทั่วไป (200),ค่าเวรพื้นฐาน,รายได้รวม,ยอดเงินสุทธิ (หักลิมิตแล้ว)\n";
-
-            let grandTotal = 0;
-
-            // วนลูปคำนวณทีละคน
-            Object.keys(staffWork).sort().forEach(operator => {
-                const shifts = Object.values(staffWork[operator]).sort((a, b) => {
-                    const aTime = a.parsedDate ? a.parsedDate.getTime() : Number.MAX_SAFE_INTEGER;
-                    const bTime = b.parsedDate ? b.parsedDate.getTime() : Number.MAX_SAFE_INTEGER;
-                    return aTime - bTime || a.date.localeCompare(b.date, 'th');
-                });
-                let operatorTotal = 0;
-                let opTele = 0;
-                let opGeneral = 0;
-                let opShifts = 0;
-
-                // แต่ละกลุ่มคือหนึ่งเวรเมื่อ API ส่ง shiftId; หากไม่มีจะ fallback เป็นหนึ่งวัน
-                shifts.forEach(work => {
-                    const basePay = PAYMENT_RULES.basePay;
-                    const telePay = work.tele * PAYMENT_RULES.telePay;
-                    const generalPay = work.general * PAYMENT_RULES.generalPay;
-
-                    const dayTotalRaw = basePay + telePay + generalPay;
-                    const dayTotalCapped = Math.min(dayTotalRaw, PAYMENT_RULES.dailyCap);
-
-                    csvContent += toCsvRow([operator, work.date, work.tele, work.general, basePay, dayTotalRaw, dayTotalCapped]) + '\n';
-
-                    operatorTotal += dayTotalCapped;
-                    opTele += work.tele;
-                    opGeneral += work.general;
-                    opShifts += 1;
-                });
-
-                // บรรทัดสรุปยอดรวมของแต่ละคน
-                csvContent += toCsvRow([`สรุปยอดคุณ ${operator}`, `รวม ${opShifts} เวร`, opTele, opGeneral, '-', '', operatorTotal]) + '\n';
-                csvContent += '\n';
-                grandTotal += operatorTotal;
-            });
-
-            csvContent += '\n' + toCsvRow(['ยอดรวมค่าตอบแทนทั้งแผนก', '', '', '', '', '', grandTotal]) + '\n';
-
-            // บังคับดาวน์โหลด
-            const safeFileNameMonth = activeMonthKey === 'all' ? 'All_Time' : activeMonthKey;
-            downloadCsv(csvContent, `HR_Payment_Report_${safeFileNameMonth}.csv`);
-
-            // Show Toast Success
-            showToast("โหลดรายงานคำนวณเงินสำเร็จ");
-        }
-
-        function copyHRReport() {
-            let textToCopy = `สรุปยอดภาระงานรายบุคคล - ${activeMonthDisplay}\n\n`;
-            textToCopy += "ลำดับ\tผู้ปฏิบัติงาน\tจำนวนเคสที่รับ\tสัดส่วน(%)\n";
-
-            if (filteredData.length === 0) {
-                alert('ไม่มีข้อมูลให้คัดลอก');
-                return;
-            }
-
-            const sortedStaff = Object.entries(getStaffCounts(filteredData)).sort((a, b) => b[1] - a[1]);
-            sortedStaff.forEach(([name, count], index) => {
-                const percent = ((count / filteredData.length) * 100).toFixed(1);
-                textToCopy += `${index + 1}\t${name}\t${count}\t${percent}%\n`;
-            });
-
-            textToCopy += `\nรวมทั้งหมด\t\t${filteredData.length}\t100%\n`;
-
-            navigator.clipboard.writeText(textToCopy).then(() => {
-                showToast("คัดลอกเรียบร้อยแล้ว");
-            }).catch(err => {
-                console.error('Copy failed', err);
-                alert('ไม่สามารถคัดลอกได้อัตโนมัติ กรุณาลากคลุมตารางแล้วกด Ctrl+C แทน');
-            });
-        }
-
-        function showToast(msg) {
-            const toast = document.getElementById('toast');
-            toast.querySelector('span').innerText = msg;
-            toast.classList.remove('translate-y-20', 'opacity-0');
-            setTimeout(() => {
-                toast.classList.add('translate-y-20', 'opacity-0');
-            }, 3000);
-        }
-
-        function renderTable(data) {
-            const tbody = document.getElementById('tableBody');
-            const mobileList = document.getElementById('mobileLogList');
-            tbody.replaceChildren();
-
-            if (data.length === 0) {
-                const row = document.createElement('tr');
-                appendTextCell(row, 'text-center py-8 text-slate-400', 'ไม่พบข้อมูลในเดือนหรือคำค้นหานี้');
-                row.firstChild.colSpan = 6;
-                tbody.appendChild(row);
-                renderMobileLogList(document, mobileList, []);
-                renderPagination(0);
-                return;
-            }
-
-            const startIndex = (tablePage - 1) * PAGE_SIZE;
-            const displayData = data.slice(startIndex, startIndex + PAGE_SIZE);
-            const fragment = document.createDocumentFragment();
-
-            displayData.forEach((row, index) => {
-                const tr = document.createElement('tr');
-                tr.className = 'hover:bg-blue-50/50 transition-colors group';
-                tr.style.animation = `fadeInUp 0.3s ease forwards ${index * 20}ms`;
-                tr.style.opacity = '0';
-
-                const dateCell = document.createElement('td');
-                dateCell.className = 'px-6 py-3 whitespace-nowrap';
-                const dateWrap = document.createElement('div');
-                dateWrap.className = 'flex items-center gap-2 font-medium text-slate-700';
-                const dateIcon = document.createElement('i');
-                dateIcon.className = 'ph ph-calendar-blank text-slate-400 group-hover:text-blue-500 transition-colors';
-                const dateText = document.createElement('span');
-                dateText.textContent = row.date || '-';
-                dateWrap.append(dateIcon, dateText);
-                dateCell.appendChild(dateWrap);
-                tr.appendChild(dateCell);
-
-                const timeCell = document.createElement('td');
-                timeCell.className = 'px-6 py-3 whitespace-nowrap';
-                const timeBadge = document.createElement('span');
-                timeBadge.className = 'bg-slate-100 text-slate-600 border border-slate-200 px-2 py-1 rounded text-xs font-mono shadow-sm';
-                timeBadge.textContent = row.time || '-';
-                timeCell.appendChild(timeBadge);
-                tr.appendChild(timeCell);
-
-                appendTextCell(tr, 'px-6 py-3 font-medium text-slate-800', row.detail || '-');
-                const typeCell = document.createElement('td');
-                typeCell.className = 'px-6 py-3';
-                const typeBadge = document.createElement('span');
-                typeBadge.className = 'bg-blue-100 text-blue-700 border border-blue-200 px-2.5 py-1 rounded-full text-xs font-bold';
-                typeBadge.textContent = row.type || '-';
-                typeCell.appendChild(typeBadge);
-                tr.appendChild(typeCell);
-                appendTextCell(tr, 'px-6 py-3 font-medium text-slate-600', row.dept || '-');
-
-                const operatorCell = document.createElement('td');
-                operatorCell.className = 'px-6 py-3';
-                const operatorWrap = document.createElement('div');
-                operatorWrap.className = 'flex items-center gap-2';
-                const avatar = document.createElement('div');
-                avatar.className = 'w-7 h-7 rounded-full bg-gradient-to-br from-blue-700 to-blue-900 text-white flex items-center justify-center text-xs font-bold uppercase shadow-sm';
-                const operator = String(row.operator || '-');
-                avatar.textContent = operator.charAt(0) || '?';
-                const operatorText = document.createElement('span');
-                operatorText.className = 'font-medium text-slate-700';
-                operatorText.textContent = operator;
-                operatorWrap.append(avatar, operatorText);
-                operatorCell.appendChild(operatorWrap);
-                tr.appendChild(operatorCell);
-                fragment.appendChild(tr);
-            });
-            tbody.appendChild(fragment);
-            renderMobileLogList(
-                document,
-                mobileList,
-                buildMobileLogRows(displayData)
-            );
-            renderPagination(data.length);
-        }
-
-        function renderPagination(totalRecords) {
-            const pagination = document.getElementById('tablePagination');
-            const info = document.getElementById('tableRecordInfo');
-            const pageInfo = document.getElementById('pageInfo');
-            const previous = document.getElementById('prevPageBtn');
-            const next = document.getElementById('nextPageBtn');
-            const totalPages = Math.max(1, Math.ceil(totalRecords / PAGE_SIZE));
-            tablePage = Math.min(tablePage, totalPages);
-
-            if (totalRecords === 0) {
-                pagination.classList.add('hidden');
-                return;
-            }
-
-            const start = (tablePage - 1) * PAGE_SIZE + 1;
-            const end = Math.min(tablePage * PAGE_SIZE, totalRecords);
-            info.textContent = `แสดง ${start}–${end} จาก ${totalRecords} รายการ`;
-            pageInfo.textContent = `หน้า ${tablePage}/${totalPages}`;
-            previous.disabled = tablePage === 1;
-            next.disabled = tablePage === totalPages;
-            pagination.classList.remove('hidden');
-        }
-
-        function renderDailyChart(data) {
-            const ctxDaily = document.getElementById('dailyChart').getContext('2d');
-            let labels = [];
-            let dataPoints = [];
-
-            if (activeMonthKey !== 'all') {
-                const [year, month] = activeMonthKey.split('-');
-                const daysInMonth = new Date(year, month, 0).getDate();
-                labels = Array.from({length: daysInMonth}, (_, i) => `${i + 1}`);
-
-                const dailyCounts = new Array(daysInMonth).fill(0);
-                data.forEach(row => {
-                    if(row._dayNum) {
-                        const dayIndex = parseInt(row._dayNum, 10) - 1;
-                        if(dayIndex >= 0 && dayIndex < daysInMonth) {
-                            dailyCounts[dayIndex]++;
-                        }
-                    }
-                });
-                dataPoints = dailyCounts;
-            } else {
-                const dailyCounts = {};
-                const sortedForLine = [...data].reverse();
-                sortedForLine.forEach(row => {
-                    if(row.date) dailyCounts[row.date] = (dailyCounts[row.date] || 0) + 1;
-                });
-                labels = Object.keys(dailyCounts).slice(-30);
-                dataPoints = Object.values(dailyCounts).slice(-30);
-            }
-
-            if (dailyChartInstance) {
-                dailyChartInstance.data.labels = labels;
-                dailyChartInstance.data.datasets[0].data = dataPoints;
-                dailyChartInstance.update();
-            } else {
-                dailyChartInstance = new Chart(ctxDaily, {
-                    type: 'line',
-                    data: {
-                        labels: labels,
-                        datasets: [{
-                            label: 'จำนวนปัญหา',
-                            data: dataPoints,
-                            borderColor: '#6366f1',
-                            backgroundColor: 'rgba(99, 102, 241, 0.1)',
-                            borderWidth: 3,
-                            pointBackgroundColor: '#ffffff',
-                            pointBorderColor: '#6366f1',
-                            pointBorderWidth: 2,
-                            pointRadius: 4,
-                            pointHoverRadius: 6,
-                            fill: true,
-
-                            tension: 0.4
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        animation: { duration: 1000, easing: 'easeOutQuart' },
-                        plugins: { legend: { display: false } },
-                        scales: {
-                            y: { beginAtZero: true, ticks: { stepSize: 1, precision: 0 } },
-                            x: { grid: { display: false } }
-                        }
-                    }
-                });
-            }
-        }
-
-        function renderTimeChart(data) {
-            const ctxTime = document.getElementById('timeChart').getContext('2d');
-
-            const timeCounts = data.reduce((acc, curr) => {
-                if(curr._hourKey !== "ไม่ระบุ") {
-                    acc[curr._hourKey] = (acc[curr._hourKey] || 0) + 1;
-                }
-                return acc;
-            }, {});
-
-            const sortedTimes = Object.keys(timeCounts).sort();
-            const timeLabels = sortedTimes;
-            const timeData = sortedTimes.map(key => timeCounts[key]);
-
-            if (timeChartInstance) {
-                timeChartInstance.data.labels = timeLabels;
-                timeChartInstance.data.datasets[0].data = timeData;
-                timeChartInstance.update();
-            } else {
-                timeChartInstance = new Chart(ctxTime, {
-                    type: 'bar',
-                    data: {
-                        labels: timeLabels,
-                        datasets: [{
-                            label: 'จำนวนปัญหา',
-                            data: timeData,
-                            backgroundColor: 'rgba(244, 63, 94, 0.8)',
-                            hoverBackgroundColor: 'rgba(225, 29, 72, 1)',
-                            borderRadius: 4,
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        animation: { duration: 800, easing: 'easeOutBounce' },
-                        plugins: { legend: { display: false } },
-                        scales: {
-                            y: { beginAtZero: true, ticks: { stepSize: 1, precision: 0 } },
-                            x: { grid: { display: false }, ticks: { maxRotation: 45, minRotation: 45 } }
-                        }
-                    }
-                });
-            }
-        }
-
-        function renderCharts(data) {
-            const deptCounts = data.reduce((acc, curr) => {
-                if(curr.dept) acc[curr.dept] = (acc[curr.dept] || 0) + 1;
-                return acc;
-            }, {});
-
-            const sortedDepts = Object.entries(deptCounts).sort((a, b) => b[1] - a[1]).slice(0, 10);
-            const deptLabels = sortedDepts.map(item => item[0]);
-            const deptData = sortedDepts.map(item => item[1]);
-
-            const staffCounts = data.reduce((acc, curr) => {
-                if(curr.operator) acc[curr.operator] = (acc[curr.operator] || 0) + 1;
-                return acc;
-            }, {});
-            const staffLabels = Object.keys(staffCounts);
-            const staffData = Object.values(staffCounts);
-
-            const defaultColors = ['#ec4899', '#eab308', '#f43f5e', '#84cc16', '#14b8a6', '#64748b'];
-
-            const staffColors = staffLabels.map((name, i) => {
-                const n = name.toLowerCase();
-                if (n.includes('กรพี')) return '#f97316';
-                if (n.includes('อธิบดี')) return '#8b5cf6';
-                if (n.includes('อัศวิน')) return '#0ea5e9';
-                if (n.includes('ณภัทร')) return '#10b981';
-                return defaultColors[i % defaultColors.length];
-            });
-
-            const ctxDept = document.getElementById('deptChart').getContext('2d');
-            if (deptChartInstance) {
-                deptChartInstance.data.labels = deptLabels;
-                deptChartInstance.data.datasets[0].data = deptData;
-                deptChartInstance.update();
-            } else {
-                deptChartInstance = new Chart(ctxDept, {
-                    type: 'bar',
-                    data: {
-                        labels: deptLabels,
-                        datasets: [{
-                            label: 'จำนวน Ticket',
-                            data: deptData,
-                            backgroundColor: 'rgba(59, 130, 246, 0.8)',
-                            hoverBackgroundColor: 'rgba(37, 99, 235, 1)',
-                            borderRadius: 6,
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        animation: { duration: 800, easing: 'easeOutBounce' },
-                        plugins: { legend: { display: false } },
-                        scales: {
-                            y: { beginAtZero: true, ticks: { stepSize: 1 } },
-                            x: { grid: { display: false } }
-                        }
-                    }
-                });
-            }
-
-            const ctxStaff = document.getElementById('staffChart').getContext('2d');
-            if (staffChartInstance) {
-                staffChartInstance.data.labels = staffLabels;
-                staffChartInstance.data.datasets[0].data = staffData;
-                staffChartInstance.data.datasets[0].backgroundColor = staffColors;
-                staffChartInstance.update();
-            } else {
-                staffChartInstance = new Chart(ctxStaff, {
-                    type: 'doughnut',
-                    data: {
-                        labels: staffLabels,
-                        datasets: [{
-                            data: staffData,
-                            backgroundColor: staffColors,
-                            borderWidth: 2,
-                            borderColor: '#ffffff',
-                            hoverOffset: 8
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        animation: { animateScale: true, animateRotate: true, duration: 1000 },
-                        plugins: {
-                            legend: { position: 'right', labels: { usePointStyle: true, boxWidth: 8 } }
-                        },
-                        cutout: '65%'
-                    }
-                });
-            }
-        }
-
-        function exportToCSV() {
-            if(filteredData.length === 0) {
-                alert("ไม่มีข้อมูลสำหรับส่งออก");
-                return;
-            }
-
-            let csvContent = "\uFEFF";
-            csvContent += toCsvRow(['วันที่', 'เวลา', 'ผู้ปฏิบัติงาน', 'รายละเอียดปัญหา', 'ประเภท', 'แผนก']) + '\n';
-
-            filteredData.forEach(row => {
-                csvContent += toCsvRow([row.date, row.time, row.operator, row.detail, row.type, row.dept]) + '\n';
-            });
-
-            const monthText = activeMonthKey === 'all' ? 'All-Time' : activeMonthKey;
-            downloadCsv(csvContent, `IT_Call_Log_${monthText}.csv`);
-            showToast("ดาวน์โหลดข้อมูลดิบแล้ว");
-        }
-
-        const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-        document.getElementById('currentDate').textContent = new Date().toLocaleDateString('th-TH', dateOptions);
-
-        function setApiStatus(message, colorClass, mobileMessage = message) {
-            const status = document.getElementById('apiStatus');
-            status.className = `text-xl font-bold ${colorClass}`;
-            setMetricPair(document, 'apiStatus', 'mobileApiStatus', message, mobileMessage);
-        }
-
-        function setLastUpdated() {
-            document.getElementById('lastUpdated').textContent = `อัปเดต: ${new Date().toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' })}`;
-        }
-
-        async function fetchDataFromGoogleSheet() {
-            if (isFetching) return;
-            const webAppUrl = '/api/incidents';
-            const refreshButton = document.getElementById('refreshBtn');
-            const controller = new AbortController();
-            const timeoutId = window.setTimeout(() => controller.abort(), API_TIMEOUT_MS);
-            isFetching = true;
-            refreshButton.disabled = true;
-            setApiStatus('กำลังโหลด...', 'text-blue-600', 'โหลด');
-
-            try {
-                const response = await fetch(webAppUrl, { signal: controller.signal, headers: { Accept: 'application/json' } });
-                if (!response.ok) throw new Error(`Status: ${response.status}`);
-                const rawJson = await response.json();
-                if (!Array.isArray(rawJson)) throw new Error('รูปแบบข้อมูล API ไม่ถูกต้อง');
-
-                rawData = processData(rawJson);
-                initMonthSelector();
-                initDeptFilter();
-                applyFilters(true);
-                setApiStatus(
-                    rawJson.length === 0 ? 'ไม่มีข้อมูล' : 'เชื่อมต่อสำเร็จ',
-                    rawJson.length === 0 ? 'text-slate-400' : 'text-emerald-600',
-                    rawJson.length === 0 ? 'ว่าง' : 'สำเร็จ'
-                );
-                setLastUpdated();
-
-            } catch (error) {
-                console.error("API Error:", error);
-                setApiStatus(
-                    error.name === 'AbortError' ? 'หมดเวลารอข้อมูล' : 'เกิดข้อผิดพลาด',
-                    'text-red-500',
-                    error.name === 'AbortError' ? 'หมดเวลา' : 'ผิดพลาด'
-                );
-                showToast('ดึงข้อมูลไม่สำเร็จ โปรดลองใหม่อีกครั้ง');
-            } finally {
-                window.clearTimeout(timeoutId);
-                isFetching = false;
-                refreshButton.disabled = false;
-            }
-        }
-
-        document.getElementById('refreshBtn').addEventListener('click', fetchDataFromGoogleSheet);
-        document.getElementById('scrollLeftBtn').addEventListener('click', () => scrollTimeline(-300));
-        document.getElementById('scrollRightBtn').addEventListener('click', () => scrollTimeline(300));
-        document.getElementById('exportHRBtn').addEventListener('click', exportHRCompensationCSV);
-        document.getElementById('copyBtn').addEventListener('click', copyHRReport);
-        document.getElementById('exportRawBtn').addEventListener('click', exportToCSV);
-        document.getElementById('prevPageBtn').addEventListener('click', () => {
-            if (tablePage > 1) {
-                tablePage -= 1;
-                renderTable(filteredData);
-            }
-        });
-        document.getElementById('nextPageBtn').addEventListener('click', () => {
-            const totalPages = Math.ceil(filteredData.length / PAGE_SIZE);
-            if (tablePage < totalPages) {
-                tablePage += 1;
-                renderTable(filteredData);
-            }
-        });
-        document.getElementById('searchInput').addEventListener('input', () => {
-            window.clearTimeout(searchDebounceTimer);
-            searchDebounceTimer = window.setTimeout(() => applyFilters(true), 250);
-        });
-        window.addEventListener('resize', updateScrollButtons);
-
-        fetchDataFromGoogleSheet();
-        window.setInterval(fetchDataFromGoogleSheet, AUTO_REFRESH_MS);
-
-    </script>
+    <!-- Main Application Script -->
+    <script src="./js/app.js?v=20260729-3"></script>
 </body>
 </html>

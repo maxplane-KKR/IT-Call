@@ -163,3 +163,57 @@ test("renders an explicit empty HR state on mobile", async () => {
     "ไม่พบข้อมูลในเดือนหรือคำค้นหานี้",
   );
 });
+
+test("renders complete mobile Log cards with wrapping detail content", async () => {
+  const mobileReports = await import("../public/mobile-reports.mjs");
+  assert.equal(typeof mobileReports.renderMobileLogList, "function");
+
+  const container = new FakeElement("div");
+  const rows = mobileReports.buildMobileLogRows([
+    {
+      date: "23/7/2026",
+      time: "20:19:00",
+      detail: "เปิด Code ระบบ COMBIZYM และตรวจสิทธิ์ผู้ใช้งาน",
+      type: "ทั่วไป",
+      dept: "ER",
+      operator: "อธิบดี",
+    },
+  ]);
+
+  mobileReports.renderMobileLogList(fakeDocument, container, rows);
+
+  assert.equal(container.children.length, 1);
+  const fragment = container.children[0];
+  assert.equal(fragment.children.length, 1);
+  const card = fragment.children[0];
+  assert.equal(card.tagName, "article");
+  assert.equal(card.className, "mobile-log-card");
+  assert.equal(
+    card.attributes["aria-label"],
+    "23/7/2026 20:19:00 อธิบดี เปิด Code ระบบ COMBIZYM และตรวจสิทธิ์ผู้ใช้งาน",
+  );
+  assert.equal(card.children[0].children[0].textContent, "23/7/2026");
+  assert.equal(card.children[0].children[1].textContent, "20:19:00");
+  assert.equal(
+    card.children[1].textContent,
+    "เปิด Code ระบบ COMBIZYM และตรวจสิทธิ์ผู้ใช้งาน",
+  );
+  assert.equal(card.children[2].children[0].textContent, "ทั่วไป");
+  assert.equal(card.children[2].children[1].textContent, "ER");
+  assert.equal(card.children[3].children[1].textContent, "อธิบดี");
+});
+
+test("renders an explicit empty Log state on mobile", async () => {
+  const mobileReports = await import("../public/mobile-reports.mjs");
+  assert.equal(typeof mobileReports.renderMobileLogList, "function");
+
+  const container = new FakeElement("div");
+  mobileReports.renderMobileLogList(fakeDocument, container, []);
+
+  assert.equal(container.children.length, 1);
+  assert.equal(container.children[0].className, "mobile-report-empty");
+  assert.equal(
+    container.children[0].textContent,
+    "ไม่พบข้อมูลในเดือนหรือคำค้นหานี้",
+  );
+});

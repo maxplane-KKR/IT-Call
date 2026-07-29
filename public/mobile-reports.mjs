@@ -107,3 +107,68 @@ export function renderMobileHrList(
   fragment.appendChild(total);
   container.appendChild(fragment);
 }
+
+export function renderMobileLogList(documentLike, container, rows) {
+  container.replaceChildren();
+
+  if (rows.length === 0) {
+    container.appendChild(
+      element(
+        documentLike,
+        "p",
+        "mobile-report-empty",
+        "ไม่พบข้อมูลในเดือนหรือคำค้นหานี้",
+      ),
+    );
+    return;
+  }
+
+  const fragment = documentLike.createDocumentFragment();
+
+  rows.forEach((row) => {
+    const article = element(documentLike, "article", "mobile-log-card");
+    article.setAttribute(
+      "aria-label",
+      `${row.date} ${row.time} ${row.operator} ${row.detail}`,
+    );
+
+    const header = element(documentLike, "header", "mobile-log-card-header");
+    const date = element(documentLike, "strong", "mobile-log-date", row.date);
+    const time = element(documentLike, "time", "mobile-log-time", row.time);
+    header.append(date, time);
+
+    const detail = element(
+      documentLike,
+      "p",
+      "mobile-log-detail",
+      row.detail,
+    );
+
+    const meta = element(documentLike, "div", "mobile-log-meta");
+    meta.append(
+      element(documentLike, "span", "mobile-log-type", row.type),
+      element(documentLike, "span", "mobile-log-department", row.department),
+    );
+
+    const operator = element(documentLike, "footer", "mobile-log-operator");
+    operator.append(
+      element(
+        documentLike,
+        "span",
+        "mobile-log-operator-avatar",
+        row.operatorInitial,
+      ),
+      element(
+        documentLike,
+        "strong",
+        "mobile-log-operator-name",
+        row.operator,
+      ),
+    );
+
+    article.append(header, detail, meta, operator);
+    fragment.appendChild(article);
+  });
+
+  container.appendChild(fragment);
+}

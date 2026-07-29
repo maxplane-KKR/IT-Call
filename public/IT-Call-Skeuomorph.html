@@ -343,6 +343,177 @@
                 text-align: center;
                 overflow-wrap: anywhere;
             }
+
+            .log-panel {
+                border-radius: 20px !important;
+            }
+
+            .log-toolbar {
+                padding: 16px !important;
+            }
+
+            .log-filters {
+                display: grid !important;
+                grid-template-columns: minmax(0, 1fr);
+                gap: 10px !important;
+                min-width: 0;
+                width: 100% !important;
+            }
+
+            .log-filters > div,
+            .log-filters select,
+            .log-filters input,
+            .log-filters button {
+                min-width: 0 !important;
+                width: 100% !important;
+            }
+
+            .log-filters button {
+                justify-content: center;
+                min-height: 44px;
+            }
+
+            .desktop-log-table {
+                display: none !important;
+            }
+
+            .mobile-log-list {
+                display: grid;
+                grid-template-columns: minmax(0, 1fr);
+                gap: 10px;
+                min-width: 0;
+                width: 100%;
+                padding: 12px;
+                background: rgba(248, 250, 252, 0.55);
+            }
+
+            .mobile-log-card {
+                display: grid;
+                gap: 11px;
+                min-width: 0;
+                width: 100%;
+                padding: 13px;
+                border: 1px solid #dbe3ec;
+                border-left: 3px solid #34b88a;
+                border-radius: 14px;
+                background: rgba(255, 255, 255, 0.9);
+                box-shadow: 0 2px 7px rgba(51, 65, 85, 0.07);
+            }
+
+            .mobile-log-card > * {
+                min-width: 0;
+            }
+
+            .mobile-log-card-header {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 10px;
+            }
+
+            .mobile-log-date {
+                color: #334155;
+                font-size: 13px;
+            }
+
+            .mobile-log-time {
+                flex: 0 0 auto;
+                padding: 4px 7px;
+                border: 1px solid #dbe3ec;
+                border-radius: 6px;
+                background: #f1f5f9;
+                color: #475569;
+                font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+                font-size: 11px;
+            }
+
+            .mobile-log-detail {
+                margin: 0;
+                color: #1e293b;
+                font-size: 14px;
+                font-weight: 600;
+                line-height: 1.55;
+                overflow-wrap: anywhere;
+                word-break: break-word;
+            }
+
+            .mobile-log-meta {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 6px;
+                min-width: 0;
+            }
+
+            .mobile-log-type,
+            .mobile-log-department {
+                max-width: 100%;
+                padding: 4px 8px;
+                overflow: hidden;
+                border-radius: 999px;
+                font-size: 11px;
+                font-weight: 700;
+                line-height: 1.2;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+
+            .mobile-log-type {
+                border: 1px solid #bfdbfe;
+                background: #dbeafe;
+                color: #1d4ed8;
+            }
+
+            .mobile-log-department {
+                border: 1px solid #bbf7d0;
+                background: #dcfce7;
+                color: #047857;
+            }
+
+            .mobile-log-operator {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                min-width: 0;
+                padding-top: 10px;
+                border-top: 1px solid #eef2f7;
+            }
+
+            .mobile-log-operator-avatar {
+                display: grid;
+                flex: 0 0 26px;
+                width: 26px;
+                height: 26px;
+                place-items: center;
+                border-radius: 999px;
+                background: linear-gradient(145deg, #1e3a5f, #0f172a);
+                color: #fff;
+                font-size: 11px;
+                font-weight: 700;
+            }
+
+            .mobile-log-operator-name {
+                min-width: 0;
+                overflow: hidden;
+                color: #475569;
+                font-size: 12px;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+
+            .log-panel #tablePagination {
+                align-items: stretch;
+                padding: 12px !important;
+            }
+
+            .log-panel #tableRecordInfo {
+                width: 100%;
+                text-align: center;
+            }
+
+            .log-panel #tablePagination > div {
+                justify-content: center;
+                width: 100%;
+            }
         }
     </style>
 </head>
@@ -561,12 +732,12 @@
         </div>
 
         <!-- Data Table -->
-        <div class="glass-panel rounded-3xl shadow-sm border border-slate-200 overflow-hidden animate-fade-in-up delay-400">
-            <div class="p-6 border-b border-slate-200 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white/50">
+        <div class="log-panel glass-panel rounded-3xl shadow-sm border border-slate-200 overflow-hidden animate-fade-in-up delay-400">
+            <div class="log-toolbar p-6 border-b border-slate-200 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white/50">
                 <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
                     <i class="ph ph-list-dashes text-emerald-500 text-xl"></i> รายการแจ้งปัญหา (Log)
                 </h3>
-                <div class="flex flex-wrap items-center gap-3 w-full sm:w-auto">
+                <div class="log-filters flex flex-wrap items-center gap-3 w-full sm:w-auto">
                     <div class="relative w-full sm:w-auto">
                         <select id="deptFilter" aria-label="กรองตามแผนก" class="pl-4 pr-8 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all shadow-sm appearance-none cursor-pointer font-medium text-slate-700 min-w-[140px]">
                             <option value="all">ทุกแผนก</option>
@@ -579,11 +750,11 @@
                                class="pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white w-full sm:w-64 transition-all shadow-sm">
                     </div>
                     <button type="button" id="exportRawBtn" class="bg-emerald-500 hover:bg-emerald-600 text-white p-2.5 rounded-xl transition-colors shadow-sm shadow-emerald-500/30 flex items-center gap-2 whitespace-nowrap" title="โหลดข้อมูลดิบเป็น Excel">
-                        <i class="ph ph-download-simple text-lg"></i> <span class="hidden sm:inline text-sm font-bold">CSV ข้อมูลดิบ</span>
+                        <i class="ph ph-download-simple text-lg"></i> <span class="text-sm font-bold">CSV ข้อมูลดิบ</span>
                     </button>
                 </div>
             </div>
-            <div class="overflow-x-auto custom-scroll">
+            <div class="desktop-log-table overflow-x-auto custom-scroll">
                 <table class="w-full text-left text-sm text-slate-600">
                     <thead class="bg-slate-50/80 text-slate-700 uppercase font-bold text-xs tracking-wider border-b border-slate-200">
                         <tr>
@@ -600,6 +771,7 @@
                     </tbody>
                 </table>
             </div>
+            <div id="mobileLogList" class="mobile-log-list" role="list" aria-live="polite"></div>
             <div id="tablePagination" class="hidden px-6 py-4 border-t border-slate-200 bg-white/50 flex flex-wrap items-center justify-between gap-3">
                 <span id="tableRecordInfo" class="text-sm text-slate-500" aria-live="polite"></span>
                 <div class="flex items-center gap-2">
@@ -624,6 +796,7 @@
             buildMobileHrRows,
             buildMobileLogRows,
             renderMobileHrList,
+            renderMobileLogList,
         } from "/mobile-reports.mjs";
 
         let rawData = [];
@@ -1113,6 +1286,7 @@
 
         function renderTable(data) {
             const tbody = document.getElementById('tableBody');
+            const mobileList = document.getElementById('mobileLogList');
             tbody.replaceChildren();
 
             if (data.length === 0) {
@@ -1120,6 +1294,7 @@
                 appendTextCell(row, 'text-center py-8 text-slate-400', 'ไม่พบข้อมูลในเดือนหรือคำค้นหานี้');
                 row.firstChild.colSpan = 6;
                 tbody.appendChild(row);
+                renderMobileLogList(document, mobileList, []);
                 renderPagination(0);
                 return;
             }
@@ -1181,6 +1356,11 @@
                 fragment.appendChild(tr);
             });
             tbody.appendChild(fragment);
+            renderMobileLogList(
+                document,
+                mobileList,
+                buildMobileLogRows(displayData)
+            );
             renderPagination(data.length);
         }
 

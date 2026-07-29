@@ -1,6 +1,43 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
+class FakeElement {
+  constructor(tagName) {
+    this.tagName = tagName;
+    this.children = [];
+    this.attributes = {};
+    this.className = "";
+    this.textContent = "";
+    this.style = {};
+  }
+
+  append(...children) {
+    this.children.push(...children);
+  }
+
+  appendChild(child) {
+    this.children.push(child);
+    return child;
+  }
+
+  replaceChildren(...children) {
+    this.children = [...children];
+  }
+
+  setAttribute(name, value) {
+    this.attributes[name] = String(value);
+  }
+}
+
+const fakeDocument = {
+  createElement(tagName) {
+    return new FakeElement(tagName);
+  },
+  createDocumentFragment() {
+    return new FakeElement("#fragment");
+  },
+};
+
 test("builds compact HR rows from the same staff totals as desktop", async () => {
   let mobileReports = {};
   try {
@@ -82,4 +119,47 @@ test("normalizes complete mobile Log records without dropping long details", asy
       operatorInitial: "-",
     },
   ]);
+});
+
+test("renders an accessible full-width HR ranking list for mobile", async () => {
+  const mobileReports = await import("../public/mobile-reports.mjs");
+  assert.equal(typeof mobileReports.renderMobileHrList, "function");
+
+  const container = new FakeElement("div");
+  const rows = mobileReports.buildMobileHrRows(
+    { อธิบดี: 3, กรพีร์วัศ: 2 },
+    5,
+  );
+
+  mobileReports.renderMobileHrList(fakeDocument, container, rows, 5);
+
+  assert.equal(container.children.length, 1);
+  const fragment = container.children[0];
+  assert.equal(fragment.children.length, 3);
+  assert.equal(fragment.children[0].tagName, "article");
+  assert.equal(fragment.children[0].className, "mobile-hr-row");
+  assert.equal(
+    fragment.children[0].attributes["aria-label"],
+    "อันดับ 1 อธิบดี 3 Ticket 60.0%",
+  );
+  assert.equal(fragment.children[0].children[1].children[1].textContent, "อธิบดี");
+  assert.equal(fragment.children[0].children[2].textContent, "3");
+  assert.equal(fragment.children[0].children[3].children[0].textContent, "60.0%");
+  assert.equal(fragment.children[2].className, "mobile-hr-total");
+  assert.equal(fragment.children[2].children[1].textContent, "5");
+});
+
+test("renders an explicit empty HR state on mobile", async () => {
+  const mobileReports = await import("../public/mobile-reports.mjs");
+  assert.equal(typeof mobileReports.renderMobileHrList, "function");
+
+  const container = new FakeElement("div");
+  mobileReports.renderMobileHrList(fakeDocument, container, [], 0);
+
+  assert.equal(container.children.length, 1);
+  assert.equal(container.children[0].className, "mobile-report-empty");
+  assert.equal(
+    container.children[0].textContent,
+    "ไม่พบข้อมูลในเดือนหรือคำค้นหานี้",
+  );
 });

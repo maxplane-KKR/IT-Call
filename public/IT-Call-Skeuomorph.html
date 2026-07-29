@@ -124,7 +124,22 @@
             display: none;
         }
 
+        .mobile-hr-list,
+        .mobile-log-list {
+            display: none;
+        }
+
         @media (max-width: 600px) {
+            body,
+            main {
+                max-width: 100%;
+                overflow-x: hidden;
+            }
+
+            main {
+                padding: 12px !important;
+            }
+
             .desktop-metric-grid {
                 display: none !important;
             }
@@ -186,6 +201,148 @@
             .mobile-metric-card-orange { color: #ea580c; border-bottom-color: #f97316; }
             .mobile-metric-card-green { color: #059669; border-bottom-color: #10b981; }
             .mobile-metric-card-green .mobile-metric-value { color: #059669; }
+
+            .hr-report-panel {
+                padding: 16px !important;
+                border-radius: 20px !important;
+            }
+
+            .hr-report-heading {
+                margin-bottom: 16px !important;
+            }
+
+            .hr-report-heading h3 {
+                align-items: flex-start;
+                font-size: 16px;
+                line-height: 1.35;
+            }
+
+            .hr-actions {
+                display: grid !important;
+                grid-template-columns: 1fr;
+                width: 100%;
+            }
+
+            .hr-actions button {
+                justify-content: center;
+                min-height: 44px;
+                width: 100%;
+            }
+
+            .desktop-hr-table {
+                display: none !important;
+            }
+
+            .mobile-hr-list {
+                display: block;
+                min-width: 0;
+                width: 100%;
+            }
+
+            .mobile-hr-row {
+                display: grid;
+                grid-template-columns: 24px minmax(0, 1fr) 42px 58px;
+                gap: 7px;
+                align-items: center;
+                min-width: 0;
+                padding: 12px 0;
+                border-bottom: 1px solid #eadfd0;
+            }
+
+            .mobile-hr-rank {
+                color: #64748b;
+                font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+                font-size: 12px;
+                text-align: center;
+            }
+
+            .mobile-hr-identity {
+                display: flex;
+                align-items: center;
+                gap: 7px;
+                min-width: 0;
+            }
+
+            .mobile-hr-avatar {
+                display: grid;
+                flex: 0 0 26px;
+                width: 26px;
+                height: 26px;
+                place-items: center;
+                border-radius: 999px;
+                background: #ffe4e8;
+                color: #be123c;
+                font-size: 11px;
+                font-weight: 700;
+            }
+
+            .mobile-hr-name {
+                min-width: 0;
+                overflow: hidden;
+                color: #334155;
+                font-size: 13px;
+                line-height: 1.25;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+
+            .mobile-hr-count {
+                color: #e11d48;
+                font-family: 'Kanit', sans-serif;
+                font-size: 15px;
+                text-align: right;
+            }
+
+            .mobile-hr-share {
+                display: grid;
+                gap: 4px;
+                min-width: 0;
+            }
+
+            .mobile-hr-percentage {
+                color: #64748b;
+                font-size: 10px;
+                text-align: right;
+            }
+
+            .mobile-hr-track {
+                height: 5px;
+                overflow: hidden;
+                border-radius: 999px;
+                background: #f1e8dd;
+            }
+
+            .mobile-hr-bar {
+                display: block;
+                height: 100%;
+                border-radius: inherit;
+                background: linear-gradient(90deg, #fb7185, #e11d48);
+            }
+
+            .mobile-hr-total {
+                display: flex;
+                justify-content: space-between;
+                gap: 12px;
+                margin: 12px -16px -16px;
+                padding: 14px 16px;
+                border-radius: 0 0 18px 18px;
+                background: #f8fafc;
+                color: #334155;
+            }
+
+            .mobile-hr-total strong:last-child {
+                color: #e11d48;
+                font-family: 'Kanit', sans-serif;
+                font-size: 18px;
+            }
+
+            .mobile-report-empty {
+                padding: 28px 12px;
+                color: #94a3b8;
+                font-size: 13px;
+                text-align: center;
+                overflow-wrap: anywhere;
+            }
         }
     </style>
 </head>
@@ -315,15 +472,15 @@
         </div>
 
         <!-- รายงานสรุปสำหรับ HR -->
-        <div class="glass-panel p-6 rounded-3xl shadow-sm border border-slate-200 mb-8 animate-pop delay-100 border-t-4 border-t-rose-500">
-            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+        <div class="hr-report-panel glass-panel p-6 rounded-3xl shadow-sm border border-slate-200 mb-8 animate-pop delay-100 border-t-4 border-t-rose-500">
+            <div class="hr-report-heading flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
                 <div>
                     <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
                         <i class="ph ph-users-three text-rose-500 text-xl"></i> สรุปยอดภาระงานรายบุคคล (สำหรับจ่าย HR / On-Call)
                     </h3>
                     <p class="text-sm text-slate-500 mt-1" id="hrReportSubtitle">ยอดสรุปประจำเดือน...</p>
                 </div>
-                <div class="flex flex-wrap items-center gap-2">
+                <div class="hr-actions flex flex-wrap items-center gap-2">
                     <!-- ปุ่มใหม่: ออกรายงาน CSV ตามสูตรเป๊ะๆ -->
                     <button type="button" id="exportHRBtn" class="bg-emerald-50 text-emerald-600 hover:bg-emerald-100 hover:border-emerald-300 border border-emerald-200 px-4 py-2 rounded-xl text-sm font-bold transition-all shadow-sm flex items-center gap-2">
                         <i class="ph ph-file-csv text-lg"></i> <span>โหลด CSV ค่าตอบแทน (HR)</span>
@@ -335,7 +492,7 @@
                 </div>
             </div>
 
-            <div class="overflow-x-auto custom-scroll">
+            <div class="desktop-hr-table overflow-x-auto custom-scroll">
                 <table class="w-full text-left text-sm text-slate-700" id="hrTable">
                     <thead class="bg-rose-50/50 text-rose-900 font-bold border-b-2 border-rose-100">
                         <tr>
@@ -357,6 +514,7 @@
                     </tfoot>
                 </table>
             </div>
+            <div id="mobileHrList" class="mobile-hr-list" role="list" aria-live="polite"></div>
         </div>
 
         <!-- กราฟรายวัน & กราฟช่วงเวลาพีก -->
@@ -462,6 +620,11 @@
 
     <script type="module">
         import { setMetricPair } from "/mobile-metrics.mjs";
+        import {
+            buildMobileHrRows,
+            buildMobileLogRows,
+            renderMobileHrList,
+        } from "/mobile-reports.mjs";
 
         let rawData = [];
         let filteredData = [];
@@ -740,8 +903,15 @@
         function renderHRReport(data) {
             const tbody = document.getElementById('hrTableBody');
             const subtitle = document.getElementById('hrReportSubtitle');
+            const staffCounts = getStaffCounts(data);
             tbody.replaceChildren();
             subtitle.textContent = `ข้อมูล: ${activeMonthDisplay} | ยอดรวมทั้งหมด ${data.length} รายการ`;
+            renderMobileHrList(
+                document,
+                document.getElementById('mobileHrList'),
+                buildMobileHrRows(staffCounts, data.length),
+                data.length
+            );
 
             if (data.length === 0) {
                 const row = document.createElement('tr');
@@ -752,7 +922,7 @@
                 return;
             }
 
-            const sortedStaff = Object.entries(getStaffCounts(data)).sort((a, b) => b[1] - a[1]);
+            const sortedStaff = Object.entries(staffCounts).sort((a, b) => b[1] - a[1]);
             const totalTickets = data.length;
             const fragment = document.createDocumentFragment();
 

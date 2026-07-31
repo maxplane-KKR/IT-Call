@@ -5,8 +5,12 @@ export const metadata: Metadata = {
   title: "IT On-call Compensation Desk",
   description: "Local preview of the IT on-call compensation dashboard.",
   icons: {
-    icon: "/icon-192.png",
-    shortcut: "/favicon.ico",
+    icon: [
+      { url: "/windows-icon-48.png", sizes: "48x48", type: "image/png" },
+      { url: "/windows-icon-192.png", sizes: "192x192", type: "image/png" },
+      { url: "/windows-icon-512.png", sizes: "512x512", type: "image/png" },
+    ],
+    shortcut: "/favicon-circle.ico",
     apple: "/icon-180.png",
   },
   manifest: "/manifest.webmanifest",

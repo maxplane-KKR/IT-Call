@@ -10,6 +10,7 @@ const favicon = fs.readFileSync(path.join(root, "public", "favicon.svg"), "utf8"
 const manifest = fs.readFileSync(path.join(root, "app", "manifest.ts"), "utf8");
 const layout = fs.readFileSync(path.join(root, "app", "layout.tsx"), "utf8");
 const styles = fs.readFileSync(path.join(root, "app", "globals.css"), "utf8");
+const installDocument = fs.readFileSync(path.join(root, "public", "IT-Call-Skeuomorph.html"), "utf8");
 
 function pngSize(name) {
   const bytes = fs.readFileSync(path.join(root, "public", name));
@@ -21,7 +22,10 @@ function pngSize(name) {
 }
 
 function pngCornerAlphas(name) {
-  const bytes = fs.readFileSync(path.join(root, "public", name));
+  return pngCornerAlphasFromBytes(fs.readFileSync(path.join(root, "public", name)), name);
+}
+
+function pngCornerAlphasFromBytes(bytes, name) {
   const width = bytes.readUInt32BE(16);
   const height = bytes.readUInt32BE(20);
 
@@ -90,6 +94,23 @@ function pngCornerAlphas(name) {
   return [top[3], top[stride - 1], bottom[3], bottom[stride - 1]];
 }
 
+function icoPngEntries(name) {
+  const bytes = fs.readFileSync(path.join(root, "public", name));
+  assert.deepEqual([...bytes.subarray(0, 4)], [0, 0, 1, 0]);
+
+  const count = bytes.readUInt16LE(4);
+  return Array.from({ length: count }, (_, index) => {
+    const entryOffset = 6 + index * 16;
+    const width = bytes[entryOffset] || 256;
+    const height = bytes[entryOffset + 1] || 256;
+    const size = bytes.readUInt32LE(entryOffset + 8);
+    const imageOffset = bytes.readUInt32LE(entryOffset + 12);
+    const png = bytes.subarray(imageOffset, imageOffset + size);
+    assert.deepEqual([...png.subarray(0, 8)], [137, 80, 78, 71, 13, 10, 26, 10]);
+    return { width, height, png };
+  });
+}
+
 test("PWA assets use the supplied Edge Soft image without recreating the mark", () => {
   assert.match(iconSvg, /<image[^>]+href=\"\/icon-512\.png\"/);
   assert.doesNotMatch(iconSvg, /<text/);
@@ -114,26 +135,67 @@ test("Windows install icons have transparent corners while Android maskable icon
   }
 });
 
+test("the installed dashboard document advertises fresh Windows icon assets", () => {
+  assert.match(installDocument, /rel="manifest"\s+href="\/manifest\.webmanifest"/);
+  assert.match(installDocument, /rel="icon"[^>]+href="\/windows-icon-48\.png"/);
+  assert.match(installDocument, /rel="shortcut icon"\s+href="\/favicon-circle\.ico"/);
+  assert.match(manifest, /src:\s*"\/windows-icon-44\.png"/);
+  assert.match(manifest, /src:\s*"\/windows-icon-192\.png"/);
+  assert.match(manifest, /src:\s*"\/windows-icon-512\.png"/);
+});
+
+test("fresh Windows PNG and ICO assets keep transparent corners at desktop sizes", () => {
+  for (const name of [
+    "windows-icon-44.png",
+    "windows-icon-48.png",
+    "windows-icon-88.png",
+    "windows-icon-192.png",
+    "windows-icon-512.png",
+  ]) {
+    assert.ok(fs.existsSync(path.join(root, "public", name)), `${name} must exist`);
+    assert.deepEqual(pngCornerAlphas(name), [0, 0, 0, 0], `${name} should render as a circle on Windows`);
+  }
+
+  const faviconName = "favicon-circle.ico";
+  assert.ok(fs.existsSync(path.join(root, "public", faviconName)), `${faviconName} must exist`);
+  const entries = icoPngEntries(faviconName);
+  assert.deepEqual(
+    entries.map(({ width, height }) => ({ width, height })),
+    [
+      { width: 16, height: 16 },
+      { width: 32, height: 32 },
+      { width: 48, height: 48 },
+    ],
+  );
+  for (const { width, png } of entries) {
+    assert.deepEqual(
+      pngCornerAlphasFromBytes(png, `${faviconName}:${width}`),
+      [0, 0, 0, 0],
+      `${faviconName}:${width} should render as a circle on Windows`,
+    );
+  }
+});
+
 test("manifest exposes PNG install icons for Windows, Android, and iOS", () => {
   assert.match(manifest, /display:\s*\"standalone\"/);
   assert.match(manifest, /orientation:\s*\"any\"/);
-  assert.match(manifest, /src:\s*\"\/icon-192\.png\"/);
-  assert.match(manifest, /src:\s*\"\/icon-512\.png\"/);
+  assert.match(manifest, /src:\s*\"\/windows-icon-192\.png\"/);
+  assert.match(manifest, /src:\s*\"\/windows-icon-512\.png\"/);
   assert.match(manifest, /src:\s*\"\/maskable-192\.png\"/);
   assert.match(manifest, /src:\s*\"\/maskable-512\.png\"/);
   assert.match(manifest, /purpose:\s*\"maskable\"/);
 });
 
 test("layout points browsers and install prompts at the supplied image assets", () => {
-  assert.match(layout, /icon:\s*\"\/icon-192\.png\"/);
+  assert.match(layout, /url:\s*\"\/windows-icon-192\.png\"/);
   assert.match(layout, /apple:\s*\"\/icon-180\.png\"/);
   assert.match(layout, /manifest:\s*\"\/manifest\.webmanifest\"/);
-  assert.match(layout, /favicon\.ico/);
+  assert.match(layout, /favicon-circle\.ico/);
   assert.match(layout, /browserconfig\.xml/);
 });
 
 test("favicon and Windows browser configuration are installable", () => {
-  const faviconIco = fs.readFileSync(path.join(root, "public", "favicon.ico"));
+  const faviconIco = fs.readFileSync(path.join(root, "public", "favicon-circle.ico"));
   const browserConfig = fs.readFileSync(path.join(root, "public", "browserconfig.xml"), "utf8");
 
   assert.deepEqual([...faviconIco.subarray(0, 4)], [0, 0, 1, 0]);

@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import path from "node:path";
 import test from "node:test";
+import { inflateSync } from "node:zlib";
 
 const root = path.resolve(import.meta.dirname, "..");
 const iconSvg = fs.readFileSync(path.join(root, "public", "icon.svg"), "utf8");
@@ -19,6 +20,76 @@ function pngSize(name) {
   };
 }
 
+function pngCornerAlphas(name) {
+  const bytes = fs.readFileSync(path.join(root, "public", name));
+  const width = bytes.readUInt32BE(16);
+  const height = bytes.readUInt32BE(20);
+
+  assert.equal(bytes[24], 8, `${name} must use 8-bit channels`);
+  assert.equal(bytes[25], 6, `${name} must use RGBA pixels`);
+  assert.equal(bytes[28], 0, `${name} must not be interlaced`);
+
+  const idatChunks = [];
+  for (let offset = 8; offset < bytes.length; ) {
+    const length = bytes.readUInt32BE(offset);
+    const type = bytes.toString("ascii", offset + 4, offset + 8);
+    if (type === "IDAT") {
+      idatChunks.push(bytes.subarray(offset + 8, offset + 8 + length));
+    }
+    offset += length + 12;
+  }
+
+  const inflated = inflateSync(Buffer.concat(idatChunks));
+  const stride = width * 4;
+  let sourceOffset = 0;
+  let previous = Buffer.alloc(stride);
+  let top;
+  let bottom;
+
+  for (let y = 0; y < height; y += 1) {
+    const filter = inflated[sourceOffset];
+    sourceOffset += 1;
+    const current = Buffer.alloc(stride);
+
+    for (let x = 0; x < stride; x += 1) {
+      const raw = inflated[sourceOffset + x];
+      const left = x >= 4 ? current[x - 4] : 0;
+      const up = previous[x];
+      const upperLeft = x >= 4 ? previous[x - 4] : 0;
+      let value;
+
+      if (filter === 0) value = raw;
+      else if (filter === 1) value = raw + left;
+      else if (filter === 2) value = raw + up;
+      else if (filter === 3) value = raw + Math.floor((left + up) / 2);
+      else if (filter === 4) {
+        const estimate = left + up - upperLeft;
+        const leftDistance = Math.abs(estimate - left);
+        const upDistance = Math.abs(estimate - up);
+        const upperLeftDistance = Math.abs(estimate - upperLeft);
+        const predictor =
+          leftDistance <= upDistance && leftDistance <= upperLeftDistance
+            ? left
+            : upDistance <= upperLeftDistance
+              ? up
+              : upperLeft;
+        value = raw + predictor;
+      } else {
+        assert.fail(`${name} uses unsupported PNG filter ${filter}`);
+      }
+
+      current[x] = value & 0xff;
+    }
+
+    if (y === 0) top = current;
+    if (y === height - 1) bottom = current;
+    previous = current;
+    sourceOffset += stride;
+  }
+
+  return [top[3], top[stride - 1], bottom[3], bottom[stride - 1]];
+}
+
 test("PWA assets use the supplied Edge Soft image without recreating the mark", () => {
   assert.match(iconSvg, /<image[^>]+href=\"\/icon-512\.png\"/);
   assert.doesNotMatch(iconSvg, /<text/);
@@ -31,6 +102,16 @@ test("PWA assets use the supplied Edge Soft image without recreating the mark", 
   assert.deepEqual(pngSize("maskable-192.png"), { width: 192, height: 192 });
   assert.deepEqual(pngSize("maskable-512.png"), { width: 512, height: 512 });
   assert.deepEqual(pngSize("mstile-150.png"), { width: 150, height: 150 });
+});
+
+test("Windows install icons have transparent corners while Android maskable icons stay full bleed", () => {
+  for (const name of ["icon-96.png", "icon-192.png", "icon-512.png"]) {
+    assert.deepEqual(pngCornerAlphas(name), [0, 0, 0, 0], `${name} should render as a circle on Windows`);
+  }
+
+  for (const name of ["maskable-192.png", "maskable-512.png"]) {
+    assert.deepEqual(pngCornerAlphas(name), [255, 255, 255, 255], `${name} should stay full bleed on Android`);
+  }
 });
 
 test("manifest exposes PNG install icons for Windows, Android, and iOS", () => {

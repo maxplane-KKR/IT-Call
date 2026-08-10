@@ -2,7 +2,7 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="description" content="IT Call Center Analytics Dashboard - ระบบวิเคราะห์ข้อมูลแจ้งซ่อมและรายงานภาระงาน IT Call Center">
     <meta name="theme-color" content="#0a2238">
     <meta name="msapplication-config" content="/browserconfig.xml">
@@ -433,20 +433,20 @@
         </main>
 
         <!-- Dedicated Mobile Bottom Navigation Bar -->
-        <nav class="mobile-bottom-nav md:hidden" aria-label="เมนูหลักสำหรับมือถือ">
-            <button type="button" class="mobile-nav-item active" data-tab="dashboard">
+        <nav class="mobile-bottom-nav md:hidden" role="tablist" aria-label="เมนูหลักสำหรับมือถือ">
+            <button type="button" class="mobile-nav-item active" data-tab="dashboard" role="tab" aria-selected="true" aria-controls="mobile-section-dashboard" tabindex="0">
                 <i class="ph ph-squares-four"></i>
                 <span>แดชบอร์ด</span>
             </button>
-            <button type="button" class="mobile-nav-item" data-tab="hr">
+            <button type="button" class="mobile-nav-item" data-tab="hr" role="tab" aria-selected="false" aria-controls="mobile-section-hr" tabindex="-1">
                 <i class="ph ph-users-three"></i>
                 <span>สรุป HR</span>
             </button>
-            <button type="button" class="mobile-nav-item" data-tab="charts">
+            <button type="button" class="mobile-nav-item" data-tab="charts" role="tab" aria-selected="false" aria-controls="mobile-section-charts" tabindex="-1">
                 <i class="ph ph-chart-line-up"></i>
                 <span>กราฟสถิติ</span>
             </button>
-            <button type="button" class="mobile-nav-item" data-tab="log">
+            <button type="button" class="mobile-nav-item" data-tab="log" role="tab" aria-selected="false" aria-controls="mobile-section-log" tabindex="-1">
                 <i class="ph ph-list-dashes"></i>
                 <span>รายการ Log</span>
             </button>
@@ -461,6 +461,6 @@
     </div>
 
     <!-- Main Application Script -->
-    <script type="module" src="./js/app.js?v=20260729-4"></script>
+    <script type="module" src="./js/app.js?v=20260810-1"></script>
 </body>
 </html>

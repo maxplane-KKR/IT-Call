@@ -10,6 +10,7 @@
  */
 
 import { getStaffCounts } from './hr-calculator.js';
+import { resolveSwipeTab } from '../mobile-navigation.mjs';
 
 export const MobileState = {
   activeTab: 'dashboard', // 'dashboard' | 'hr' | 'charts' | 'log'
@@ -22,18 +23,39 @@ export const MobileState = {
  */
 export function initMobileView(onTabChange) {
   const bottomNavItems = document.querySelectorAll('.mobile-nav-item');
+  const mobileLayout = document.getElementById('mobile-layout');
+  let gestureStart = null;
+
+  const activateTab = (targetTab) => {
+    if (!targetTab || targetTab === MobileState.activeTab) return;
+    setMobileTab(targetTab);
+    if (typeof onTabChange === 'function') onTabChange(targetTab);
+  };
+
   bottomNavItems.forEach(item => {
-    item.addEventListener('click', (e) => {
-      e.preventDefault();
-      const targetTab = item.dataset.tab;
-      if (targetTab) {
-        setMobileTab(targetTab);
-        if (typeof onTabChange === 'function') {
-          onTabChange(targetTab);
-        }
-      }
+    item.addEventListener('click', (event) => {
+      event.preventDefault();
+      activateTab(item.dataset.tab);
+    });
+    item.addEventListener('keydown', (event) => {
+      if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
+      event.preventDefault();
+      activateTab(resolveSwipeTab(MobileState.activeTab, event.key === 'ArrowRight' ? -100 : 100, 0));
     });
   });
+
+  mobileLayout?.addEventListener('pointerdown', (event) => {
+    if (event.pointerType !== 'touch' || event.clientX < 24 || event.clientX > window.innerWidth - 24) return;
+    if (event.target.closest('button, a, input, select, textarea, canvas, [data-horizontal-scroll]')) return;
+    gestureStart = { pointerId: event.pointerId, x: event.clientX, y: event.clientY };
+  });
+  mobileLayout?.addEventListener('pointerup', (event) => {
+    if (!gestureStart || event.pointerId !== gestureStart.pointerId) return;
+    const nextTab = resolveSwipeTab(MobileState.activeTab, event.clientX - gestureStart.x, event.clientY - gestureStart.y);
+    gestureStart = null;
+    activateTab(nextTab);
+  });
+  mobileLayout?.addEventListener('pointercancel', () => { gestureStart = null; });
 }
 
 /**
@@ -45,8 +67,12 @@ export function setMobileTab(tabName) {
   // Update Nav Item States
   const bottomNavItems = document.querySelectorAll('.mobile-nav-item');
   bottomNavItems.forEach(item => {
-    if (item.dataset.tab === tabName) {
+    const isActive = item.dataset.tab === tabName;
+    item.setAttribute('aria-selected', String(isActive));
+    item.tabIndex = isActive ? 0 : -1;
+    if (isActive) {
       item.classList.add('active');
+      item.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
     } else {
       item.classList.remove('active');
     }
@@ -66,15 +92,18 @@ export function setMobileTab(tabName) {
       if (key === tabName) {
         el.classList.remove('hidden');
         el.classList.add('animate-fade-in');
+        el.setAttribute('aria-hidden', 'false');
       } else {
         el.classList.add('hidden');
         el.classList.remove('animate-fade-in');
+        el.setAttribute('aria-hidden', 'true');
       }
     }
   });
 
   // Scroll to top of content container smoothly on tab switch
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' });
 }
 
 if (typeof window !== 'undefined') {

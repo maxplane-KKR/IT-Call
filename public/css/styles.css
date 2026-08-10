@@ -299,7 +299,7 @@ input[type="text"]:focus, select:focus {
   bottom: 0;
   left: 0;
   right: 0;
-  height: 68px;
+  min-height: calc(68px + env(safe-area-inset-bottom, 0px));
   background: linear-gradient(180deg, #fefcf8 0%, #eee4d2 100%);
   border-top: 1px solid #ffffff;
   box-shadow:
@@ -308,9 +308,17 @@ input[type="text"]:focus, select:focus {
   z-index: 50;
   display: flex;
   align-items: center;
-  justify-content: space-around;
-  padding-bottom: env(safe-area-inset-bottom, 0px);
+  justify-content: flex-start;
+  gap: 6px;
+  padding: 6px max(10px, env(safe-area-inset-left, 0px)) env(safe-area-inset-bottom, 0px) max(10px, env(safe-area-inset-left, 0px));
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x proximity;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
 }
+
+.mobile-bottom-nav::-webkit-scrollbar { display: none; }
 
 .mobile-nav-item {
   display: flex;
@@ -318,7 +326,8 @@ input[type="text"]:focus, select:focus {
   align-items: center;
   justify-content: center;
   gap: 3px;
-  min-width: 64px;
+  flex: 1 0 78px;
+  scroll-snap-align: center;
   min-height: 48px;
   color: var(--text-muted);
   font-family: var(--font-heading);
@@ -330,7 +339,12 @@ input[type="text"]:focus, select:focus {
   cursor: pointer;
   transition: all 0.2s ease;
   -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
 }
+
+#mobile-layout { touch-action: pan-y; }
+.mobile-nav-item:active { background: rgba(37, 99, 235, 0.1); border-radius: 12px; }
+.mobile-nav-item:focus-visible { outline: 3px solid rgba(37, 99, 235, 0.45); outline-offset: -3px; border-radius: 12px; }
 
 .mobile-nav-item i {
   font-size: 1.35rem;
@@ -346,6 +360,11 @@ input[type="text"]:focus, select:focus {
   transform: translateY(-2px) scale(1.12);
   color: var(--accent-blue);
   filter: drop-shadow(0 2px 4px rgba(37, 99, 235, 0.3));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-in, .animate-pop, .animate-pulse-glow { animation: none !important; }
+  .mobile-nav-item, .mobile-nav-item i { transition: none; }
 }
 
 /* Mobile Log Card (3D Skeuomorphic Card) */

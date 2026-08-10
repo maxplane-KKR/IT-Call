@@ -11,10 +11,10 @@ test("changes to the adjacent tab only for an intentional horizontal swipe", asy
   }
 
   assert.equal(typeof navigation.resolveSwipeTab, "function");
-  assert.equal(navigation.resolveSwipeTab("dashboard", -72, 8), "hr");
+  assert.equal(navigation.resolveSwipeTab("dashboard", -72, 8), "log");
   assert.equal(navigation.resolveSwipeTab("charts", 70, 5), "hr");
   assert.equal(navigation.resolveSwipeTab("dashboard", 80, 4), "dashboard");
-  assert.equal(navigation.resolveSwipeTab("log", -80, 4), "log");
+  assert.equal(navigation.resolveSwipeTab("charts", -80, 4), "charts");
   assert.equal(navigation.resolveSwipeTab("hr", -35, 3), "hr");
   assert.equal(navigation.resolveSwipeTab("hr", -80, 90), "hr");
 });

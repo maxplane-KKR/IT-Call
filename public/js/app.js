@@ -353,25 +353,6 @@ import { fetchJsonWithRetry } from './fetch-resilience.js';
     downloadCsvFile(csvContent, `IT_Call_Log_${safeMonth}.csv`);
   }
 
-  function copyHRReportText(filteredData, monthDisplay) {
-    if (!filteredData || filteredData.length === 0) {
-      return Promise.reject(new Error("ไม่มีข้อมูลให้คัดลอก"));
-    }
-
-    let textToCopy = `สรุปยอดภาระงานรายบุคคล - ${monthDisplay}\n\n`;
-    textToCopy += "ลำดับ\tผู้ปฏิบัติงาน\tจำนวนเคสที่รับ\tสัดส่วน(%)\n";
-
-    const sortedStaff = Object.entries(getStaffCounts(filteredData)).sort((a, b) => b[1] - a[1]);
-    sortedStaff.forEach(([name, count], index) => {
-      const percent = ((count / filteredData.length) * 100).toFixed(1);
-      textToCopy += `${index + 1}\t${name}\t${count}\t${percent}%\n`;
-    });
-
-    textToCopy += `\nรวมทั้งหมด\t\t${filteredData.length}\t100%\n`;
-
-    return navigator.clipboard.writeText(textToCopy);
-  }
-
   // ==========================================================================
   // 5. CHART.JS MANAGER
   // ==========================================================================
@@ -1290,16 +1271,6 @@ import { fetchJsonWithRetry } from './fetch-resilience.js';
         } catch (err) {
           showToast(err.message || "ไม่สามารถส่งออกข้อมูลได้");
         }
-      });
-    });
-
-    // Copy HR Summary Buttons
-    const copyHRBtns = document.querySelectorAll('.copy-hr-btn');
-    copyHRBtns.forEach(btn => {
-      btn.addEventListener('click', () => {
-        copyHRReportText(AppState.filteredData, AppState.activeMonthDisplay)
-          .then(() => showToast("คัดลอกสรุปข้อมูล HR แล้ว"))
-          .catch(() => showToast("ไม่สามารถคัดลอกข้อมูลได้"));
       });
     });
 

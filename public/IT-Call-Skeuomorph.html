@@ -161,9 +161,6 @@
                             <button type="button" class="export-hr-btn skeuo-btn skeuo-btn-emerald px-4 py-2 text-xs flex items-center gap-2">
                                 <i class="ph ph-file-csv text-lg"></i> โหลด CSV ค่าตอบแทน (HR)
                             </button>
-                            <button type="button" class="copy-hr-btn skeuo-btn px-4 py-2 text-xs flex items-center gap-2 text-rose-700">
-                                <i class="ph ph-copy text-lg text-rose-600"></i> คัดลอกข้อมูลสรุป
-                            </button>
                         </div>
                     </div>
 
@@ -303,20 +300,20 @@
                 <!-- SECTION 1: MOBILE DASHBOARD TAB -->
                 <div id="mobile-section-dashboard" class="space-y-4">
                     <!-- Compact Metrics Grid -->
-                    <div class="grid grid-cols-2 gap-3">
-                        <div class="glass-card p-3.5 border-l-4 border-l-blue-500">
+                    <div class="mobile-metrics-grid">
+                        <div class="mobile-metric-card glass-card border-l-4 border-l-blue-500">
                             <p class="text-[11px] text-slate-500 font-medium">Ticket ทั้งหมด</p>
                             <h3 class="text-2xl font-extrabold text-slate-800 font-heading mt-0.5" id="mobileTotalTickets">0</h3>
                         </div>
-                        <div class="glass-card p-3.5 border-l-4 border-l-emerald-500">
+                        <div class="mobile-metric-card glass-card border-l-4 border-l-emerald-500">
                             <p class="text-[11px] text-slate-500 font-medium">สถานะ API</p>
                             <h3 class="api-status-badge text-sm font-bold text-emerald-600 font-heading mt-1">เชื่อมต่อสำเร็จ</h3>
                         </div>
-                        <div class="glass-card p-3.5 border-l-4 border-l-purple-500">
+                        <div class="mobile-metric-card glass-card border-l-4 border-l-purple-500">
                             <p class="text-[11px] text-slate-500 font-medium">แผนกแจ้งเยอะสุด</p>
                             <h3 class="text-sm font-bold text-slate-800 truncate font-heading mt-1" id="mobileTopDept">-</h3>
                         </div>
-                        <div class="glass-card p-3.5 border-l-4 border-l-orange-500">
+                        <div class="mobile-metric-card glass-card border-l-4 border-l-orange-500">
                             <p class="text-[11px] text-slate-500 font-medium">ผู้รับเรื่องเยอะสุด</p>
                             <h3 class="text-sm font-bold text-slate-800 truncate font-heading mt-1" id="mobileTopStaff">-</h3>
                         </div>
@@ -348,12 +345,9 @@
                             </div>
                         </div>
 
-                        <div class="grid grid-cols-2 gap-2 mb-4">
+                        <div class="grid grid-cols-1 gap-2 mb-4">
                             <button type="button" class="export-hr-btn skeuo-btn skeuo-btn-emerald p-2.5 text-xs flex items-center justify-center gap-1.5">
                                 <i class="ph ph-file-csv text-base"></i> โหลด CSV
-                            </button>
-                            <button type="button" class="copy-hr-btn skeuo-btn p-2.5 text-xs text-rose-700 flex items-center justify-center gap-1.5">
-                                <i class="ph ph-copy text-base text-rose-600"></i> คัดลอกข้อมูล
                             </button>
                         </div>
 
@@ -434,23 +428,27 @@
 
         <!-- Dedicated Mobile Bottom Navigation Bar -->
         <nav class="mobile-bottom-nav md:hidden" role="tablist" aria-label="เมนูหลักสำหรับมือถือ">
+
             <button type="button" class="mobile-nav-item active" data-tab="dashboard" role="tab" aria-selected="true" aria-controls="mobile-section-dashboard" tabindex="0">
                 <i class="ph ph-squares-four"></i>
                 <span>แดชบอร์ด</span>
             </button>
-            <button type="button" class="mobile-nav-item" data-tab="hr" role="tab" aria-selected="false" aria-controls="mobile-section-hr" tabindex="-1">
-                <i class="ph ph-users-three"></i>
-                <span>สรุป HR</span>
-            </button>
-            <button type="button" class="mobile-nav-item" data-tab="charts" role="tab" aria-selected="false" aria-controls="mobile-section-charts" tabindex="-1">
-                <i class="ph ph-chart-line-up"></i>
-                <span>กราฟสถิติ</span>
-            </button>
+
             <button type="button" class="mobile-nav-item" data-tab="log" role="tab" aria-selected="false" aria-controls="mobile-section-log" tabindex="-1">
                 <i class="ph ph-list-dashes"></i>
                 <span>รายการ Log</span>
             </button>
-        </nav>
+
+            <button type="button" class="mobile-nav-item" data-tab="hr" role="tab" aria-selected="false" aria-controls="mobile-section-hr" tabindex="-1">
+                <i class="ph ph-users-three"></i>
+                <span>สรุป HR</span>
+            </button>
+
+            <button type="button" class="mobile-nav-item" data-tab="charts" role="tab" aria-selected="false" aria-controls="mobile-section-charts" tabindex="-1">
+                <i class="ph ph-chart-line-up"></i>
+                <span>กราฟสถิติ</span>
+            </button>
+</nav>
 
         <!-- Toast Notification Container -->
         <div id="toast" class="skeuo-btn bg-slate-900 text-white px-6 py-3 rounded-xl shadow-2xl flex items-center gap-3 z-50">

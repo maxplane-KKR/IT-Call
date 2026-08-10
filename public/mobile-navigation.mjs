@@ -1,4 +1,4 @@
-export const MOBILE_TABS = ["dashboard", "hr", "charts", "log"];
+export const MOBILE_TABS = ["dashboard", "log", "hr", "charts"];
 
 export function resolveSwipeTab(currentTab, deltaX, deltaY, threshold = 56) {
   const currentIndex = MOBILE_TABS.indexOf(currentTab);

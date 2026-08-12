@@ -32,8 +32,9 @@ export async function fetchJsonWithRetry(url, {
       return await response.json();
     } catch (error) {
       lastError = error;
-      const retryableNetworkError = error?.name !== 'AbortError'
-        && (error?.retryable || error instanceof TypeError);
+      const retryableNetworkError = error?.name === 'AbortError'
+        || error?.retryable
+        || error instanceof TypeError;
       if (!retryableNetworkError || attempt === attempts) throw error;
       await wait(retryDelayMs * attempt);
     } finally {

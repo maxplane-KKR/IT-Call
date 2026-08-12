@@ -129,11 +129,13 @@ test("rejects an Apps Script error payload instead of caching an empty result", 
   );
 });
 
-test("allows a cold Apps Script response enough time to seed the edge cache", async () => {
+test("bounds cold Apps Script retries below the browser timeout", async () => {
   const route = await readFile(
     new URL("../app/api/incidents/route.ts", import.meta.url),
     "utf8",
   );
 
-  assert.match(route, /AbortSignal\.timeout\(45_000\)/);
+  assert.match(route, /fetchWithTimeoutRetry/);
+  assert.match(route, /attempts:\s*2/);
+  assert.match(route, /timeoutMs:\s*8_000/);
 });

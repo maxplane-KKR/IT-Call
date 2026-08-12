@@ -2,6 +2,7 @@ import {
   createIncidentSource,
   recentIncidentRows,
 } from "../../../lib/incidents-source.mjs";
+import { fetchWithTimeoutRetry } from "../../../lib/upstream-fetch.mjs";
 import { getRequestExecutionContext } from "vinext/shims/request-context";
 
 const SOURCE_URL = "https://script.google.com/macros/s/AKfycbzet3nNEL9X8pEqB0YiqseO8GylRGTQZbtcCw4EVBfro19JkmPUouoCmVq6OjO2mMM2zA/exec";
@@ -31,11 +32,10 @@ const incidentSource = createIncidentSource({
     getRequestExecutionContext()?.waitUntil(promise);
   },
   fetchSource: async () => {
-    const response = await fetch(SOURCE_URL, {
-      cache: "no-store",
-      signal: AbortSignal.timeout(45_000),
+    const response = await fetchWithTimeoutRetry(SOURCE_URL, {
+      attempts: 2,
+      timeoutMs: 8_000,
     });
-    if (!response.ok) throw new Error(`Apps Script returned ${response.status}`);
     return recentIncidentRows(await response.json(), { years: 3 });
   },
 });

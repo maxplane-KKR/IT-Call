@@ -3,7 +3,7 @@ import { readFile } from "node:fs/promises";
 import test from "node:test";
 import { fetchWithTimeoutRetry } from "../lib/upstream-fetch.mjs";
 
-test("the incidents route retries a stalled upstream within the edge budget", async () => {
+test("the incidents route allows a cold Apps Script response to finish", async () => {
   const route = await readFile(
     new URL("../app/api/incidents/route.ts", import.meta.url),
     "utf8",
@@ -11,7 +11,7 @@ test("the incidents route retries a stalled upstream within the edge budget", as
 
   assert.match(route, /fetchWithTimeoutRetry/);
   assert.match(route, /attempts:\s*2/);
-  assert.match(route, /timeoutMs:\s*8_000/);
+  assert.match(route, /timeoutMs:\s*20_000/);
 });
 
 test("a stalled upstream request is retried once", async () => {

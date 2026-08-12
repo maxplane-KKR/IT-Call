@@ -860,7 +860,8 @@ import { fetchJsonWithRetry } from './fetch-resilience.js';
       setTimeout(() => renderAllCharts(AppState.filteredData, AppState.activeMonthKey), 50);
     }
 
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    document.getElementById('app-container')?.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' });
   }
 
   window.setMobileTab = setMobileTab;

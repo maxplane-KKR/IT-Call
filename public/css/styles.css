@@ -320,6 +320,45 @@ input[type="text"]:focus, select:focus {
   .mobile-metric-card { padding-inline: 10px; }
 }
 
+/* Compact layouts use one vertical scroller: the app container. */
+@media (max-width: 1279px) {
+  html,
+  body {
+    height: 100%;
+    overflow-y: hidden;
+  }
+
+  #app-container {
+    height: 100dvh;
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  #app-container > main,
+  #mobile-layout,
+  #mobile-section-dashboard,
+  #mobile-section-charts,
+  #mobile-section-log,
+  .tablet-dashboard-chart-card,
+  .tablet-dashboard-hr-card,
+  #mobileHRContainer,
+  #mobileLogContainer {
+    min-height: 0;
+    height: auto;
+    max-height: none;
+    overflow: visible;
+    overscroll-behavior-y: auto;
+  }
+
+  #mobile-section-dashboard,
+  #mobile-section-charts,
+  #mobile-section-log {
+    padding-bottom: calc(6rem + env(safe-area-inset-bottom, 0px));
+  }
+}
+
 /* Fill compact tablets vertically; landscape keeps the denser split layout. */
 @media (min-width: 768px) and (max-width: 1279px) {
   #app-container {

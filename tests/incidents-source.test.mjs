@@ -137,5 +137,5 @@ test("bounds cold Apps Script retries below the browser timeout", async () => {
 
   assert.match(route, /fetchWithTimeoutRetry/);
   assert.match(route, /attempts:\s*2/);
-  assert.match(route, /timeoutMs:\s*8_000/);
+  assert.match(route, /timeoutMs:\s*20_000/);
 });

@@ -103,7 +103,7 @@ export function setMobileTab(tabName) {
 
   // Scroll to top of content container smoothly on tab switch
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' });
+  document.getElementById('app-container')?.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' });
 }
 
 if (typeof window !== 'undefined') {

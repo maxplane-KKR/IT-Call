@@ -34,7 +34,7 @@ const incidentSource = createIncidentSource({
   fetchSource: async () => {
     const response = await fetchWithTimeoutRetry(SOURCE_URL, {
       attempts: 2,
-      timeoutMs: 8_000,
+      timeoutMs: 20_000,
     });
     return recentIncidentRows(await response.json(), { years: 3 });
   },

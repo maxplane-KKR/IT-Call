@@ -320,13 +320,38 @@ input[type="text"]:focus, select:focus {
   .mobile-metric-card { padding-inline: 10px; }
 }
 
-/* iPad Air and compact tablets use tabs without stacking the dashboard. */
+/* Fill compact tablets vertically; landscape keeps the denser split layout. */
 @media (min-width: 768px) and (max-width: 1279px) {
+  #app-container {
+    overflow-y: hidden;
+  }
+
+  #app-container > main {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+
+  #app-container > main > section {
+    flex: 0 0 auto;
+  }
+
+  #mobile-layout {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior-y: contain;
+  }
+
   #mobile-section-dashboard:not(.hidden) {
     display: grid;
-    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto minmax(0, 1.1fr) minmax(0, 0.9fr);
     gap: 16px;
     align-items: stretch;
+    width: 100%;
+    min-height: 100%;
+    height: 100%;
   }
 
   #mobile-section-dashboard > * {
@@ -334,12 +359,53 @@ input[type="text"]:focus, select:focus {
     margin-block-start: 0 !important;
   }
 
-  #mobile-section-dashboard > .glass-card {
+  #mobile-section-dashboard .mobile-metrics-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-auto-rows: minmax(96px, auto);
+  }
+
+  .tablet-dashboard-chart-card,
+  .tablet-dashboard-hr-card {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
     height: 100%;
   }
 
+  .tablet-dashboard-hr-card {
+    overflow: hidden;
+  }
+
+  #mobileHRContainer {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior-y: contain;
+    -webkit-overflow-scrolling: touch;
+    padding-right: 4px;
+  }
+
+  .tablet-dashboard-chart-frame {
+    flex: 1;
+    min-height: 0;
+    height: auto !important;
+  }
+
+  .tablet-dashboard-chart-frame canvas {
+    min-height: 0;
+  }
+}
+
+@media (min-width: 1024px) and (max-width: 1279px) {
+  #mobile-section-dashboard:not(.hidden) {
+    grid-template-columns: minmax(0, 0.78fr) minmax(0, 1.05fr) minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr);
+  }
+
   #mobile-section-dashboard .mobile-metrics-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     grid-auto-rows: minmax(0, 1fr);
+    height: 100%;
   }
 }
 

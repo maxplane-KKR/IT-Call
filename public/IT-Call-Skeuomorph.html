@@ -25,12 +25,12 @@
     <script src="https://unpkg.com/@phosphor-icons/web@2.1.1"></script>
 
     <!-- Custom UI-UX Pro Max Design System Styles -->
-    <link rel="stylesheet" href="./css/styles.css?v=20260729-3">
+    <link rel="stylesheet" href="./css/styles.css?v=20260812-1">
 </head>
-<body class="text-slate-800 h-screen flex flex-col overflow-hidden antialiased">
+<body class="text-slate-800 h-[100dvh] flex flex-col overflow-hidden antialiased">
 
     <!-- App Main Container (Strict 100vw Max Width) -->
-    <div id="app-container" class="flex-1 flex flex-col w-full max-w-[100vw] overflow-x-hidden overflow-y-auto custom-scroll pb-24 md:pb-6">
+    <div id="app-container" class="flex-1 flex flex-col w-full max-w-[100vw] overflow-x-hidden overflow-y-auto custom-scroll pb-24 xl:pb-6">
 
         <!-- Header (Original Dark Navy Gradient) -->
         <header class="bg-gradient-to-r from-[#1a2535] to-[#2a3a50] text-white shadow-[0_4px_16px_rgba(0,0,0,0.3)] py-4 px-4 md:px-6 flex items-center justify-between z-20 sticky top-0">
@@ -97,9 +97,9 @@
             </section>
 
             <!-- ===================================================================
-                 DESKTOP VIEW (Visible on >= 768px screens)
+                 DESKTOP VIEW (Visible on >= 1280px screens)
                  =================================================================== -->
-            <div id="desktop-layout" class="hidden md:block space-y-6">
+            <div id="desktop-layout" class="hidden xl:block space-y-6">
 
                 <!-- Metric Cards Grid -->
                 <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
@@ -292,10 +292,10 @@
             </div>
 
             <!-- ===================================================================
-                 DEDICATED MOBILE VIEW (Visible on < 768px screens)
+                 COMPACT TABBED VIEW (Visible on < 1280px screens)
                  Full 100vw width without horizontal scrolling
                  =================================================================== -->
-            <div id="mobile-layout" class="block md:hidden w-full max-w-[100vw] overflow-x-hidden space-y-4">
+            <div id="mobile-layout" class="block xl:hidden w-full max-w-[100vw] overflow-x-hidden space-y-4">
 
                 <!-- SECTION 1: MOBILE DASHBOARD TAB -->
                 <div id="mobile-section-dashboard" class="space-y-4">
@@ -427,7 +427,7 @@
         </main>
 
         <!-- Dedicated Mobile Bottom Navigation Bar -->
-        <nav class="mobile-bottom-nav md:hidden" role="tablist" aria-label="เมนูหลักสำหรับมือถือ">
+        <nav class="mobile-bottom-nav xl:hidden" role="tablist" aria-label="เมนูหลักสำหรับมือถือและแท็บเล็ต">
 
             <button type="button" class="mobile-nav-item active" data-tab="dashboard" role="tab" aria-selected="true" aria-controls="mobile-section-dashboard" tabindex="0">
                 <i class="ph ph-squares-four"></i>

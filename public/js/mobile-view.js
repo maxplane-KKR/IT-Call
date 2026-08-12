@@ -262,5 +262,5 @@ export function renderMobileHRReport(data, activeMonthDisplay) {
  * Mobile view layout setup check
  */
 export function isMobileScreen() {
-  return window.innerWidth < 768;
+  return window.innerWidth < 1280;
 }

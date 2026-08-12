@@ -319,6 +319,30 @@ input[type="text"]:focus, select:focus {
   .mobile-metrics-grid { gap: 8px; }
   .mobile-metric-card { padding-inline: 10px; }
 }
+
+/* iPad Air and compact tablets use tabs without stacking the dashboard. */
+@media (min-width: 768px) and (max-width: 1279px) {
+  #mobile-section-dashboard:not(.hidden) {
+    display: grid;
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+    gap: 16px;
+    align-items: stretch;
+  }
+
+  #mobile-section-dashboard > * {
+    min-width: 0;
+    margin-block-start: 0 !important;
+  }
+
+  #mobile-section-dashboard > .glass-card {
+    height: 100%;
+  }
+
+  #mobile-section-dashboard .mobile-metrics-grid {
+    grid-auto-rows: minmax(0, 1fr);
+  }
+}
+
 /* Mobile Bottom Navigation (Skeuomorphic Bar) */
 .mobile-bottom-nav {
   position: fixed;
@@ -436,7 +460,7 @@ button, input, select, a {
   opacity: 1;
 }
 
-@media (min-width: 768px) {
+@media (min-width: 1280px) {
   #toast {
     bottom: 24px;
     left: auto;

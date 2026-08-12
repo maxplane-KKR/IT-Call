@@ -2,9 +2,9 @@
 
 > **สำหรับ agentic workers:** REQUIRED SUB-SKILL: ใช้ `superpowers:subagent-driven-development` (แนะนำ) หรือ `superpowers:executing-plans` เพื่อทำตามแผนทีละงาน ทุกขั้นใช้ checkbox (`- [ ]`) สำหรับติดตามผล
 
-**เป้าหมาย:** รวมสรุป HR เข้า Dashboard ให้ iPad Air ใช้พื้นที่เต็มจอโดยเลื่อนเฉพาะรายการ HR และลดแถบนำทางล่างเหลือ 3 เมนู
+**เป้าหมาย:** รวมสรุป HR เข้า Dashboard ให้ iPad Air ใช้พื้นที่เต็มจอ เลื่อนที่หน้าหลัก และลดแถบนำทางล่างเหลือ 3 เมนู
 
-**สถาปัตยกรรม:** ย้าย markup HR เดิมเข้า `mobile-section-dashboard` เพื่อใช้ renderer และข้อมูลเดิมโดยไม่เพิ่ม logic ซ้ำ จากนั้นกำหนด CSS เฉพาะช่วง 768–1279 พิกเซลให้แนวตั้งเป็น 3 แถวและแนวนอนเป็น 3 คอลัมน์ พร้อมจำกัด overflow ไว้ที่ `mobileHRContainer`
+**สถาปัตยกรรม:** ย้าย markup HR เดิมเข้า `mobile-section-dashboard` เพื่อใช้ renderer และข้อมูลเดิมโดยไม่เพิ่ม logic ซ้ำ จากนั้นกำหนด CSS เฉพาะช่วง 768–1279 พิกเซลให้แนวตั้งเป็น 3 แถวและแนวนอนเป็น 3 คอลัมน์ โดยใช้ `app-container` เป็นพื้นที่เลื่อนหลักและไม่สร้าง scroll ซ้อนใน `mobileHRContainer`
 
 **เทคโนโลยี:** HTML5, Tailwind utility classes ที่มีอยู่, CSS media queries, JavaScript DOM เดิม, Node.js test runner, Vinext/Vite
 
@@ -13,7 +13,7 @@
 - ไม่เพิ่ม dependency
 - ไม่แก้ API สูตรคำนวณค่าตอบแทน หรือข้อมูลต้นทาง
 - เดสก์ท็อปตั้งแต่ 1280 พิกเซลขึ้นไปต้องไม่เปลี่ยนโครงเดิม
-- iPad Dashboard ต้องไม่เลื่อนทั้งหน้า แต่รายการ HR เลื่อนภายในการ์ดได้
+- iPad Dashboard ต้องเลื่อนที่หน้าหลัก และรายการ HR ต้องไม่สร้าง scroll container ภายใน
 - มือถือต่ำกว่า 768 พิกเซลให้ Dashboard เลื่อนตามเนื้อหาตามปกติ
 - ไม่ deploy production จนกว่าจะได้รับอนุญาตโดยตรง
 
@@ -23,7 +23,7 @@
 - `public/css/styles.css`: กำหนดความสูง กริด และ overflow สำหรับ iPad
 - `tests/ipad-air-hr-dashboard.test.mjs`: ตรวจโครง DOM และเมนูหลังรวม HR
 - `tests/ipad-air-layout.test.mjs`: ตรวจ 3 แถวแนวตั้งและ 3 คอลัมน์แนวนอน
-- `tests/ipad-air-fill.test.mjs`: ตรวจการใช้ความสูงเต็มจอและการเลื่อนภายในการ์ด HR
+- `tests/ipad-air-fill.test.mjs`: ตรวจการใช้ความสูงเต็มจอ การเลื่อนหน้าหลัก และการยกเลิก scroll ภายในการ์ด HR
 
 ---
 
@@ -103,7 +103,7 @@ git commit -m "Move HR summary into mobile dashboard"
 
 ---
 
-### งานที่ 2: จัด Dashboard iPad ให้เต็มจอและจำกัดการเลื่อนอยู่ในการ์ด HR
+### งานที่ 2: จัด Dashboard iPad ให้เต็มจอและเลื่อนผ่านหน้าหลัก
 
 **ไฟล์:**
 - แก้ไข: `public/css/styles.css:323-410`
@@ -112,7 +112,7 @@ git commit -m "Move HR summary into mobile dashboard"
 
 **อินเทอร์เฟซ:**
 - ใช้: class `tablet-dashboard-chart-card`, `tablet-dashboard-chart-frame`, `tablet-dashboard-hr-card`
-- ส่งมอบ: แนวตั้ง 3 แถว, แนวนอน 3 คอลัมน์, `mobileHRContainer` เป็น scroll container
+- ส่งมอบ: แนวตั้ง 3 แถว, แนวนอน 3 คอลัมน์, `app-container` เป็น scroll container หลัก
 
 - [ ] **ขั้นที่ 1: ขยาย regression tests ให้ครอบคลุม HR**
 
@@ -129,7 +129,7 @@ assert.match(
 );
 assert.match(
   css,
-  /#mobileHRContainer\s*{[\s\S]*overflow-y:\s*auto[\s\S]*overscroll-behavior-y:\s*contain/,
+  /#mobileHRContainer\s*{[^}]*overflow-y:\s*visible[^}]*overscroll-behavior-y:\s*auto/,
 );
 ```
 
@@ -137,7 +137,7 @@ assert.match(
 
 รัน: `node --test tests/ipad-air-layout.test.mjs tests/ipad-air-fill.test.mjs`
 
-ผลที่คาด: FAIL เพราะ CSS ปัจจุบันมี 2 แถว/2 คอลัมน์และยังไม่จำกัด overflow ของ HR
+ผลที่คาด: FAIL เพราะ CSS ปัจจุบันยังจำกัด overflow ของ HR และไม่เลื่อนผ่านหน้าหลัก
 
 - [ ] **ขั้นที่ 3: ใช้ CSS ขั้นต่ำตามสเป็ก**
 
@@ -145,7 +145,7 @@ assert.match(
 @media (min-width: 768px) and (max-width: 1279px) {
   #mobile-section-dashboard:not(.hidden) {
     grid-template-columns: minmax(0, 1fr);
-    grid-template-rows: auto minmax(0, 1.1fr) minmax(0, 0.9fr);
+    grid-template-rows: auto auto auto;
   }
 
   .tablet-dashboard-chart-card,
@@ -153,25 +153,25 @@ assert.match(
     display: flex;
     flex-direction: column;
     min-height: 0;
-    height: 100%;
+    height: auto;
   }
 
   .tablet-dashboard-hr-card {
-    overflow: hidden;
+    overflow: visible;
   }
 
   #mobileHRContainer {
     flex: 1;
     min-height: 0;
-    overflow-y: auto;
-    overscroll-behavior-y: contain;
+    overflow-y: visible;
+    overscroll-behavior-y: auto;
   }
 }
 
 @media (min-width: 1024px) and (max-width: 1279px) {
   #mobile-section-dashboard:not(.hidden) {
     grid-template-columns: minmax(0, 0.78fr) minmax(0, 1.05fr) minmax(0, 1fr);
-    grid-template-rows: minmax(0, 1fr);
+    grid-template-rows: auto;
   }
 }
 ```

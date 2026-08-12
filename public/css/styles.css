@@ -323,7 +323,7 @@ input[type="text"]:focus, select:focus {
 /* Fill compact tablets vertically; landscape keeps the denser split layout. */
 @media (min-width: 768px) and (max-width: 1279px) {
   #app-container {
-    overflow-y: hidden;
+    overflow-y: auto;
   }
 
   #app-container > main {
@@ -339,19 +339,19 @@ input[type="text"]:focus, select:focus {
   #mobile-layout {
     flex: 1;
     min-height: 0;
-    overflow-y: auto;
-    overscroll-behavior-y: contain;
+    overflow-y: visible;
+    overscroll-behavior-y: auto;
   }
 
   #mobile-section-dashboard:not(.hidden) {
     display: grid;
     grid-template-columns: minmax(0, 1fr);
-    grid-template-rows: auto minmax(0, 1.1fr) minmax(0, 0.9fr);
+    grid-template-rows: auto auto auto;
     gap: 16px;
-    align-items: stretch;
+    align-items: start;
     width: 100%;
     min-height: 100%;
-    height: 100%;
+    height: auto;
   }
 
   #mobile-section-dashboard > * {
@@ -369,26 +369,26 @@ input[type="text"]:focus, select:focus {
     display: flex;
     flex-direction: column;
     min-height: 0;
-    height: 100%;
+    height: auto;
   }
 
   .tablet-dashboard-hr-card {
-    overflow: hidden;
+    overflow: visible;
   }
 
   #mobileHRContainer {
     flex: 1;
     min-height: 0;
-    overflow-y: auto;
-    overscroll-behavior-y: contain;
+    overflow-y: visible;
+    overscroll-behavior-y: auto;
     -webkit-overflow-scrolling: touch;
     padding-right: 4px;
   }
 
   .tablet-dashboard-chart-frame {
-    flex: 1;
+    flex: none;
     min-height: 0;
-    height: auto !important;
+    height: clamp(260px, 38vh, 420px) !important;
   }
 
   .tablet-dashboard-chart-frame canvas {
@@ -399,13 +399,13 @@ input[type="text"]:focus, select:focus {
 @media (min-width: 1024px) and (max-width: 1279px) {
   #mobile-section-dashboard:not(.hidden) {
     grid-template-columns: minmax(0, 0.78fr) minmax(0, 1.05fr) minmax(0, 1fr);
-    grid-template-rows: minmax(0, 1fr);
+    grid-template-rows: auto;
   }
 
   #mobile-section-dashboard .mobile-metrics-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     grid-auto-rows: minmax(0, 1fr);
-    height: 100%;
+    height: auto;
   }
 }
 

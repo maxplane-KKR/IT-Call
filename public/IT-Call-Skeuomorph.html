@@ -58,6 +58,11 @@
                     <span class="hidden md:inline text-xs font-bold">รีเฟรช</span>
                 </button>
 
+                <button id="themePanelToggle" type="button" class="header-theme-button" aria-label="เปิดการตั้งค่าธีม" aria-controls="themePanel" aria-expanded="false">
+                    <i class="ph ph-palette" aria-hidden="true"></i>
+                    <span class="hidden sm:inline">ธีม</span>
+                </button>
+
                 <!-- Live Status Badge -->
                 <div class="bg-emerald-500/20 text-emerald-100 border border-emerald-500/40 px-3 py-1.5 rounded-full flex items-center gap-2 text-xs font-bold shadow-sm">
                     <div class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_8px_rgba(52,211,153,0.8)]"></div>
@@ -100,6 +105,17 @@
                  DESKTOP VIEW (Visible on >= 1280px screens)
                  =================================================================== -->
             <div id="desktop-layout" class="hidden xl:block space-y-6">
+
+                <section id="cardThemePreview" class="command-hero theme-netflix" data-theme="theme-netflix" aria-labelledby="cardThemeTitle">
+                    <div id="cardGlassSurface" class="command-hero-surface is-dark">
+                        <div>
+                            <p class="command-kicker">OPERATIONAL OVERVIEW</p>
+                            <h2 id="cardThemeTitle">สถานการณ์งาน IT วันนี้</h2>
+                            <p>ติดตามเคส แนวโน้ม และภาระงานจากข้อมูลชุดเดียว</p>
+                        </div>
+                        <div class="command-hero-meta"><span id="currentDateHero"></span><span id="lastUpdatedHero">กำลังโหลดข้อมูล...</span></div>
+                    </div>
+                </section>
 
                 <!-- Metric Cards Grid -->
                 <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
@@ -451,6 +467,34 @@
         </div>
 
     </div>
+
+    <div id="themePanelBackdrop" class="theme-panel-backdrop" hidden></div>
+    <aside id="themePanel" class="theme-panel" role="dialog" aria-labelledby="themePanelTitle" aria-modal="true" aria-hidden="true">
+        <header class="theme-panel-header">
+            <div><p class="theme-panel-kicker">CARD APPEARANCE</p><h2 id="themePanelTitle">ตกแต่งธีม Dashboard</h2></div>
+            <button id="themePanelClose" type="button" class="icon-button" aria-label="ปิดการตั้งค่าธีม"><i class="ph ph-x" aria-hidden="true"></i></button>
+        </header>
+        <div class="theme-panel-body">
+            <fieldset class="theme-control-group">
+                <legend>พรีเซ็ตสี</legend>
+                <div class="theme-preset-grid">
+                    <button class="theme-preset preset-mint" data-theme="theme-mint" type="button" aria-pressed="false">Mint</button>
+                    <button class="theme-preset preset-neon" data-theme="theme-neon" type="button" aria-pressed="false">Neon</button>
+                    <button class="theme-preset preset-rose" data-theme="theme-rose" type="button" aria-pressed="false">Rose</button>
+                    <button class="theme-preset preset-sunset" data-theme="theme-sunset" type="button" aria-pressed="false">Sunset</button>
+                    <button class="theme-preset preset-netflix" data-theme="theme-netflix" type="button" aria-pressed="true">Netflix</button>
+                    <button class="theme-preset preset-luxury" data-theme="theme-luxury" type="button" aria-pressed="false">Luxury</button>
+                </div>
+            </fieldset>
+            <div class="theme-control-group"><label for="cardGlassMode">โทน Glass</label><select id="cardGlassMode"><option value="light">Light Glass</option><option value="dark" selected>Dark Glass</option></select></div>
+            <div class="theme-control-group"><label for="cardOpacity">ความทึบ <output id="cardOpacityValue">88%</output></label><input id="cardOpacity" type="range" min="40" max="100" value="88"></div>
+            <div class="theme-control-group"><label for="cardBlur">ความเบลอ <output id="cardBlurValue">12px</output></label><input id="cardBlur" type="range" min="0" max="30" value="12"></div>
+            <div class="theme-control-group"><label class="upload-button" for="cardBackgroundImage">เลือกรูปพื้นหลัง Hero</label><input id="cardBackgroundImage" type="file" accept="image/*" hidden><button id="removeCardBackground" type="button" class="quiet-button">ลบรูปพื้นหลัง</button></div>
+            <button id="appThemeToggle" type="button" class="secondary-button" aria-pressed="false">เปลี่ยนเป็น Light Glass</button>
+            <button id="saveCardTheme" type="button" class="primary-button">บันทึกการตั้งค่า</button>
+            <p id="cardThemeStatus" role="status" aria-live="polite"></p>
+        </div>
+    </aside>
 
     <!-- Main Application Script -->
     <script type="module" src="./js/app.js?v=20260812-1"></script>

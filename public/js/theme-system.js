@@ -89,3 +89,151 @@ export function validateCustomImageFile(file) {
   }
   return { ok: true };
 }
+
+function setStatus(documentLike, message) {
+  const status = documentLike.getElementById("cardThemeStatus");
+  if (status) status.textContent = message;
+}
+
+export function initThemeSystem({
+  documentLike = document,
+  windowLike = window,
+  storage = window.localStorage,
+} = {}) {
+  const saved = loadCardPreferences(storage);
+  const state = {
+    ...saved,
+    appThemeMode: loadAppThemeMode(storage),
+    customImageData: null,
+  };
+  const root = documentLike.body;
+  const panel = documentLike.getElementById("themePanel");
+  const toggle = documentLike.getElementById("themePanelToggle");
+  const backdrop = documentLike.getElementById("themePanelBackdrop");
+  const preview = documentLike.getElementById("cardThemePreview");
+  const glass = documentLike.getElementById("cardGlassSurface");
+  if (!root || !panel || !toggle || !backdrop || !preview || !glass) return null;
+
+  const render = () => {
+    CARD_THEME_CONFIG.themes.forEach(theme => root.classList.remove(`app-${theme}`));
+    root.classList.add(`app-${state.theme}`);
+    root.classList.toggle("light-glass-theme", state.appThemeMode === "light");
+    const opacity = state.opacity / 100;
+    preview.style.backgroundImage = state.customImageData
+      ? `url("${state.customImageData}")`
+      : "";
+    preview.dataset.theme = state.theme;
+    glass.classList.toggle("is-dark", state.glassMode === "dark");
+    glass.style.backgroundColor = state.glassMode === "light"
+      ? `rgba(255, 255, 255, ${opacity})`
+      : `rgba(2, 6, 23, ${opacity})`;
+    glass.style.backdropFilter = `blur(${state.blur}px)`;
+    glass.style.webkitBackdropFilter = `blur(${state.blur}px)`;
+
+    documentLike.querySelectorAll(".theme-preset").forEach(button => {
+      const active = button.dataset.theme === state.theme && !state.customImageData;
+      button.classList.toggle("active", active);
+      button.setAttribute("aria-pressed", String(active));
+    });
+    const glassMode = documentLike.getElementById("cardGlassMode");
+    const opacityInput = documentLike.getElementById("cardOpacity");
+    const blurInput = documentLike.getElementById("cardBlur");
+    if (glassMode) glassMode.value = state.glassMode;
+    if (opacityInput) opacityInput.value = String(state.opacity);
+    if (blurInput) blurInput.value = String(state.blur);
+    const opacityValue = documentLike.getElementById("cardOpacityValue");
+    const blurValue = documentLike.getElementById("cardBlurValue");
+    if (opacityValue) opacityValue.textContent = `${state.opacity}%`;
+    if (blurValue) blurValue.textContent = `${state.blur}px`;
+    const appToggle = documentLike.getElementById("appThemeToggle");
+    const isLight = state.appThemeMode === "light";
+    if (appToggle) {
+      appToggle.setAttribute("aria-pressed", String(isLight));
+      appToggle.textContent = isLight ? "เปลี่ยนเป็น Dark Glass" : "เปลี่ยนเป็น Light Glass";
+    }
+    const CustomEventConstructor = windowLike.CustomEvent;
+    if (typeof CustomEventConstructor === "function") {
+      windowLike.dispatchEvent(new CustomEventConstructor("itcall:themechange", {
+        detail: { theme: state.theme },
+      }));
+    }
+  };
+
+  const setPanelOpen = (open) => {
+    panel.setAttribute("aria-hidden", String(!open));
+    panel.setAttribute("aria-modal", String(open));
+    toggle.setAttribute("aria-expanded", String(open));
+    backdrop.hidden = !open;
+    documentLike.body.classList.toggle("theme-panel-open", open);
+    if (open) documentLike.getElementById("themePanelClose")?.focus();
+    else toggle.focus();
+  };
+
+  toggle.addEventListener("click", () => setPanelOpen(true));
+  documentLike.getElementById("themePanelClose")?.addEventListener("click", () => setPanelOpen(false));
+  backdrop.addEventListener("click", () => setPanelOpen(false));
+  documentLike.addEventListener("keydown", event => {
+    if (event.key === "Escape" && panel.getAttribute("aria-hidden") === "false") setPanelOpen(false);
+  });
+
+  documentLike.querySelectorAll(".theme-preset").forEach(button => {
+    button.addEventListener("click", () => {
+      state.theme = button.dataset.theme;
+      state.customImageData = null;
+      if (state.theme === "theme-netflix") state.glassMode = "dark";
+      render();
+    });
+  });
+  documentLike.getElementById("cardOpacity")?.addEventListener("input", event => {
+    state.opacity = Number(event.target.value);
+    render();
+  });
+  documentLike.getElementById("cardBlur")?.addEventListener("input", event => {
+    state.blur = Number(event.target.value);
+    render();
+  });
+  documentLike.getElementById("cardGlassMode")?.addEventListener("change", event => {
+    state.glassMode = event.target.value === "light" ? "light" : "dark";
+    render();
+  });
+  documentLike.getElementById("appThemeToggle")?.addEventListener("click", () => {
+    state.appThemeMode = state.appThemeMode === "light" ? "dark" : "light";
+    try { saveAppThemeMode(storage, state.appThemeMode); }
+    catch { setStatus(documentLike, "เปลี่ยนธีมได้ แต่ไม่สามารถบันทึกโหมดแอป"); }
+    render();
+  });
+  documentLike.getElementById("cardBackgroundImage")?.addEventListener("change", event => {
+    const file = event.target.files?.[0];
+    const result = validateCustomImageFile(file);
+    if (!result.ok) {
+      setStatus(documentLike, result.message);
+      event.target.value = "";
+      return;
+    }
+    const reader = new windowLike.FileReader();
+    reader.addEventListener("load", loadEvent => {
+      state.customImageData = loadEvent.target.result;
+      render();
+      setStatus(documentLike, "ใช้รูปพื้นหลังกับ Hero แล้ว");
+    });
+    reader.readAsDataURL(file);
+  });
+  documentLike.getElementById("removeCardBackground")?.addEventListener("click", () => {
+    state.customImageData = null;
+    const input = documentLike.getElementById("cardBackgroundImage");
+    if (input) input.value = "";
+    render();
+    setStatus(documentLike, "ลบรูปพื้นหลังแล้ว");
+  });
+  documentLike.getElementById("saveCardTheme")?.addEventListener("click", () => {
+    try {
+      saveCardPreferences(storage, state);
+      setStatus(documentLike, "บันทึกการตั้งค่าแล้ว");
+    } catch {
+      setStatus(documentLike, "เปลี่ยนธีมได้ แต่ไม่สามารถบันทึกการตั้งค่า");
+    }
+  });
+
+  render();
+  return { state, render, setPanelOpen };
+}

@@ -119,6 +119,8 @@ export function initThemeSystem({
     root.classList.add(`app-${state.theme}`);
     root.classList.toggle("light-glass-theme", state.appThemeMode === "light");
     const opacity = state.opacity / 100;
+    root.style.setProperty("--theme-card-opacity", String(opacity));
+    root.style.setProperty("--theme-card-blur", `${state.blur}px`);
     preview.style.backgroundImage = state.customImageData
       ? `url("${state.customImageData}")`
       : "";

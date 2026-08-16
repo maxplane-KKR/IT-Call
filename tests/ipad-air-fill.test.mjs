@@ -33,8 +33,8 @@ test("all compact tabs use only the app container as the vertical scroller", asy
     readFile(new URL("../public/js/app.js", import.meta.url), "utf8"),
   ]);
 
-  assert.match(html, /styles\.css\?v=20260812-3/);
-  assert.match(html, /app\.js\?v=20260812-1/);
+  assert.match(html, /styles\.css\?v=20260816-1/);
+  assert.match(html, /app\.js\?v=20260816-1/);
   assert.match(
     css,
     /@media \(max-width: 1279px\)[\s\S]*#app-container\s*{[^}]*height:\s*100dvh[^}]*min-height:\s*0[^}]*overflow-y:\s*auto/,

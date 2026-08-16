@@ -1,4 +1,5 @@
 import { fetchJsonWithRetry } from './fetch-resilience.js';
+import { initThemeSystem } from './theme-system.js';
 
 /**
  * IT Call Center Analytics Web Application
@@ -57,6 +58,18 @@ import { fetchJsonWithRetry } from './fetch-resilience.js';
   const DESKTOP_PAGE_SIZE = 100;
   let searchDebounceTimer = null;
   const chartInstances = {};
+
+  function getChartTheme() {
+    const style = getComputedStyle(document.body);
+    const primary = style.getPropertyValue('--theme-primary').trim() || '#e50914';
+    const primaryRgb = style.getPropertyValue('--theme-primary-rgb').trim() || '229, 9, 20';
+    return {
+      primary,
+      primarySoft: `rgba(${primaryRgb}, .18)`,
+      text: style.getPropertyValue('--theme-muted').trim() || '#aeb6c4',
+      grid: style.getPropertyValue('--theme-line').trim() || 'rgba(255,255,255,.13)',
+    };
+  }
 
   // ==========================================================================
   // 2. HELPER FUNCTIONS
@@ -360,6 +373,7 @@ import { fetchJsonWithRetry } from './fetch-resilience.js';
     const canvas = document.getElementById(canvasId);
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
+    const theme = getChartTheme();
 
     let labels = [];
     let dataPoints = [];
@@ -401,11 +415,11 @@ import { fetchJsonWithRetry } from './fetch-resilience.js';
           datasets: [{
             label: 'จำนวนปัญหา',
             data: dataPoints,
-            borderColor: '#6366f1',
-            backgroundColor: 'rgba(99, 102, 241, 0.15)',
+            borderColor: theme.primary,
+            backgroundColor: theme.primarySoft,
             borderWidth: 3,
             pointBackgroundColor: '#ffffff',
-            pointBorderColor: '#6366f1',
+            pointBorderColor: theme.primary,
             pointBorderWidth: 2,
             pointRadius: 4,
             pointHoverRadius: 6,
@@ -427,8 +441,8 @@ import { fetchJsonWithRetry } from './fetch-resilience.js';
             }
           },
           scales: {
-            y: { beginAtZero: true, ticks: { stepSize: 1, precision: 0, color: '#64748b' }, grid: { color: 'rgba(0,0,0,0.05)' } },
-            x: { ticks: { color: '#64748b' }, grid: { display: false } }
+            y: { beginAtZero: true, ticks: { stepSize: 1, precision: 0, color: theme.text }, grid: { color: theme.grid } },
+            x: { ticks: { color: theme.text }, grid: { display: false } }
           }
         }
       });
@@ -439,6 +453,7 @@ import { fetchJsonWithRetry } from './fetch-resilience.js';
     const canvas = document.getElementById(canvasId);
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
+    const theme = getChartTheme();
 
     const timeCounts = data.reduce((acc, curr) => {
       if (curr._hourKey !== "ไม่ระบุ") {
@@ -463,8 +478,8 @@ import { fetchJsonWithRetry } from './fetch-resilience.js';
           datasets: [{
             label: 'จำนวนปัญหา',
             data: timeData,
-            backgroundColor: 'rgba(244, 63, 94, 0.8)',
-            hoverBackgroundColor: 'rgba(225, 29, 72, 1)',
+            backgroundColor: theme.primarySoft,
+            hoverBackgroundColor: theme.primary,
             borderRadius: 4
           }]
         },
@@ -474,8 +489,8 @@ import { fetchJsonWithRetry } from './fetch-resilience.js';
           animation: { duration: 800, easing: 'easeOutBounce' },
           plugins: { legend: { display: false } },
           scales: {
-            y: { beginAtZero: true, ticks: { stepSize: 1, precision: 0, color: '#64748b' }, grid: { color: 'rgba(0,0,0,0.05)' } },
-            x: { ticks: { maxRotation: 45, minRotation: 45, color: '#64748b' }, grid: { display: false } }
+            y: { beginAtZero: true, ticks: { stepSize: 1, precision: 0, color: theme.text }, grid: { color: theme.grid } },
+            x: { ticks: { maxRotation: 45, minRotation: 45, color: theme.text }, grid: { display: false } }
           }
         }
       });
@@ -486,6 +501,7 @@ import { fetchJsonWithRetry } from './fetch-resilience.js';
     const canvas = document.getElementById(canvasId);
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
+    const theme = getChartTheme();
 
     const deptCounts = data.reduce((acc, curr) => {
       if (curr.dept) acc[curr.dept] = (acc[curr.dept] || 0) + 1;
@@ -508,8 +524,8 @@ import { fetchJsonWithRetry } from './fetch-resilience.js';
           datasets: [{
             label: 'จำนวน Ticket',
             data: deptData,
-            backgroundColor: 'rgba(59, 130, 246, 0.8)',
-            hoverBackgroundColor: 'rgba(37, 99, 235, 1)',
+            backgroundColor: theme.primarySoft,
+            hoverBackgroundColor: theme.primary,
             borderRadius: 6
           }]
         },
@@ -519,8 +535,8 @@ import { fetchJsonWithRetry } from './fetch-resilience.js';
           animation: { duration: 800, easing: 'easeOutBounce' },
           plugins: { legend: { display: false } },
           scales: {
-            y: { beginAtZero: true, ticks: { stepSize: 1, precision: 0, color: '#64748b' }, grid: { color: 'rgba(0,0,0,0.05)' } },
-            x: { ticks: { color: '#64748b' }, grid: { display: false } }
+            y: { beginAtZero: true, ticks: { stepSize: 1, precision: 0, color: theme.text }, grid: { color: theme.grid } },
+            x: { ticks: { color: theme.text }, grid: { display: false } }
           }
         }
       });
@@ -531,6 +547,7 @@ import { fetchJsonWithRetry } from './fetch-resilience.js';
     const canvas = document.getElementById(canvasId);
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
+    const theme = getChartTheme();
 
     const staffCounts = data.reduce((acc, curr) => {
       if (curr.operator) acc[curr.operator] = (acc[curr.operator] || 0) + 1;
@@ -562,7 +579,7 @@ import { fetchJsonWithRetry } from './fetch-resilience.js';
             data: staffData,
             backgroundColor: staffColors,
             borderWidth: 2,
-            borderColor: '#ffffff',
+            borderColor: theme.grid,
             hoverOffset: 8
           }]
         },
@@ -573,7 +590,7 @@ import { fetchJsonWithRetry } from './fetch-resilience.js';
           plugins: {
             legend: {
               position: 'right',
-              labels: { usePointStyle: true, boxWidth: 8, color: '#475569', font: { family: 'Kanit' } }
+              labels: { usePointStyle: true, boxWidth: 8, color: theme.text, font: { family: 'Kanit' } }
             }
           },
           cutout: '65%'
@@ -1030,15 +1047,22 @@ import { fetchJsonWithRetry } from './fetch-resilience.js';
   }
 
   function updateHeaderIndicators() {
+    const currentDateText = new Date().toLocaleDateString('th-TH', {
+      weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+    });
     const dateEl = document.getElementById('currentDate');
     if (dateEl) {
-      const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-      dateEl.textContent = new Date().toLocaleDateString('th-TH', options);
+      dateEl.textContent = currentDateText;
     }
+    const heroDateEl = document.getElementById('currentDateHero');
+    if (heroDateEl) heroDateEl.textContent = currentDateText;
 
     const updatedEl = document.getElementById('lastUpdated');
     if (updatedEl && AppState.lastUpdated) {
-      updatedEl.textContent = `อัปเดต: ${AppState.lastUpdated.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' })}`;
+      const updatedText = `อัปเดต: ${AppState.lastUpdated.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' })}`;
+      updatedEl.textContent = updatedText;
+      const heroUpdatedEl = document.getElementById('lastUpdatedHero');
+      if (heroUpdatedEl) heroUpdatedEl.textContent = updatedText;
     }
 
     const statusEls = document.querySelectorAll('.api-status-badge');
@@ -1177,6 +1201,14 @@ import { fetchJsonWithRetry } from './fetch-resilience.js';
   }
 
   function bindEvents() {
+    window.addEventListener('itcall:themechange', () => {
+      Object.values(chartInstances).forEach(chart => chart.destroy());
+      Object.keys(chartInstances).forEach(key => delete chartInstances[key]);
+      if (AppState.rawData.length > 0) {
+        renderAllCharts(AppState.filteredData, AppState.activeMonthKey);
+      }
+    });
+
     // Refresh Buttons
     const refreshBtns = document.querySelectorAll('.refresh-btn');
     refreshBtns.forEach(btn => {
@@ -1355,6 +1387,7 @@ import { fetchJsonWithRetry } from './fetch-resilience.js';
     });
 
     bindEvents();
+    initThemeSystem();
     setMobileTab('dashboard');
 
     try {

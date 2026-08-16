@@ -122,6 +122,8 @@ export function initThemeSystem({
     preview.style.backgroundImage = state.customImageData
       ? `url("${state.customImageData}")`
       : "";
+    CARD_THEME_CONFIG.themes.forEach(theme => preview.classList.remove(theme));
+    if (!state.customImageData) preview.classList.add(state.theme);
     preview.dataset.theme = state.theme;
     glass.classList.toggle("is-dark", state.glassMode === "dark");
     glass.style.backgroundColor = state.glassMode === "light"

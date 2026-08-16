@@ -15,6 +15,11 @@ test("มี Command Ribbon และลำดับ visual sections ที่�
   assert.match(css, /\.command-ribbon-layout[\s\S]*\.operations-grid[\s\S]*\.team-summary-card[\s\S]*\.log-section/);
 });
 
+test("Command Ribbon แสดงเป็น flex เฉพาะ desktop ไม่ทับ hidden บนมือถือ", async () => {
+  const css = await readFile(new URL("../public/css/styles.css", import.meta.url), "utf8");
+  assert.match(css, /@media \(min-width: 1280px\)\s*\{\s*\.command-ribbon-layout\s*\{[^}]*display:\s*flex !important/);
+});
+
 test("รักษา ID ที่ renderer เดิมใช้งานครบ", async () => {
   const html = await readFile(new URL("../public/IT-Call-Skeuomorph.html", import.meta.url), "utf8");
   for (const id of [

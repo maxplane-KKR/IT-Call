@@ -24,3 +24,10 @@ test("Custom Image ผูกกับ Hero และไม่มี body backgro
   assert.doesNotMatch(script, /document\.body\.style\.backgroundImage/);
   assert.match(script, /itcall:themechange/);
 });
+
+test("compact cards ใช้ surface จากธีมเดียวกับ desktop", async () => {
+  const css = await readFile(new URL("../public/css/styles.css", import.meta.url), "utf8");
+  assert.match(css, /#mobile-layout\s+\.glass-card,\s*#mobile-layout\s+\.mobile-metric-card\s*\{[^}]*background:\s*var\(--theme-surface\)/);
+  assert.match(css, /\.command-ribbon-layout\s+\.command-ribbon\s*>\s*\.glass-card\s*\{[^}]*background:\s*var\(--theme-surface\)/);
+  assert.match(css, /\.command-hero-surface h2\s*\{[^}]*color:\s*#fff/);
+});

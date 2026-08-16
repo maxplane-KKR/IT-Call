@@ -350,7 +350,10 @@
                         </div>
                     </div>
 
-                    <!-- Dashboard HR Summary -->
+                </div>
+
+                <!-- SECTION 2: MOBILE TEAM TAB -->
+                <div id="mobile-section-team" class="hidden space-y-4" aria-hidden="true">
                     <div class="tablet-dashboard-hr-card glass-card p-4 border-t-4 border-t-rose-500">
                         <div class="flex items-center justify-between mb-3">
                             <div>
@@ -358,20 +361,14 @@
                                 <p id="mobileHRSubtitle" class="text-[11px] text-slate-500 mt-0.5"></p>
                             </div>
                         </div>
-
                         <div class="grid grid-cols-1 gap-2 mb-4">
-                            <button type="button" class="export-hr-btn skeuo-btn skeuo-btn-emerald p-2.5 text-xs flex items-center justify-center gap-1.5">
-                                <i class="ph ph-file-csv text-base"></i> โหลด CSV
-                            </button>
+                            <button type="button" class="export-hr-btn skeuo-btn skeuo-btn-emerald p-2.5 text-xs flex items-center justify-center gap-1.5"><i class="ph ph-file-csv text-base"></i> โหลด CSV</button>
                         </div>
-
-                        <div id="mobileHRContainer" class="space-y-2.5">
-                            <!-- Mobile HR Dynamic Touch Cards -->
-                        </div>
+                        <div id="mobileHRContainer" class="space-y-2.5"><!-- Mobile HR Dynamic Touch Cards --></div>
                     </div>
                 </div>
 
-                <!-- SECTION 2: MOBILE CHARTS TAB -->
+                <!-- SECTION 3: MOBILE CHARTS TAB -->
                 <div id="mobile-section-charts" class="hidden space-y-4">
                     <div class="glass-card p-4">
                         <h3 class="text-xs font-bold text-slate-800 mb-3 flex items-center gap-1.5 font-heading">
@@ -448,15 +445,19 @@
                 <span>แดชบอร์ด</span>
             </button>
 
-            <button type="button" class="mobile-nav-item" data-tab="log" role="tab" aria-selected="false" aria-controls="mobile-section-log" tabindex="-1">
-                <i class="ph ph-list-dashes"></i>
-                <span>รายการ Log</span>
+            <button type="button" class="mobile-nav-item" data-tab="team" role="tab" aria-selected="false" aria-controls="mobile-section-team" tabindex="-1">
+                <i class="ph ph-users-three"></i>
+                <span>ทีม IT</span>
             </button>
-
 
             <button type="button" class="mobile-nav-item" data-tab="charts" role="tab" aria-selected="false" aria-controls="mobile-section-charts" tabindex="-1">
                 <i class="ph ph-chart-line-up"></i>
                 <span>กราฟสถิติ</span>
+            </button>
+
+            <button type="button" class="mobile-nav-item" data-tab="log" role="tab" aria-selected="false" aria-controls="mobile-section-log" tabindex="-1">
+                <i class="ph ph-list-dashes"></i>
+                <span>รายการ Log</span>
             </button>
 </nav>
 

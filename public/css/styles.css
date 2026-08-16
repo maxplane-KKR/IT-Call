@@ -686,3 +686,19 @@ body.light-glass-theme.app-theme-luxury { --theme-canvas: #fafaf9; --theme-canva
   body, *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
 }
 
+/* Four-tab Touch Dashboard contract */
+@media (max-width: 1279px) {
+  #mobile-section-team { min-height: 0; height: auto; max-height: none; overflow: visible; padding-bottom: calc(6rem + env(safe-area-inset-bottom, 0px)); }
+  #mobile-section-dashboard, #mobile-section-charts, #mobile-section-log { padding-bottom: calc(6rem + env(safe-area-inset-bottom, 0px)); }
+  .mobile-bottom-nav { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); overflow-x: hidden; background: var(--theme-surface-strong); border-top-color: var(--theme-line); box-shadow: 0 -10px 28px rgba(0,0,0,.22); }
+  .mobile-nav-item { min-width: 0; flex: 1 1 auto; color: var(--theme-muted); }
+  .mobile-nav-item.active, .mobile-nav-item.active i { color: var(--theme-primary); }
+  .mobile-nav-item:focus-visible { outline-color: rgba(var(--theme-primary-rgb), .55); }
+}
+
+@media (min-width: 768px) and (max-width: 1279px) {
+  #mobile-section-team:not(.hidden) { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; align-items: start; width: 100%; min-height: 100%; height: auto; }
+  #mobile-section-team > * { min-width: 0; margin-block-start: 0 !important; }
+  #mobile-section-team .tablet-dashboard-hr-card { min-height: 0; height: auto; overflow: visible; }
+}
+

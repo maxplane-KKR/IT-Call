@@ -4,7 +4,7 @@
  * 
  * Special Mobile Features:
  * - 100% full width viewport without horizontal overflow scroll
- * - Mobile Bottom Tab Bar (Dashboard, HR Report, Charts, Ticket Log)
+ * - Mobile Bottom Tab Bar (Dashboard, Team, Charts, Ticket Log)
  * - Mobile Touch Cards for Ticket Logs (replacing wide table scrolling)
  * - Touch-optimized target sizes (min 44px) & safe area spacing
  */
@@ -81,7 +81,7 @@ export function setMobileTab(tabName) {
   // Toggle Section Visibility
   const sections = {
     'dashboard': document.getElementById('mobile-section-dashboard'),
-    'hr': document.getElementById('mobile-section-hr'),
+    'team': document.getElementById('mobile-section-team'),
     'charts': document.getElementById('mobile-section-charts'),
     'log': document.getElementById('mobile-section-log')
   };

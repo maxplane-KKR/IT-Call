@@ -838,7 +838,7 @@ import { fetchJsonWithRetry } from './fetch-resilience.js';
 
     const sections = {
       'dashboard': document.getElementById('mobile-section-dashboard'),
-      'hr': document.getElementById('mobile-section-hr'),
+      'team': document.getElementById('mobile-section-team'),
       'charts': document.getElementById('mobile-section-charts'),
       'log': document.getElementById('mobile-section-log')
     };
@@ -849,11 +849,19 @@ import { fetchJsonWithRetry } from './fetch-resilience.js';
         if (key === tabName) {
           el.classList.remove('hidden');
           el.classList.add('animate-fade-in');
+          el.setAttribute('aria-hidden', 'false');
         } else {
           el.classList.add('hidden');
           el.classList.remove('animate-fade-in');
+          el.setAttribute('aria-hidden', 'true');
         }
       }
+    });
+
+    bottomNavItems.forEach(item => {
+      const isActive = item.dataset.tab === tabName;
+      item.setAttribute('aria-selected', String(isActive));
+      item.tabIndex = isActive ? 0 : -1;
     });
 
     if (tabName === 'charts') {

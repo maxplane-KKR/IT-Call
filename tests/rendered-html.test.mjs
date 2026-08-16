@@ -50,7 +50,9 @@ test("keeps the supplied dashboard content and routes data through the edge API"
   assert.match(appScript, /fetchJsonWithRetry\(API_CONFIG\.url/);
   assert.match(dashboard, /Chart\.js|chart\.umd\.min\.js/);
   assert.match(dashboard, /width=device-width, initial-scale=1\.0/);
-  assert.doesNotMatch(dashboard, /theme-toggle|โหมดสว่าง|โหมดมืด/i);
+  assert.match(dashboard, /id="themePanelToggle"/);
+  assert.match(dashboard, /id="cardThemePreview"/);
+  assert.match(dashboard, /data-theme="theme-netflix"/);
 });
 
 test("keeps CSV export UTF-8 and incident details", async () => {

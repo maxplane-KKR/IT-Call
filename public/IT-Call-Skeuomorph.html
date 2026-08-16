@@ -104,7 +104,7 @@
             <!-- ===================================================================
                  DESKTOP VIEW (Visible on >= 1280px screens)
                  =================================================================== -->
-            <div id="desktop-layout" class="hidden xl:block space-y-6">
+            <div id="desktop-layout" class="hidden xl:block command-ribbon-layout">
 
                 <section id="cardThemePreview" class="command-hero theme-netflix" data-theme="theme-netflix" aria-labelledby="cardThemeTitle">
                     <div id="cardGlassSurface" class="command-hero-surface is-dark">
@@ -118,7 +118,7 @@
                 </section>
 
                 <!-- Metric Cards Grid -->
-                <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
+                <div class="command-ribbon grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6" aria-label="ตัวชี้วัดสำคัญ">
                     <!-- Metric 1: Total Tickets -->
                     <div class="glass-card p-6 border-b-4 border-b-blue-500 flex items-center gap-5 glass-card-interactive">
                         <div class="p-4 bg-gradient-to-br from-blue-100 to-blue-50 border border-blue-200 rounded-2xl text-blue-600 shadow-inner">
@@ -165,7 +165,7 @@
                 </div>
 
                 <!-- HR Compensation Summary Section -->
-                <div class="glass-card p-6 border-t-4 border-t-rose-500">
+                <div class="team-summary-card glass-card p-6 border-t-4 border-t-rose-500">
                     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
                         <div>
                             <h3 class="text-base md:text-lg font-bold text-slate-800 flex items-center gap-2 font-heading">
@@ -205,7 +205,7 @@
                 </div>
 
                 <!-- Desktop Charts (2x2 Grid) -->
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="operations-grid grid grid-cols-1 lg:grid-cols-2 gap-6">
                     <!-- Daily Trend Chart -->
                     <div class="glass-card p-6">
                         <h3 class="text-base font-bold text-slate-800 mb-4 flex items-center gap-2 font-heading">
@@ -248,7 +248,7 @@
                 </div>
 
                 <!-- Desktop Log Table -->
-                <div class="glass-card overflow-hidden">
+                <div class="log-section glass-card overflow-hidden">
                     <div class="p-5 border-b border-slate-300 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white/40">
                         <h3 class="text-base font-bold text-slate-800 flex items-center gap-2 font-heading">
                             <i class="ph ph-list-dashes text-emerald-600 text-xl"></i> รายการแจ้งปัญหา (Log)

@@ -29,6 +29,8 @@
 </head>
 <body class="text-slate-800 h-[100dvh] flex flex-col overflow-hidden antialiased">
 
+    <a class="skip-link" href="#main-content">ข้ามไปยังเนื้อหาหลัก</a>
+
     <!-- App Main Container (Strict 100vw Max Width) -->
     <div id="app-container" class="flex-1 flex flex-col w-full max-w-[100vw] overflow-x-hidden overflow-y-auto custom-scroll pb-24 xl:pb-6">
 
@@ -44,7 +46,7 @@
                 </div>
             </div>
 
-            <div class="flex items-center gap-2.5 md:gap-4 text-sm">
+            <div class="flex items-center gap-2.5 md:gap-4 text-sm" role="toolbar" aria-label="เครื่องมือแดชบอร์ด">
                 <!-- Test API Link -->
                 <a href="https://script.google.com/macros/s/AKfycbzet3nNEL9X8pEqB0YiqseO8GylRGTQZbtcCw4EVBfro19JkmPUouoCmVq6OjO2mMM2zA/exec"
                    target="_blank" rel="noopener noreferrer"
@@ -64,8 +66,8 @@
                 </button>
 
                 <!-- Live Status Badge -->
-                <div class="bg-emerald-500/20 text-emerald-100 border border-emerald-500/40 px-3 py-1.5 rounded-full flex items-center gap-2 text-xs font-bold shadow-sm">
-                    <div class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_8px_rgba(52,211,153,0.8)]"></div>
+                <div class="bg-emerald-500/20 text-emerald-100 border border-emerald-500/40 px-3 py-1.5 rounded-full flex items-center gap-2 text-xs font-bold shadow-sm" role="status" aria-label="สถานะข้อมูล Live Data">
+                    <div aria-hidden="true" class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_8px_rgba(52,211,153,0.8)]"></div>
                     <span class="hidden sm:inline">Live Data</span>
                 </div>
 
@@ -75,15 +77,15 @@
         </header>
 
         <!-- Dynamic Main Content Wrapper -->
-        <main class="flex-1 w-full max-w-[100vw] overflow-x-hidden p-4 md:p-6 lg:p-8">
+        <main id="main-content" class="flex-1 w-full max-w-[100vw] overflow-x-hidden p-4 md:p-6 lg:p-8" tabindex="-1">
 
             <!-- Month Selector Visual Timeline (Skeuomorphic Style) -->
-            <section class="mb-6 animate-fade-in">
+            <section class="mb-6 animate-fade-in" aria-labelledby="monthSelectorTitle">
                 <div class="flex items-center justify-between mb-3">
-                    <h2 class="text-base md:text-lg font-bold text-slate-800 flex items-center gap-2 font-heading">
+                    <h2 id="monthSelectorTitle" class="text-base md:text-lg font-bold text-slate-800 flex items-center gap-2 font-heading">
                         <i class="ph ph-calendar-check text-blue-600 text-lg"></i> เลือกช่วงเวลา (เดือน)
                     </h2>
-                    <span id="recordCount" class="text-xs font-bold text-slate-700 skeuo-badge px-3 py-1 rounded-lg">กำลังโหลด...</span>
+                    <span id="recordCount" class="text-xs font-bold text-slate-700 skeuo-badge px-3 py-1 rounded-lg" role="status" aria-live="polite">กำลังโหลด...</span>
                 </div>
 
                 <div class="relative flex items-center group/timeline">
@@ -91,7 +93,7 @@
                         <i class="ph ph-caret-left font-bold text-lg"></i>
                     </button>
 
-                    <div id="monthSelector" class="flex gap-3 overflow-x-auto py-2 px-2 w-full no-scrollbar scroll-smooth relative z-0">
+                    <div id="monthSelector" class="flex gap-3 overflow-x-auto py-2 px-2 w-full no-scrollbar scroll-smooth relative z-0" role="group" aria-label="เดือนที่ใช้รายงาน">
                         <button type="button" class="px-5 py-2.5 skeuo-btn skeuo-btn-primary whitespace-nowrap">กำลังโหลดข้อมูล...</button>
                     </div>
 
@@ -104,7 +106,7 @@
             <!-- ===================================================================
                  DESKTOP VIEW (Visible on >= 1280px screens)
                  =================================================================== -->
-            <div id="desktop-layout" class="hidden xl:block command-ribbon-layout">
+            <section id="desktop-layout" class="hidden xl:block command-ribbon-layout" aria-label="มุมมองแดชบอร์ดสำหรับเดสก์ท็อป">
 
                 <section id="cardThemePreview" class="command-hero theme-netflix" data-theme="theme-netflix" aria-labelledby="cardThemeTitle">
                     <div id="cardGlassSurface" class="command-hero-surface is-dark">
@@ -118,57 +120,58 @@
                 </section>
 
                 <!-- Metric Cards Grid -->
-                <div class="command-ribbon grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6" aria-label="ตัวชี้วัดสำคัญ">
+                <section class="command-ribbon grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6" aria-labelledby="desktopMetricsTitle">
+                    <h2 id="desktopMetricsTitle" class="visually-hidden">ตัวชี้วัดสำคัญ</h2>
                     <!-- Metric 1: Total Tickets -->
-                    <div class="glass-card p-6 border-b-4 border-b-blue-500 flex items-center gap-5 glass-card-interactive">
+                    <article class="glass-card p-6 border-b-4 border-b-blue-500 flex items-center gap-5 glass-card-interactive" aria-label="Ticket ทั้งหมด">
                         <div class="p-4 bg-gradient-to-br from-blue-100 to-blue-50 border border-blue-200 rounded-2xl text-blue-600 shadow-inner">
                             <i class="ph ph-ticket text-3xl"></i>
                         </div>
                         <div>
                             <p class="text-xs text-slate-500 font-medium mb-1">Ticket ทั้งหมด</p>
-                            <h2 class="text-3xl font-extrabold text-slate-800 tracking-tight font-heading" id="totalTickets">0</h2>
+                            <h3 class="text-3xl font-extrabold text-slate-800 tracking-tight font-heading" id="totalTickets">0</h3>
                         </div>
-                    </div>
+                    </article>
 
                     <!-- Metric 2: Top Dept -->
-                    <div class="glass-card p-6 border-b-4 border-b-purple-500 flex items-center gap-5 glass-card-interactive">
+                    <article class="glass-card p-6 border-b-4 border-b-purple-500 flex items-center gap-5 glass-card-interactive" aria-label="แผนกที่แจ้งปัญหาเยอะที่สุด">
                         <div class="p-4 bg-gradient-to-br from-purple-100 to-purple-50 border border-purple-200 rounded-2xl text-purple-600 shadow-inner">
                             <i class="ph ph-buildings text-3xl"></i>
                         </div>
                         <div class="overflow-hidden">
                             <p class="text-xs text-slate-500 font-medium mb-1">แผนกที่แจ้งเยอะสุด</p>
-                            <h2 class="text-lg font-bold text-slate-800 truncate font-heading" id="topDept">-</h2>
+                            <h3 class="text-lg font-bold text-slate-800 truncate font-heading" id="topDept">-</h3>
                         </div>
-                    </div>
+                    </article>
 
                     <!-- Metric 3: Top Staff -->
-                    <div class="glass-card p-6 border-b-4 border-b-orange-500 flex items-center gap-5 glass-card-interactive">
+                    <article class="glass-card p-6 border-b-4 border-b-orange-500 flex items-center gap-5 glass-card-interactive" aria-label="ผู้รับเรื่องมากที่สุด">
                         <div class="p-4 bg-gradient-to-br from-orange-100 to-orange-50 border border-orange-200 rounded-2xl text-orange-600 shadow-inner">
                             <i class="ph ph-user-gear text-3xl"></i>
                         </div>
                         <div class="overflow-hidden">
                             <p class="text-xs text-slate-500 font-medium mb-1">ผู้รับเรื่องเยอะสุด</p>
-                            <h2 class="text-lg font-bold text-slate-800 truncate font-heading" id="topStaff">-</h2>
+                            <h3 class="text-lg font-bold text-slate-800 truncate font-heading" id="topStaff">-</h3>
                         </div>
-                    </div>
+                    </article>
 
                     <!-- Metric 4: API Connection Status -->
-                    <div class="glass-card p-6 border-b-4 border-b-emerald-500 flex items-center gap-5 glass-card-interactive">
+                    <article class="glass-card p-6 border-b-4 border-b-emerald-500 flex items-center gap-5 glass-card-interactive" aria-label="สถานะการเชื่อมต่อข้อมูล">
                         <div class="p-4 bg-gradient-to-br from-emerald-100 to-emerald-50 border border-emerald-200 rounded-2xl text-emerald-600 shadow-inner">
                             <i class="ph ph-check-circle text-3xl"></i>
                         </div>
                         <div>
                             <p class="text-xs text-slate-500 font-medium mb-1">สถานะดึงข้อมูล</p>
-                            <h2 class="api-status-badge text-lg font-bold text-emerald-600 font-heading">เชื่อมต่อสำเร็จ</h2>
+                            <h3 class="api-status-badge text-lg font-bold text-emerald-600 font-heading">เชื่อมต่อสำเร็จ</h3>
                         </div>
-                    </div>
-                </div>
+                    </article>
+                </section>
 
                 <!-- HR Compensation Summary Section -->
-                <div class="team-summary-card glass-card p-6 border-t-4 border-t-rose-500">
+                <section class="team-summary-card glass-card p-6 border-t-4 border-t-rose-500" aria-labelledby="hrSummaryTitle">
                     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
                         <div>
-                            <h3 class="text-base md:text-lg font-bold text-slate-800 flex items-center gap-2 font-heading">
+                            <h3 id="hrSummaryTitle" class="text-base md:text-lg font-bold text-slate-800 flex items-center gap-2 font-heading">
                                 <i class="ph ph-users-three text-rose-600 text-xl"></i> สรุปยอดภาระงานรายบุคคล (สำหรับจ่าย HR / On-Call)
                             </h3>
                             <p class="text-xs text-slate-500 mt-1" id="hrReportSubtitle">ยอดสรุปประจำเดือน...</p>
@@ -182,12 +185,13 @@
 
                     <div class="overflow-x-auto rounded-xl border border-slate-300 shadow-inner">
                         <table class="w-full text-left text-sm text-slate-700">
+                            <caption class="visually-hidden">สรุปจำนวนเคสและสัดส่วนภาระงานรายบุคคล</caption>
                             <thead class="bg-gradient-to-b from-rose-100 to-rose-50 text-rose-900 font-bold border-b-2 border-rose-200">
                                 <tr>
-                                    <th class="px-6 py-3.5 w-20">ลำดับ</th>
-                                    <th class="px-6 py-3.5">ผู้ปฏิบัติงาน (ออนคอล)</th>
-                                    <th class="px-6 py-3.5 text-right">จำนวนเคสที่รับ (Ticket)</th>
-                                    <th class="px-6 py-3.5 text-right w-44">สัดส่วน (%)</th>
+                                    <th scope="col" class="px-6 py-3.5 w-20">ลำดับ</th>
+                                    <th scope="col" class="px-6 py-3.5">ผู้ปฏิบัติงาน (ออนคอล)</th>
+                                    <th scope="col" class="px-6 py-3.5 text-right">จำนวนเคสที่รับ (Ticket)</th>
+                                    <th scope="col" class="px-6 py-3.5 text-right w-44">สัดส่วน (%)</th>
                                 </tr>
                             </thead>
                             <tbody id="hrTableBody" class="divide-y divide-slate-200 bg-white/70">
@@ -202,59 +206,59 @@
                             </tfoot>
                         </table>
                     </div>
-                </div>
+                </section>
 
                 <!-- Desktop Charts (2x2 Grid) -->
-                <div class="operations-grid grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <section class="operations-grid grid grid-cols-1 lg:grid-cols-2 gap-6" aria-label="กราฟวิเคราะห์การปฏิบัติงาน">
                     <!-- Daily Trend Chart -->
-                    <div class="glass-card p-6">
-                        <h3 class="text-base font-bold text-slate-800 mb-4 flex items-center gap-2 font-heading">
+                    <article class="glass-card p-6" aria-labelledby="dailyChartTitle">
+                        <h3 id="dailyChartTitle" class="text-base font-bold text-slate-800 mb-4 flex items-center gap-2 font-heading">
                             <i class="ph ph-trend-up text-indigo-600 text-xl"></i> ปริมาณปัญหาแยกตามวัน
                         </h3>
                         <div class="relative h-64 w-full">
-                            <canvas id="dailyChart"></canvas>
+                            <canvas id="dailyChart" role="img" aria-label="กราฟปริมาณปัญหาแยกตามวัน"></canvas>
                         </div>
-                    </div>
+                    </article>
 
                     <!-- Peak Hours Chart -->
-                    <div class="glass-card p-6">
-                        <h3 class="text-base font-bold text-slate-800 mb-4 flex items-center gap-2 font-heading">
+                    <article class="glass-card p-6" aria-labelledby="timeChartTitle">
+                        <h3 id="timeChartTitle" class="text-base font-bold text-slate-800 mb-4 flex items-center gap-2 font-heading">
                             <i class="ph ph-clock text-rose-600 text-xl"></i> วิเคราะห์ช่วงเวลาพีก (Peak Hours)
                         </h3>
                         <div class="relative h-64 w-full">
-                            <canvas id="timeChart"></canvas>
+                            <canvas id="timeChart" role="img" aria-label="กราฟวิเคราะห์ช่วงเวลาพีก"></canvas>
                         </div>
-                    </div>
+                    </article>
 
                     <!-- Department Chart -->
-                    <div class="glass-card p-6">
-                        <h3 class="text-base font-bold text-slate-800 mb-4 flex items-center gap-2 font-heading">
+                    <article class="glass-card p-6" aria-labelledby="deptChartTitle">
+                        <h3 id="deptChartTitle" class="text-base font-bold text-slate-800 mb-4 flex items-center gap-2 font-heading">
                             <i class="ph ph-chart-bar text-blue-600 text-xl"></i> สัดส่วนการแจ้งปัญหาแบ่งตามแผนก
                         </h3>
                         <div class="relative h-64 w-full">
-                            <canvas id="deptChart"></canvas>
+                            <canvas id="deptChart" role="img" aria-label="กราฟสัดส่วนการแจ้งปัญหาแยกตามแผนก"></canvas>
                         </div>
-                    </div>
+                    </article>
 
                     <!-- Staff Distribution Chart -->
-                    <div class="glass-card p-6">
-                        <h3 class="text-base font-bold text-slate-800 mb-4 flex items-center gap-2 font-heading">
+                    <article class="glass-card p-6" aria-labelledby="staffChartTitle">
+                        <h3 id="staffChartTitle" class="text-base font-bold text-slate-800 mb-4 flex items-center gap-2 font-heading">
                             <i class="ph ph-chart-pie-slice text-purple-600 text-xl"></i> สัดส่วนผู้ปฏิบัติงาน
                         </h3>
                         <div class="relative h-64 w-full flex justify-center">
-                            <canvas id="staffChart"></canvas>
+                            <canvas id="staffChart" role="img" aria-label="กราฟสัดส่วนผู้ปฏิบัติงาน"></canvas>
                         </div>
-                    </div>
-                </div>
+                    </article>
+                </section>
 
                 <!-- Desktop Log Table -->
-                <div class="log-section glass-card overflow-hidden">
+                <section class="log-section glass-card overflow-hidden" aria-labelledby="desktopLogTitle">
                     <div class="p-5 border-b border-slate-300 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white/40">
-                        <h3 class="text-base font-bold text-slate-800 flex items-center gap-2 font-heading">
+                        <h3 id="desktopLogTitle" class="text-base font-bold text-slate-800 flex items-center gap-2 font-heading">
                             <i class="ph ph-list-dashes text-emerald-600 text-xl"></i> รายการแจ้งปัญหา (Log)
                         </h3>
 
-                        <div class="flex flex-wrap items-center gap-3 w-full sm:w-auto">
+                        <div class="flex flex-wrap items-center gap-3 w-full sm:w-auto" role="search" aria-label="ค้นหาและกรองรายการแจ้งปัญหา">
                             <!-- Dept Filter -->
                             <div class="relative w-full sm:w-auto">
                                 <select id="deptFilter" aria-label="กรองตามแผนก" class="w-full sm:w-44 pl-4 pr-8 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs font-semibold text-slate-800 focus:outline-none appearance-none cursor-pointer">
@@ -279,14 +283,15 @@
 
                     <div class="overflow-x-auto">
                         <table class="w-full text-left text-sm text-slate-700">
+                            <caption class="visually-hidden">รายการแจ้งปัญหาและผู้ปฏิบัติงาน</caption>
                             <thead class="bg-gradient-to-b from-slate-100 to-slate-200 text-slate-800 uppercase font-bold text-xs tracking-wider border-b border-slate-300">
                                 <tr>
-                                    <th class="px-6 py-4">วันที่แจ้ง</th>
-                                    <th class="px-6 py-4">เวลา</th>
-                                    <th class="px-6 py-4">รายละเอียดปัญหา</th>
-                                    <th class="px-6 py-4">ประเภท</th>
-                                    <th class="px-6 py-4">แผนกที่แจ้ง</th>
-                                    <th class="px-6 py-4">ผู้ปฏิบัติงาน</th>
+                                    <th scope="col" class="px-6 py-4">วันที่แจ้ง</th>
+                                    <th scope="col" class="px-6 py-4">เวลา</th>
+                                    <th scope="col" class="px-6 py-4">รายละเอียดปัญหา</th>
+                                    <th scope="col" class="px-6 py-4">ประเภท</th>
+                                    <th scope="col" class="px-6 py-4">แผนกที่แจ้ง</th>
+                                    <th scope="col" class="px-6 py-4">ผู้ปฏิบัติงาน</th>
                                 </tr>
                             </thead>
                             <tbody id="tableBody" class="divide-y divide-slate-200 bg-white/60">
@@ -303,42 +308,43 @@
                             <button type="button" id="nextPageBtn" class="skeuo-btn px-3.5 py-1.5 text-xs text-slate-700 disabled:opacity-40">ถัดไป</button>
                         </div>
                     </div>
-                </div>
+                </section>
 
-            </div>
+            </section>
 
             <!-- ===================================================================
                  COMPACT TABBED VIEW (Visible on < 1280px screens)
                  Full 100vw width without horizontal scrolling
                  =================================================================== -->
-            <div id="mobile-layout" class="block xl:hidden w-full max-w-[100vw] overflow-x-hidden space-y-4">
+            <section id="mobile-layout" class="block xl:hidden w-full max-w-[100vw] overflow-x-hidden space-y-4" aria-label="มุมมองแดชบอร์ดสำหรับมือถือและแท็บเล็ต">
 
                 <!-- SECTION 1: MOBILE DASHBOARD TAB -->
-                <div id="mobile-section-dashboard" class="space-y-4">
+                <section id="mobile-section-dashboard" class="space-y-4" aria-labelledby="mobileDashboardTitle">
+                    <h2 id="mobileDashboardTitle" class="visually-hidden">ภาพรวมแดชบอร์ด</h2>
                     <!-- Compact Metrics Grid -->
-                    <div class="mobile-metrics-grid">
-                        <div class="mobile-metric-card glass-card border-l-4 border-l-blue-500">
+                    <section class="mobile-metrics-grid" aria-label="ตัวชี้วัดสำคัญ">
+                        <article class="mobile-metric-card glass-card border-l-4 border-l-blue-500" aria-label="Ticket ทั้งหมด">
                             <p class="text-[11px] text-slate-500 font-medium">Ticket ทั้งหมด</p>
                             <h3 class="text-2xl font-extrabold text-slate-800 font-heading mt-0.5" id="mobileTotalTickets">0</h3>
-                        </div>
-                        <div class="mobile-metric-card glass-card border-l-4 border-l-emerald-500">
+                        </article>
+                        <article class="mobile-metric-card glass-card border-l-4 border-l-emerald-500" aria-label="สถานะ API">
                             <p class="text-[11px] text-slate-500 font-medium">สถานะ API</p>
                             <h3 class="api-status-badge text-sm font-bold text-emerald-600 font-heading mt-1">เชื่อมต่อสำเร็จ</h3>
-                        </div>
-                        <div class="mobile-metric-card glass-card border-l-4 border-l-purple-500">
+                        </article>
+                        <article class="mobile-metric-card glass-card border-l-4 border-l-purple-500" aria-label="แผนกที่แจ้งปัญหาเยอะที่สุด">
                             <p class="text-[11px] text-slate-500 font-medium">แผนกแจ้งเยอะสุด</p>
                             <h3 class="text-sm font-bold text-slate-800 truncate font-heading mt-1" id="mobileTopDept">-</h3>
-                        </div>
-                        <div class="mobile-metric-card glass-card border-l-4 border-l-orange-500">
+                        </article>
+                        <article class="mobile-metric-card glass-card border-l-4 border-l-orange-500" aria-label="ผู้รับเรื่องมากที่สุด">
                             <p class="text-[11px] text-slate-500 font-medium">ผู้รับเรื่องเยอะสุด</p>
                             <h3 class="text-sm font-bold text-slate-800 truncate font-heading mt-1" id="mobileTopStaff">-</h3>
-                        </div>
-                    </div>
+                        </article>
+                    </section>
 
                     <!-- Quick Overview Chart Card -->
-                    <div class="tablet-dashboard-chart-card glass-card p-4">
+                    <article class="tablet-dashboard-chart-card glass-card p-4" aria-labelledby="mobileSummaryChartTitle">
                         <div class="flex items-center justify-between mb-3">
-                            <h3 class="text-xs font-bold text-slate-800 flex items-center gap-1.5 font-heading">
+                            <h3 id="mobileSummaryChartTitle" class="text-xs font-bold text-slate-800 flex items-center gap-1.5 font-heading">
                                 <i class="ph ph-trend-up text-indigo-600 text-base"></i> สรุปแนวโน้มปัญหา
                             </h3>
                             <button type="button" onclick="window.setMobileTab && window.setMobileTab('charts')" class="text-[11px] text-blue-600 font-semibold flex items-center gap-0.5">
@@ -346,18 +352,18 @@
                             </button>
                         </div>
                         <div class="tablet-dashboard-chart-frame relative h-48 w-full">
-                            <canvas id="mobileSummaryChart"></canvas>
+                            <canvas id="mobileSummaryChart" role="img" aria-label="กราฟสรุปแนวโน้มปัญหา"></canvas>
                         </div>
-                    </div>
+                    </article>
 
-                </div>
+                </section>
 
                 <!-- SECTION 2: MOBILE TEAM TAB -->
-                <div id="mobile-section-team" class="hidden space-y-4" aria-hidden="true">
-                    <div class="tablet-dashboard-hr-card glass-card p-4 border-t-4 border-t-rose-500">
+                <section id="mobile-section-team" class="hidden space-y-4" aria-hidden="true" aria-labelledby="mobileTeamTitle">
+                    <article class="tablet-dashboard-hr-card glass-card p-4 border-t-4 border-t-rose-500" aria-labelledby="mobileTeamTitle">
                         <div class="flex items-center justify-between mb-3">
                             <div>
-                                <h3 class="text-sm font-bold text-slate-800 font-heading">สรุปภาระงานรายบุคคล (HR)</h3>
+                                <h3 id="mobileTeamTitle" class="text-sm font-bold text-slate-800 font-heading">สรุปภาระงานรายบุคคล (HR)</h3>
                                 <p id="mobileHRSubtitle" class="text-[11px] text-slate-500 mt-0.5"></p>
                             </div>
                         </div>
@@ -365,42 +371,44 @@
                             <button type="button" class="export-hr-btn skeuo-btn skeuo-btn-emerald p-2.5 text-xs flex items-center justify-center gap-1.5"><i class="ph ph-file-csv text-base"></i> โหลด CSV</button>
                         </div>
                         <div id="mobileHRContainer" class="space-y-2.5"><!-- Mobile HR Dynamic Touch Cards --></div>
-                    </div>
-                </div>
+                    </article>
+                </section>
 
                 <!-- SECTION 3: MOBILE CHARTS TAB -->
-                <div id="mobile-section-charts" class="hidden space-y-4">
-                    <div class="glass-card p-4">
-                        <h3 class="text-xs font-bold text-slate-800 mb-3 flex items-center gap-1.5 font-heading">
+                <section id="mobile-section-charts" class="hidden space-y-4" aria-labelledby="mobileChartsTitle">
+                    <h2 id="mobileChartsTitle" class="visually-hidden">กราฟสถิติ</h2>
+                    <article class="glass-card p-4" aria-labelledby="mobileTimeChartTitle">
+                        <h3 id="mobileTimeChartTitle" class="text-xs font-bold text-slate-800 mb-3 flex items-center gap-1.5 font-heading">
                             <i class="ph ph-clock text-rose-600"></i> วิเคราะห์ช่วงเวลาพีก
                         </h3>
                         <div class="relative h-48 w-full">
-                            <canvas id="mobileTimeChart"></canvas>
+                            <canvas id="mobileTimeChart" role="img" aria-label="กราฟวิเคราะห์ช่วงเวลาพีก"></canvas>
                         </div>
-                    </div>
+                    </article>
 
-                    <div class="glass-card p-4">
-                        <h3 class="text-xs font-bold text-slate-800 mb-3 flex items-center gap-1.5 font-heading">
+                    <article class="glass-card p-4" aria-labelledby="mobileDeptChartTitle">
+                        <h3 id="mobileDeptChartTitle" class="text-xs font-bold text-slate-800 mb-3 flex items-center gap-1.5 font-heading">
                             <i class="ph ph-chart-bar text-blue-600"></i> สัดส่วนแบ่งตามแผนก
                         </h3>
                         <div class="relative h-48 w-full">
-                            <canvas id="mobileDeptChart"></canvas>
+                            <canvas id="mobileDeptChart" role="img" aria-label="กราฟสัดส่วนแบ่งตามแผนก"></canvas>
                         </div>
-                    </div>
+                    </article>
 
-                    <div class="glass-card p-4">
-                        <h3 class="text-xs font-bold text-slate-800 mb-3 flex items-center gap-1.5 font-heading">
+                    <article class="glass-card p-4" aria-labelledby="mobileStaffChartTitle">
+                        <h3 id="mobileStaffChartTitle" class="text-xs font-bold text-slate-800 mb-3 flex items-center gap-1.5 font-heading">
                             <i class="ph ph-chart-pie-slice text-purple-600"></i> สัดส่วนผู้ปฏิบัติงาน
                         </h3>
                         <div class="relative h-48 w-full flex justify-center">
-                            <canvas id="mobileStaffChart"></canvas>
+                            <canvas id="mobileStaffChart" role="img" aria-label="กราฟสัดส่วนผู้ปฏิบัติงาน"></canvas>
                         </div>
-                    </div>
-                </div>
+                    </article>
+                </section>
 
                 <!-- SECTION 4: MOBILE TICKET LOG TAB -->
-                <div id="mobile-section-log" class="hidden space-y-3">
-                    <div class="glass-card p-3 space-y-2.5">
+                <section id="mobile-section-log" class="hidden space-y-3" aria-labelledby="mobileLogTitle">
+                    <h2 id="mobileLogTitle" class="visually-hidden">รายการแจ้งปัญหา</h2>
+                    <div class="glass-card p-3 space-y-2.5" role="search" aria-label="ค้นหาและกรองรายการแจ้งปัญหา">
                         <div class="flex items-center gap-2">
                             <div class="relative flex-1">
                                 <i class="ph ph-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-xs"></i>
@@ -426,14 +434,15 @@
                     </div>
 
                     <!-- Mobile Pagination -->
-                    <div class="glass-card p-3 flex items-center justify-between text-xs">
+                    <nav class="glass-card p-3 flex items-center justify-between text-xs" aria-label="หน้ารายการแจ้งปัญหา">
                         <button type="button" id="mobilePrevBtn" class="skeuo-btn px-3 py-1.5 text-slate-700 disabled:opacity-40">ก่อนหน้า</button>
                         <span id="mobileLogPageInfo" class="text-[11px] text-slate-600 font-mono font-bold"></span>
                         <button type="button" id="mobileNextBtn" class="skeuo-btn px-3 py-1.5 text-slate-700 disabled:opacity-40">ถัดไป</button>
-                    </div>
-                </div>
+                    </nav>
 
-            </div>
+                </section>
+
+            </section>
 
         </main>
 
@@ -459,10 +468,10 @@
                 <i class="ph ph-list-dashes"></i>
                 <span>รายการ Log</span>
             </button>
-</nav>
+        </nav>
 
         <!-- Toast Notification Container -->
-        <div id="toast" class="skeuo-btn bg-slate-900 text-white px-6 py-3 rounded-xl shadow-2xl flex items-center gap-3 z-50">
+        <div id="toast" class="skeuo-btn bg-slate-900 text-white px-6 py-3 rounded-xl shadow-2xl flex items-center gap-3 z-50" role="status" aria-live="polite" aria-atomic="true">
             <i class="ph ph-check-circle text-emerald-400 text-xl"></i>
             <span class="toast-message text-sm font-medium">ดำเนินการเรียบร้อยแล้ว</span>
         </div>
